@@ -1,0 +1,118 @@
+% Master-Thesis: Indoor self-localization with Smartphones using iBeacons
+% Thomas Bopst (MSI)
+% HTWG-Konstanz
+%
+% Date: 01.10.2014
+%
+
+\documentclass[11pt,a4paper]{report}
+
+% Own packages
+\usepackage[utf8]{inputenc}
+\usepackage[german, english]{babel}
+\usepackage{courier}
+
+\usepackage{listings}
+\lstset{numbers=left, numberstyle=\tiny, numbersep=20pt} % Programmcode einfügen
+\lstset{basicstyle=\footnotesize\ttfamily, breaklines=true}
+\lstset{language=XML}
+
+\usepackage{pgfplots}
+
+
+\selectlanguage{english}
+
+\usepackage[printonlyused]{acronym}
+% PDF Eigenschaften
+% -----------------
+\usepackage
+[
+	colorlinks = false,
+	bookmarks = true,
+	pdftitle={Master-Thesis Indoor self-localization with Smartphones using iBeacons},
+	pdfauthor={Thomas Bopst},
+	pdfsubject={Master-Thesis},
+	pdfkeywords={HTWG-Konstanz, Master-Thesis, MSI},
+	urlcolor=blue,
+	pdfstartview=FitH
+]{hyperref}
+
+\usepackage{titlesec}
+\titleformat{\chapter}[display]
+{\normalfont\huge\bfseries}{\chaptertitlename\ \thechapter}{20pt}{\Huge}
+\titlespacing*{\chapter}{0pt}{-40pt}{20pt}
+
+% HTWG-Template
+\usepackage{graphicx}
+\usepackage{a4wide} % HTWG a4
+%\usepackage[english]{babel}
+
+% HTWG-Template
+\newcommand{\thema}{Indoor self-localization with Smartphones
+ using iBeacons}
+\newcommand{\schlagworte}{Indoor Localization, iBeacons}
+\newcommand{\zusammenfassung}{Zusammenfassung}
+\newcommand{\ausgabedatum}{01.10.2014}
+\newcommand{\abgabedatum}{01.01.1900}
+\newcommand{\autor}{Thomas Bopst}
+\newcommand{\autorStrasse}{Albert-Gebhardt-Str. 5}
+\newcommand{\autorPLZ}{79761}
+\newcommand{\autorOrt}{Waldshut-Tiengen}
+\newcommand{\autorGeburtsort}{München}
+\newcommand{\autorGeburtsdatum}{31.01.1990 }
+\newcommand{\prueferA}{Prof. Dr. Oliver Bittel}
+\newcommand{\prueferB}{M.Sc. Michael Blaich}
+\newcommand{\firma}{HTWG-Konstanz}
+\newcommand{\studiengang}{Master of Science Informatik}
+
+
+\begin{document}
+
+% select language
+\selectlanguage{german}
+
+ % set pagecount style to i,ii,...
+\setcounter{page}{1}
+\pagenumbering{roman}
+
+
+% HTWG-Template
+% -------------
+\include{template/cover}
+\include{template/title}
+\include{template/abstract}
+\include{template/affidavit}
+
+% change language to english
+\selectlanguage{english}
+
+% Abbreviations
+\include{chapters/0_abbreviation}
+\newpage
+
+% Table of contents
+\tableofcontents
+\newpage
+%\listoffigures
+%\listoftables
+
+% Content
+% -------
+\setcounter{page}{1} % set pagecount style to 1, 2, ...
+\pagenumbering{arabic}
+
+\include{chapters/1_introduction}
+\include{chapters/2_design}
+\include{chapters/6_evaluation}
+\include{chapters/7_conclusion}
+\include{chapters/8_future}
+
+\appendix
+\include{chapters/9_appendix}
+
+\addcontentsline{toc}{chapter}{Bibliography} %References
+\bibliographystyle{IEEEtranS}
+\nocite{*}
+\bibliography{bib/references}
+
+\end{document}
