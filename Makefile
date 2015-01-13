@@ -3,15 +3,16 @@
 MAINTEX = thesis
 CHAPTER = chapters/
 TEMPLATE = template/
+PDFLATEX = pdflatex --shell-escape
 
 pdf:
-	pdflatex $(MAINTEX).tex
+	$(PDFLATEX) $(MAINTEX).tex
 	bibtex $(MAINTEX).aux
-	pdflatex $(MAINTEX).tex
-	pdflatex $(MAINTEX).tex
+	$(PDFLATEX) $(MAINTEX).tex
+	$(PDFLATEX) $(MAINTEX).tex
 	open $(MAINTEX).pdf
 
 clean:
 	rm $(CHAPTER)*.aux $(TEMPLATE)*.aux
 	rm $(MAINTEX).aux $(MAINTEX).toc $(MAINTEX).log $(MAINTEX).out
-	rm $(MAINTEX).bbl $(MAINTEX).blg
+	rm $(MAINTEX).bbl $(MAINTEX).blg $(MAINTEX).pgf-plot.gnuplot *.log

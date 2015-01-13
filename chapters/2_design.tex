@@ -1,1 +1,329 @@
-\chapter{Design} \label{chap:design}
+%\chapter{Design} \label{chap:design}
+\chapter{iBeacons}
+
+\section{Bluetooth Low Energy}
+
+\section{iBeacons it self}
+
+\section{API}
+
+\section{Evaluation}
+
+
+
+\chapter{Build-in sensors} \label{chap:sensors} % A smartphone's build-in sensors
+
+This chapter describes first, the applicable build-in sensors of today's current smartphone generation.
+Afterwards, it gives an overview of the applicable \acsp{API} to access either raw or processed sensor data.
+Finally, it evaluates the data provided by the sensors' \acsp{API}.
+
+
+\section{Build-in Sensors}
+
+Todays smartphones include multiple sensors to give applications the possibility to measure physical properties of the smartphone's environment.
+By measuring these environmental properties, applications can process and react on them.
+This section gives an overview of available sensors of the latest smartphone generation that are applicable for this project.
+It also describes the physical properties that can be measure with it and their functionality.
+
+
+\paragraph{Magnetometer}
+
+Today most smartphones have a build-in magnetometer to measure the strength and heading of a magnetic field.
+Typically, the magnetometer is build with at least one hall sensor which usually measures the magnetic field resp. the magnetic flux density in microteslas.
+For instance, Apple's iPhones includes a three-axis magnetometer, thus it is able to determine the heading in three-dimensional space which is being used by the digital compass, for example \cite{ios_cm, wwdc_2012}.
+%%
+% 3-axis hall-effect sensor
+% measures heading
+% explain hall effekt and mention that it detects voltage, iron, ... according to wwdc talk 2012
+% gerichteter Vektor
+%%
+
+
+\paragraph{Accelerometer}
+
+The accelerometer, which is also implemented in most of the latest smartphone generation, measures the acceleration applied to the device.
+The measured acceleration is the gravity plus the acceleration that the user applies to the device, measured in $\frac{m}{s^2}$.
+Thus, the measured acceleration is $1g = 9.81 \frac{m}{s^2}$ if the device is stationary, resp. no user acceleration is applied to the device.
+Typically, smartphones include a three-axis accelerometer, to measure the acceleration along the three spatial axis, to determine the device's tip and tilt for example \cite{ios_cm, wwdc_2012}.
+% in a classy static state conditions
+
+\paragraph{Gyroscope}
+
+Modern smartphones usually include a three-axis gyroscope to measure the rotation rate along the device's spatial axis.
+Rotation rate is measured in $\frac{rad}{s}$, thus the gyroscope can be used to determine the device's attitude.
+Like every sensor data, also the gyroscope's measurements include some bias.
+Hence, determining the device's attitude with the raw gyroscope measurements includes a growing drift over time \cite{ios_cm, wwdc_2012}.
+
+
+\paragraph{Barometer}
+
+Some of the latest smartphones also include a barometer to measure air presure.
+Air presure is measured in $kilopascals$.
+Thus, the relative change in altitude can be calculated.
+The Barometer can be used for hiking apps to determin the change in altitude for example \cite{ios_cm}.
+
+
+\section{\acsp{API}}
+
+To use the sensors within an application running on the device, the operating system provides different \acsp{API}.
+As mentioned before, the raw sensor data always includes some bias, e.g. the device's hardware biases the measured magnetic field.
+Apple provides for all mentioned sensors the possibility to access either raw sensor data including bias, or already filtered and processed data with less bias.
+This section gives an overview of the applicable higher level \acsp{API} with focus on Apple's iOS 8 platform.
+
+
+\paragraph{Motion Processing}
+
+Apple introduced with the iPhone 5S in 2013, a motion coprocessor called M7.
+The latest iPhone, iPhone 6, includes an improved version called M8, which better accuracy. Additionally, it is able to process the iPhone6's barometer data.
+The key features of the CoreMotion framework and the motion coprocessor is sensor fusion, energy efficiency and motion awareness over the past seven days.
+
+CoreMotion implements algorithms to filter and fuse the input of multiple sensors.
+Thus the \acsp{API} can provide more accurate results, for things like device attitude.
+Together with the motion co-processor it can also offer more convenient interfaces to the developers with already calculated data, like step counting and motion activity classification for example.
+
+Earlier iPhone's used their processor to gather and process the sensor's data.
+This is very energy consuming and unefficient, because it eates up a lot of \acs{CPU} time.
+According to Pham, one of Apple's core motion engineers, the motion co-processor is very energy efficient.
+He mentions, that the energy consumption of 24 hours motion processing, e.g. motion activity classification or pedometer, is equal to a three minute FaceTime\footnote{FaceTime is Apple's video telephony application.} call \cite{wwdc_2014}.
+
+The motion awareness feature gives applications the possiblity, to query a users motion data for the past seven days.
+
+\paragraph{Push and Pull Interface}
+The following \acsp{API} are providing to types of interfaces; a push and a pull interface.
+
+The push interface repeatedly provides the application with new sensor data, usually in a certain time interval.
+Therefore, the developer needs to provide and register a handler function, which is beeing called with the new data.
+
+The pull interface is designed to query historical data within a specified range of time, of the past seven days.
+According to Pham, querying historical data is more accurate than the data provided via the push interface, because the filters can operate better on a bigger amount of data.
+Also, some values ajust over time, like the pedometers stride estimation \cite{wwdc_2014}.
+
+Both interfaces are providing their data asynchonously to the developers application.
+% pull interface, update, handler asynchronous add time the historical data is beeing stored bey the phone
+
+
+\paragraph{MotionActivity}
+
+Apple's \texttt{CMMotionActivityManager}, which is part of the CoreMotion framework, is able to detect and classify different activityies, like walking, running, cycling, etc.
+For the activity detection and classification the motion coprocessor together with the accelerometer is used \cite{wwwdc_2014}.
+
+As mentioned before the CoreMotion framework's MotionActivity \acsp{API} provides a push interface to receive motion activity changes, and a pull interface to query historical data between two dates.
+Both \acsp{API} are reporting every single change in motion activity that was detected.
+
+Figure \ref{fig:motionActivity} gives an overview of the different motion activities and illustrates some example scenarios.
+The states \texttt{walking}, \texttt{running}, \texttt{automotive}, \texttt{cycling} and \texttt{unknown} are mutally exclusive motion activity types, whereas \texttt{stationary} is not mutually exclusive to the other types.
+
+\begin{center}
+\begin{figure}
+\begin{tabular}{l*{6}{c}}
+Device scenarios & stationary & walking & running & automotive & cycling & unknown \\
+\hline
+On table & \textbf{true} & false & false & false & false & false\\
+Person checking email & false & false & false & false & false & false\\
+Person walking & false & \textbf{true} & false & false & false & false\\
+In ideling vehicle & \textbf{true} & false & false & \textbf{true} & false & false\\
+In moving vehicle & false & false & false & \textbf{true} & false & false\\
+After reboot & false & false & false & false & false & \textbf{true}
+\end{tabular}
+\caption{Motion activity example scenarios based on Pham's example \cite{wwdc_2014}.}
+\label{fig:motionActivity}
+\end{figure}
+\end{center}
+
+Thus,
+\begin{itemize}
+  \item a device lying \textbf{on table} does not move, hence it is stationary.
+  \item a \textbf{person checking email}  usually does not hold its smartphone completely steady.
+  \item a \textbf{person walking} can be detected across body location.
+  \item the motion activity type of a device \textbf{in an idling vehicle} e.g. in front of a stop sign, is stationary and at the same time automotive. Therefore, the device needs to be mounted in car.
+  \item in a \textbf{moving vehicle} the state is  automotive.
+  \item immediate after a \textbf{reboot} the device state is unknown because it first needs to collect some data to determine its real state.
+\end{itemize}
+
+As mentioned by Pham, the CMMotionActivityManager has some latancy depending on the activity and its location.
+For example, if a person is walking and holds its device in hand it takes around 5 - 10 seconds to detect walking but if it is in pocket it takes just around 3 - 5 seconds.
+To detect walking takes fairly long compared to the running state.
+It takes just a couple of steps. According to Pham, one reason is, that they can assume, that a running persons does not check their emails or facebook messages at the same time.
+If the phone is mounted in car, the driving state can also be detected very fast. He also mentions that the cycling state is very difficult to detect.
+
+Another important point is the accuracy accros body location.
+He points out, that the average accuracy accross body location is always the same.
+
+Every \texttt{CMMotionActivity} object wich is passed to the application does also include a \texttt{confidence} property.
+The confidence is measured in three different levels: low, medium and high.
+Thus the more confident the \texttt{CMMotionActivityManager} is about a motion activity state, the higher the confidence value.
+Usually, it increases over time if the activity type does not change.
+
+% accurate on average
+% falls out of walking state if your stopping to chat or open door
+% running, not important where device is, can be quickly detected, hand full of steps, so no multitasking (facebook), stop because they have to stop,
+% driving if mounted on car very fast detection
+% mutal exclusion
+% confidence
+
+\paragraph{Pedometer}
+
+The pedometer \acsp{API} is also a component of Apple's CoreMotion framework.
+It provides the distance in meters, a person traveled over time.
+Therefore, the iPhone needs to be equipped with a motion coprocessor \footnote{Note: iPads with a motion co-processer do not provide step counting and distance estimation.}.
+The motion coprocessor processes the accelerometer's data to count a person's steps and to estimate the person's stride length.
+The stride estimation adapts over time, thus the more often the pedometer is used, the better the accuracy.
+According to Pham, the pedometer has a consistent performance and accuracy across the phone's body location \cite{wwdc_2014}.
+
+As mentioned before there are two different interfaces to request the pedometer data.
+Via the pull interface the application can ask the pedometer component for the distance a person traveled by passing a start and end date.
+
+The second possibility is the push interface, thus the application can register a handler to receive updates while the person is walking.
+If the user is walking or running, the handler gets called around every 2.5 seconds, assuming the motion processor detects the taken steps.
+If it does not detect steps, the handler is not being called.
+The received steps and distances are the cummulative steps and distance since the start date, which is for all successive \texttt{CMPedometerData} objects the same \cite{wwdc_2014}.
+
+The received \texttt{CMPedometerData} contains the following values \cite{ios_cm}:
+\begin{itemize}
+  \item \texttt{startDate}, absolute start date
+  \item \texttt{endDate}, absolute end date
+  \item \texttt{steps} as integer
+  \item \texttt{distance} estimation in meters
+  \item \texttt{floorsAscended}, M8 coprocessor with barometer required
+  \item \texttt{floorsDescended}, M8 coprocessor with barometer required
+\end{itemize}
+
+\begin{center}
+\begin{figure}
+\begin{tabular}{*{5}{l}}
+timestamp & startDate & endDate & distance & steps\\
+\hline
+9.3564 & 0.0019 & 9.2981 & 4.1351 & 7\\
+14.4272 & 0.0019 & 11.8354 & 4.1351 & 7\\
+14.4357 & 0.0019 & 14.3802 & 9.0606 & 15\\
+16.9566 & 0.0019 & 16.9193 & 9.7806 & 16\\
+22.0541 & 0.0019 & 19.4658 & 9.7806 & 16\\
+22.0553 & 0.0019 & 22.0038 & 13.5247 & 22\\
+24.6033 & 0.0019 & 24.5478 & 14.2447 & 23\\
+29.6747 & 0.0019 & 27.0876 & 14.2447 & 23\\
+29.6754 & 0.0019 & 29.6292 & 18.5546 & 30\\
+32.2152 & 0.0019 & 32.1722 & 19.2546 & 31\\
+\end{tabular}
+\caption{Recorded pedometer example data with additional timestamp.
+Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used instead of the absolute timestamps.
+Additionally all values, except the steps, are being truncated.}
+\label{fig:pedometerExampleData}
+\end{figure}
+\end{center}
+
+Figure \ref{fig:pedometerExampleData} shows a recorded test walk.
+The first row shows the relative timestamp to the recording start, when the data was received by the application.
+
+As you can see, there are some entries with the same step count and distance but with different timestamp and endDate.
+In between of two of these data sets with the same stepcount and distance the user actually stopped walking, resp. the pedometer did not recognize any steps.
+At the point in time, where the pedometer recognizes that the user continues walking, it pushes the same step count and distance with different endDate.
+This repeated data is usually passed together with the following pedometer data, as you can see in row two and three, for example.
+The two endDates usually have a difference of around 2.5 seconds, whereas the timestamp is roughly the same.
+
+If the user puts the application into brackground and resumes it later on, CoreMotion immediatly provides the application with an update, not just after 2.5 seconds \cite{wwdc_2014}.
+
+
+\paragraph{DeviceMotion}
+
+As mentioned before the iPhone provides a magnetometer, which is good for heading, a accelerometer which can be used to calculate the phones tip and tilt, and a gyroscope to measure a device's rotation rate.
+To calculate a device's attitude, its pose in three-dimensional space, with raw sensor data is very difficult among other things like uncertainty and ambiguity.
+But Apple's CoreMotion framework does not only provide raw sensor data, it also provides computed data, like the user acceleration and the device's attitude, via their \texttt{CMDeviceMotion} component.
+Theirefore, a technique, called sensor fusion, is being used.
+It combines the measurements of the before mentioned sensors to reduce bias and uncertainties and to remove ambiguities.
+Besides the \textbf{device's attitude}, the \texttt{CMDeviceMotion} component provides also other data, which are all by-products of the device's attitude calculation:
+\begin{itemize}
+  \item \textbf{gravity} in complete unconstraint motion
+  \item \textbf{user acceleration} is the acceleration without gravity
+  \item \textbf{rotation rate} which is bias compensated
+  \item \textbf{magnetic field} with removed disturbances
+\end{itemize}
+
+The \textbf{device attitude} is provided in three different mathimatical forms: Euler angles, quaternions and a rotion matrix.
+
+\begin{center}
+  \begin{figure}
+    \includegraphics[width=0.4\textwidth]{figures/iphone_coordinatesystem}
+    \caption{The iPhones local coordinate system. Source: Pham \cite{wwdc_2012}}
+    \label{fig:iphone_cs}
+  \end{figure}
+\end{center}
+
+To start receiving the device's attitude via the \texttt{CMDeviceMotionManager} a reference frame needs to be specified.
+Figure \ref{fig:iphone_cs} shows the iPhones local coordinate system, which is important to know, to understand the differences between the four possible reference.
+All four \texttt{CMAttitudeReferenceFrame}, illustrated in figure \ref{fig:cm_referenceframes}, do have the vertical z-axis aligned with the gravity in common.
+The specified reference frame does also specify the type of sensor fusion as you can see below.
+\begin{itemize}
+  \item \textbf{XArbitrary} (fig. \ref{fig:cm_referenceframes_xArbitrary}): The x and y axis are unspecified. The initial pose fixes the x and y orientation. There is no heading correction, thus it drifts over time.
+  \item \textbf{XArbitraryCorrected} (fig. \ref{fig:cm_referenceframes_xArbitraryCorrected}): The x and y axis are unspecified. The initial pose fixes the x and y orientation. Additionaly, the magnetometer is used correct heading to improve yaw accuracy over time.
+  \item \textbf{XMagneticNorth} (fig. \ref{fig:cm_referenceframes_xMagneticNorth}): The x axis is absolutely tagged to magnetic north. It uses the compass for the orientation.
+  \item \textbf{xTrueNorth} (fig. \ref{fig:cm_referenceframes_xTrueNorth}): The x axis is absolutely tagged to true north\footnote{The earth's magnatic field moves. Thus true and magnetic north are not the same. Maps are always oriented to true north.}. It uses the compass to determine true north.
+\end{itemize}
+
+\begin{center}
+\begin{figure}
+      \subfloat[XArbitrary]{
+        \includegraphics[width=0.4\textwidth]{figures/cm_xArbitrary}
+        \label{fig:cm_referenceframes_xArbitrary}
+      }
+      \quad
+      \subfloat[XArbitraryCorrected]{
+        \includegraphics[width=0.4\textwidth]{figures/cm_xArbitraryCorrected}
+        \label{fig:cm_referenceframes_xArbitraryCorrected}
+      }
+      \vspace{1cm}
+      \subfloat[XMagneticNorth]{
+        \includegraphics[width=0.4\textwidth]{figures/cm_xMagneticNorth}
+        \label{fig:cm_referenceframes_xMagneticNorth}
+      }
+      \quad
+      \subfloat[XTrueNorth]{
+        \includegraphics[width=0.4\textwidth]{figures/cm_xTrueNorth}
+        \label{fig:cm_referenceframes_xTrueNorth}
+      }
+      \caption{Shows the different device attitude reference frames. Source: Andy Pham \cite{wwdc_2012}}
+      \label{fig:cm_referenceframes}
+\end{figure}
+\end{center}
+
+% sensor fusion accelerometer, gyro and depending on reference frame magnetometer
+% gyro not for attitude, acc for tip and tilt but only under classy static state condition, and magnetometer good for heading other conditions interference
+% pointing stability of the magnetometer and accelerometer and responsiveness of gyro
+% sensor fusion removes uncertainties about ambiguities => gravity complete unconstraint motion, userAcceleration, rotationrate (bias compensated), attitude, and magneticfield (disturbance removed)
+% user acceleration without gravity in G's 3 axis, without attitude it's assumtion is unclear how it looks if device is moved back and fourth
+% rotation rate right hand rule
+% all are by-products of attitude. Attitude pose in 3d space how it sits there.
+% quaternions, rotationmatrix, euler angle
+%reference frames => flavor of sensor fusion, xarbitrary -> z is align with gravitational axis uses initial value, xarbritrarycorrected uses magnetometer to corrected, better long term yaw accuracy
+% true north, hiking should use true north because of maps.
+\paragraph{Compass}
+The compass is part of the CoreLocation framework.
+It provides the device's magnetic heading and also its true north heading in degrees.
+The heading depends on the specified device orientation, for example if it is in portrait, landscape left or landscape right mode \cite{ios_cl}.
+According to Pham, the compass uses sensor fusion and not only the magnetometer \cite{wwdc_2012}.
+
+To access the device's heading, the \texttt{CLLocationManager} must be configured.
+It informs the application when the heading changes.
+The developer can specify a heading filter. Thus, a new heading is just reported, if the heading filter was exceeded \cite{ios_cl}.
+
+As already mentioned before the magnetometer measures the magnetic field, which is not just the earth's magnetic field.
+It is also being biased, for example, by iron bars and AC current.
+To reduce bias, the compass asks the user to calibrate it by moving the device in a specific manner.
+CoreLocation by itself detects, if the compass needs calibration and automatically promts the user a calibration view.
+
+\section{Evaluation}
+
+\paragraph{MotionActivity}
+
+\paragraph{Pedometer}
+
+\paragraph{DeviceAttitude}
+
+\paragraph{Compass}
+
+
+\chapter{Algorithm / Filter}
+Decision PF (Map)
+Particle Filter
+\section{ActionModel}
+\section{ObservationModel}
+
