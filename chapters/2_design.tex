@@ -105,7 +105,7 @@ Both interfaces are providing their data asynchonously to the developers applica
 \paragraph{MotionActivity}
 
 Apple's \texttt{CMMotionActivityManager}, which is part of the CoreMotion framework, is able to detect and classify different activityies, like walking, running, cycling, etc.
-For the activity detection and classification the motion coprocessor together with the accelerometer is used \cite{wwwdc_2014}.
+For the activity detection and classification the motion coprocessor together with the accelerometer is used \cite{wwdc_2014}.
 
 As mentioned before the CoreMotion framework's MotionActivity \acsp{API} provides a push interface to receive motion activity changes, and a pull interface to query historical data between two dates.
 Both \acsp{API} are reporting every single change in motion activity that was detected.
@@ -310,121 +310,311 @@ It is also being biased, for example, by iron bars and AC current.
 To reduce bias, the compass asks the user to calibrate it by moving the device in a specific manner.
 CoreLocation by itself detects, if the compass needs calibration and automatically promts the user a calibration view.
 
+
 \section{Evaluation}
+
+The purpose of this section is to find out if the above referenced sensors and \acsp{API} are suitable for this project.
+Therefor, it evaluates the provided data, and also verifies the above referenced statments, made by Apple's engineers.
+% Verify apples statements
+% evaluate the unvertainties
+
 
 \paragraph{MotionActivity}
 
+As mentionend above, the \texttt{CMMotionActivity} component is to detect and classify a users activity.
+To proof the statment concerning the recognition duration of the walking state, made by Apple's engineer Andy Pham, we did some test walks \cite{wwdc_2014}.
+The results of our experiment show, that the claim of a recognition time of 10 -15 seconds for the walking state is very optimistic.
+Figure \ref{fig:eval:motionActivity} shows the beginning of one of these test walks.
+
+From begin on the test user started to walk with constant speed with his phone in hand.
+The first line shows, that the component even recognized, that the device is moving (not stationary) before we started the application.
+In reality we first started the application, before we started to walk, but not stationary means that the user just somehow moves the device.
+After $\approx 10.7$ seconds, the component increases its confidence for the current state.
+Another $\approx 5$ seconds later it set the confidence to high, thus the component is very confidente that the user somehow moves the device.
+After $\approx 25$ seconds of walking, the components finally detects with medium confidence that the user acctually walks.
+
+Compared to detecting the users walking state, it detects nearly in realtime, that the user stops walking after $\approx 32$ seconds.
+At this point the user holds his device very steady, which is shown by the last three entries, where the component switches between stationary and not stationary in a very short time period.
+
+Our experiment shows, that the user needs to actually walk a very long distance until the phone recognizes that the user is walking.
+The user also has to hold the device very steady until the device claims that the device is stationary.
+Thus CoreMotion's \texttt{CMMotionActivity} cannot really be used to determine a users walking state for short distances.
+
+\begin{center}
+\begin{figure}
+\begin{tabular}{l*{7}{c}}
+start date & confidence & unknown & stationary & walking & running & automotive & cycling \\
+\hline
+-2.0246 & 0 & false & false & false & false & false & false\\
+10.7026 & 1 & false & false & false & false & false & false\\
+15.7922 & 2 & false & false & false & false & false & false\\
+25.9676 & 0 & false & false & \textbf{true} & false & false & false\\
+32.3255 & 1 & false & \textbf{true} & false & false & false & false\\
+32.6434 & 1 & false & false & false & false & false & false\\
+33.2792 & 1 & false & \textbf{true} & false & false & false & false\\
+\dots & \dots & \dots & \dots & \dots & \dots & \dots & \dots
+\end{tabular}
+\caption{Shows a part of the recorded MotionActivity during a test walk.
+Remark: To simplify the table the start date is shown as relative timestamp instead of an absolute date.}
+\label{fig:eval:motionActivity}
+\end{figure}
+\end{center}
+
+
 \paragraph{Pedometer}
+
+To evaluate the accuracy of CoreMotion's \texttt{CMPedometer} component we did some test walks for different distances to compare the actual distance and step count with the measured values.
+Due to the fact, that users usually carrying their smartphone in their pants pocket or holding it in their hand, we did the experiment for both positions.
+Figure \ref{fig:eval:pedometerHand} shows the measured distances (fig. \ref{fig:eval:pedometerHand:dist}) and step counts (fig. \ref{fig:eval:pedometerHand:steps}) while the user test user walked a specified distance with the phone in hand.
+The results of the same experiment with the phone in pants pocket are shown in figure \ref{fig:eval:pedometerPocket}.
+
+The experiments visualization shows the measurments dispersion. Sometimes the \texttt{CMPedometer} over- or underestimates the distance resp. step count.
+It also shows, that the phone on average underestimates the distance and step count if the user holds the device in hand.
+If the user walks with the phone in his pants pocket, the device also underestimates the measured distance, whereas the measured step count is more precise.
+
+
+Figure \ref{fig:eval:pedometerNDF} depicts the \texttt{CMPedometer}'s standard deviation $\sigma$ depending on the distance and phones position.
+To model the uncertainty for any walked distance depending on the phones position, we used linear regression based on our measurements.
+Initially we expected a higher accuracy of the estimated distance if the user carries the phone in his pants pocket, but the diagram proofs the opposite.
+$\sigma$ is significantly smaller if the user holds the phone in his hand.
+
+To be able to better compare the difference in the phones position, we used the measured data to determine the pedometers uncertainties depending on the walked distance.
+Figure \ref{fig:eval:pedometerNDF} depicts the standard deviation $\sigma$ depending on the distance and phones position.
+To model the uncertainty for any walked distance depending on the phones position, we used linear regression, based on our measurements.
+The difference in slope of the regression lines shows, that the phone in hand position provides a much better accuracy for increasing distances.
 
 % CMPedometer (step count, distance)  dispersion plots
 \begin{figure}[htbp]
-      \subfloat[Distance measurement dispersion plot. Measured with phone in hand.]{
+      \subfloat[Distance measurements]{
         \begin{tikzpicture}
-          \begin{axis}[width=0.4\textwidth, height=0.4\textheight,
+          \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
               xlabel={Reference distance (m)},
               ylabel={Distance (m)},
+              legend entries={measurements, average},
+              legend pos=south east,
             grid = major]
             \addplot [blue, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inHand.csv};
             \addplot [blue, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
           \end{axis}
         \end{tikzpicture}
+        \label{fig:eval:pedometerHand:dist}
       }
       \quad
-      \subfloat[Step count dispersion plot. Measured with phone in hand.]{
+      \subfloat[Step count measurements]{
         \begin{tikzpicture}
-          \begin{axis}[width=0.4\textwidth, height=0.4\textheight,
+          \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
               xlabel={Reference distance (m)},
               ylabel={Step count},
+              legend entries={measurements, average, step count ref.},
+              legend pos=south east,
             grid = major]
             \addplot [blue, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inHand.csv};
             \addplot [blue, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
             \addplot [green, only marks, mark=*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=stepRef] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
           \end{axis}
         \end{tikzpicture}
+        \label{fig:eval:pedometerHand:steps}
       }
-      \vspace{1cm}
-       \subfloat[Distance measurement dispersion plot. Measured with phone in pocket.]{
-        \begin{tikzpicture}
-          \begin{axis}[width=0.4\textwidth, height=0.4\textheight,
-              xlabel={Reference distance (m)},
-              ylabel={Distance (m)},
-            grid = major]
-            \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
-            \addplot [red, only marks, mark=triangle*, mark size=2pt] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
-          \end{axis}
-        \end{tikzpicture}
-      }
-      \quad
-      \subfloat[Step count dispersion plot. Measured with phone in pocket.]{
-        \begin{tikzpicture}
-          \begin{axis}[width=0.4\textwidth, height=0.4\textheight,
-              xlabel={Reference distance (m)},
-              ylabel={Step count},
-            grid = major]
-            \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
-            \addplot [red, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
-            \addplot [green, only marks, mark=*, mark size=2pt] table[col sep=semicolon, x=distanceRef, y=stepRef] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
-          \end{axis}
-        \end{tikzpicture}
-      }
-
- \caption{Measurement curicumstances: The measurements where taken indoor (HTWG Konstanz cellar F building).}
-
+      \caption{Shows the measured distances and step counts for different distances. The measurements where taken indoor on a hard floor with the \textbf{smartphone in hand}.}
+ \label{fig:eval:pedometerHand}
 \end{figure}
 
-
-% CMPedometer (step count, distance) error plots
-
 \begin{figure}[htbp]
-  \subfloat[Distance error]{
+  \vspace{1cm}
+  \subfloat[Distance measurements]{
     \begin{tikzpicture}
-      \begin{axis}[width=0.4\textwidth, height=0.4\textheight,
+      \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
           xlabel={Reference distance (m)},
-          ylabel={Average distance error (m)},
+          ylabel={Distance (m)},
+          legend entries={measurements, average},
+          legend pos=south east,
         grid = major]
-        \addplot [blue, only marks, mark=*] table[col sep=semicolon, x=distanceRef, y=distanceError] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
-        \addplot [red, only marks, mark=*] table[col sep=semicolon, x=distanceRef, y=distanceError] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
+        \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
+        \addplot [red, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
       \end{axis}
     \end{tikzpicture}
+    \label{fig:eval:pedometerPocket:dist}
   }
   \quad
-  \subfloat[Step count error]{
+  \subfloat[Step count measurements]{
     \begin{tikzpicture}
-      \begin{axis}[width=0.4\textwidth, height=0.4\textheight,
+      \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
           xlabel={Reference distance (m)},
-          ylabel={Average step count error},
+          ylabel={Step count},
+          legend entries={measurements, average, step count ref.},
+          legend pos=south east,
         grid = major]
-        \addplot [blue, only marks, mark=*] table[col sep=semicolon, x=distanceRef, y=stepError] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
-        \addplot [red, only marks, mark=*] table[col sep=semicolon, x=distanceRef, y=stepError] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
+        \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
+        \addplot [red, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
+        \addplot [green, only marks, mark=*, mark size=2pt] table[col sep=semicolon, x=distanceRef, y=stepRef] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
       \end{axis}
     \end{tikzpicture}
+    \label{fig:eval:pedometerPocket:steps}
   }
-  \caption{Measurement curicumstances: The measurements where taken indoor (HTWG Konstanz cellar F building).}
+  \caption{Shows the measured distances and step counts for different distances. The measurements where taken indoor on a hard floor with the \textbf{smartphone in pants pocket}.}
+  \label{fig:eval:pedometerPocket}
 \end{figure}
 
 \begin{figure}
   \begin{tikzpicture}
-    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.9\textheight,
-        title={Normal Distribution Function parameters},
-        xlabel={Mean $\mu$ (m)},
+    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.4\textheight,
+        xlabel={Distance / Mean $\mu$ (m)},
         ylabel={Standard deviation $\sigma$ (m)},
         legend entries={in hand, $f(\mu)=0.0971 \cdot \mu + 1.445$, in pocket, $f(\mu)=0.1971 \cdot \mu + 2.8703$},
+        legend pos=north west,
       grid = major]
       \addplot [blue, mark=*] table[col sep=semicolon, x=mu_distanceRef, y=sigma_distanceRef] {csv/2014-10-28_htwg_keller_f/inHand_ndf_parameters.csv};
-%      \addplot [blue, dashed, domain=0:30, samples=2]{0.0680*x+2.1559};
+      %      \addplot [blue, dashed, domain=0:30, samples=2]{0.0680*x+2.1559};
       \addplot [blue, dashed, domain=0:30, samples=2]{0.0971*x+1.445};
       \addplot [red, mark=*] table[col sep=semicolon, x=mu_distanceRef, y=sigma_distanceRef] {csv/2014-10-28_htwg_keller_f/inPocket_ndf_parameters.csv};
       \addplot [red, dashed, domain=0:30, samples=2]{0.1971*x+2.8703};
-  \end{axis}
-\end{tikzpicture}
-\caption {Measurement curicumstances: The measurements where taken in the F building cellar of HTWG Konstanz. For each reference distance 10 measurements where taken.}
+    \end{axis}
+  \end{tikzpicture}
+  \caption {Shows the \texttt{CMPedometer} component's uncertainty depending on the walked distance and the phone's position.}
+  \label{fig:eval:pedometerNDF}
 \end{figure}
-\paragraph{DeviceAttitude}
-
-\paragraph{Compass}
 
 
-\chapter{Algorithm / Filter}
+Besides the pedometer's accuracy, we also evaluated the duration until the component detects that the user is walking and thus delivers the first distance estimation.
+The \texttt{CMPedometer} on average needs $5 - 10 seconds$ to deliver the first estimation, which is also consistent with Pham's statement \cite{wwdc_2014}.
+This estimation typically contains a step count of $6 - 8 steps$. Once it detected that the user is walking it regularly delivers estimation data every $\approx 2.5 seconds$.
+Another interesting value is the time it takes the pedometer to recognize that the user continued walking, after short break of $\approx 10 - 15 seconds$.
+Against our expectation, it takes approximately the same amount of time and also the same amount of steps, as the component requires to recognize it the first time.
+This beahaviour is also depicted in figure \ref{fig:eval:pedometerExampleData}.
+Line 1 shows the amount of time and steps it took the component to recognize that the user is walking.
+After $50 steps$ the user took a short break of around $15 seconds$. The following lines show, that it tooks $6steps$ to recognize that the user continued walking.
+The third data block shows another break that the user made during his walk.
+
+\begin{center}
+\begin{figure}
+\begin{tabular}{*{4}{l}}
+startDate & endDate & distance & steps\\
+\hline
+0.0019 & 8.2329 & 4.8273 & 7\\
+0.0019 & 10.7811 & 7.9850 & 11\\
+0.0019 & 13.3238 & 11.4785 & 16\\
+\dots & \dots & \dots & \dots\\
+0.0019 & 31.1349 & 37.2110 & 50\\
+0.0019 & 54.0149 & 37.2110 & 50\\
+0.0019 & 56.5503 & 41.4032 & 56\\
+\dots & \dots & \dots & \dots\\
+0.0019 & 69.2608 & 57.2046 & 78\\
+0.0019 & 84.5138 & 57.2046 & 78\\
+0.0019 & 87.0569 & 64.8046 & 88
+\end{tabular}
+\caption{Recorded pedometer example data.
+Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used instead of the absolute timestamps.
+Additionally all values, except the steps, are being truncated.}
+\label{fig:eval:pedometerExampleData}
+\end{figure}
+\end{center}
+
+
+\paragraph{Heading}
+As mentioned earlier, the algorithm dicussed in chapter \ref{chap:pf} needs heading to determine in which direction the user is moving.
+To get the device's heading, either the \texttt{CMAttitude} provided by CoreMotion or the \texttt{CLHeading} provided by CoreLocation can be used.
+In this paragraph we are first going to evaluate the \texttt{CMAttitude} component's data and then the data provided by \texttt{CLHeading}.
+
+%The device's attitude provided by the \texttt{CMDeviceMotion} component of Apple's CoreMotion framework can be used to calculate the device's heading.
+As mentioned before the \texttt{CMAttitude} data is being provided as euler angles, quaternions and rotation matrix.
+To be able to compare attitude with compass heading, it is of advatage to transform the attitude into a heading in compass degrees.
+This means if the device top is pointing towards magnetic north the heading $\theta = 0^{\circ}$,  east $\theta = 90^{\circ}$,  south $\theta = 180^{\circ}$ and west $\theta = 270^{\circ}$.
+Equation \ref{eq:rotationmatrix} shows the 3-dimensional rotation matrix provided by \texttt{CMAttitude}, as specified in the CoreMotion framework's documentation \cite{ios_cm}.
+The calculation of $\theta$ in compass degrees, where $m_{1,2}$ and $m_{2,2}$ are describing the transformation of the phone's y-axis by the rotation around its z-axis, is shown in equation \ref{eq:rotation2heading}.
+
+\begin{equation} \label{eq:rotationmatrix}
+  M_{3,3} = \begin{pmatrix}
+      m_{1,1} & m_{1,2} & m_{1,3} \\
+      m_{2,1} & m_{2,2} & m_{2,3} \\
+      m_{3,1} & m_{3,2} & m_{3,3}
+  \end{pmatrix}
+\end{equation}
+
+\begin{equation} \label{eq:rotation2heading}
+  \theta = (\pi + {\rm atan2}\left(m_{2,2} , m_{1,2}\right)) \cdot \frac{180.0}{\pi}, \quad \text{for } m_{2,2}, m_{1,2} \neq 0
+\end{equation}
+
+As mentioned earlier the \texttt{CMAttitude} values depend on the specified reference frame, which also affects the sensor fusion algorithm.
+To be able to easily compare the calculated heading $\theta$ directly with the compass heading we decided to use the \texttt{xMagneticNorth} reference frame, thus z is aligned to gravity and x points towards magnetic north
+
+The most important requirement for heading is longterm accuracy. Therefor, we walked 10 times around a small table in same direction and recorded the heading after each round.
+To record the heading we put the device after each round on the table at the exact same position, thus the heading should be roughly the same after each round.
+Figure \ref{fig:evalAttitude:xMagneticNorth} the error of each measurement compared to the initial measurement.
+First we walked counter-clockwise around the table and observed an enormouse drift of $\approx 30^{\circ}$ each round, sums up to a drift of $\approx 300^{\circ}$ after 10 rounds.
+To double check this, we walked also clockwise around the table and observed the same amount of drift in the opposite direction.
+Apple's engineer Adam Pham explicitly mentioned that the magnetometer is being used to provide longterm yaw accuracy if the \texttt{xArbitraryCorrected} reference frame is being specified.
+Thus, we repeated the same test for the \texttt{xArbitrary} and the \texttt{xArbitraryCorrected} reference frame and compared it with the results before.
+Figure \ref{fig:evalAttitude:referenceframes} shows the result. There is nearly no difference in longterm accuracy between the three reference frames.
+
+% heading calculation via rotation matrix
+% statements regarding longterm accuracy
+% reagiert nicht auf magnet
+
+\begin{figure}[htbp]
+    \begin{tikzpicture}
+      \begin{axis}[width=0.5\textwidth, height=0.4\textheight,
+          xlabel={round},
+          ylabel={heading error (degree)},
+          legend entries={counter-clockwise, clockwise},
+          legend pos=north west,
+        grid = major]
+        \addplot [blue, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_left.csv};
+        \addplot [blue, dashed, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_right.csv};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with reference frame \texttt{xMagneticNorth}.}
+    \label{fig:evalAttitude:xMagneticNorth}
+\end{figure}
+
+\begin{figure}[htbp]
+    \begin{tikzpicture}
+      \begin{axis}[width=0.5\textwidth, height=0.4\textheight,
+          xlabel={round},
+          ylabel={heading error (degree)},
+          legend entries={xMagneticNorth, xArbitrary, xArbitraryCorrected},
+          legend pos=north west,
+        grid = major]
+        \addplot [blue, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_left.csv};
+        \addplot [red, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xArbitraryAndCompass.csv};
+        \addplot [green, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xArbitraryCorrectedAndCompass.csv};
+      \end{axis}
+    \end{tikzpicture}
+    \caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with three different reference frames.}
+    \label{fig:evalAttitude:referenceframes}
+\end{figure}
+
+During the experiment also the compass' \texttt{CLHeading} values where recorded.
+Figure \ref{fig:eval:compass} shows the heading's error over time. The values where measured together with the values of figure \ref{fig:evalAttitude:xMagneticNorth} and \ref{fig:evalAttitude:referenceframes}.
+The chart shows no drift over time compared to the data measured from \texttt{CMAttitude}, but it also shows, that the compass can be biased by other magnetic fields.
+The outliers in the experiment with counter-clockwise direction let assume, that there another magnetic field biased the befor measured magnetic field.
+
+That the compass reacts on other magnetic fields, than the earth's magnetic field can easily by proofed by moving a small magnet around the phone.
+Compared to the compass, the \texttt{CMAttitude} does not react on other magnectic fields, like the one of a magnet.
+
+According to the 40 measurements of figure \ref{fig:eval:compass}, the compass' standard deviation $\sigma$ amounts $\sigma = 3.1^{\circ}$.
+During the experiment the \texttt{CLHeading} components heading filter was set to $1.0^{\circ}$.
+% compass ist genau genug
+
+\begin{figure}[htbp]
+  \begin{tikzpicture}
+    \begin{axis}[width=0.6\textwidth, height=0.4\textheight,
+      xlabel={round},
+      ylabel={heading error (degree)},
+      grid = major]
+      \addplot [blue, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_left.csv};
+      \addplot [blue, dashed, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_right.csv};
+      \addplot [red, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xArbitraryAndCompass.csv};
+      \addplot [green, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xArbitraryCorrectedAndCompass.csv};
+    \end{axis}
+  \end{tikzpicture}
+
+  \caption{Shows the compass' magnetic heading error in degree. The measurements where taken by walking 10 times around a table. The initial measurement is being used as reference value. The heading filter was set to 1.0 degree.}
+  \label{fig:eval:compass}
+\end{figure}
+
+
+
+\chapter{Algorithm / Filter} \label{chap:pf}
 Decision PF (Map)
 Particle Filter
 \section{ActionModel}
