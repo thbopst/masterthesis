@@ -89,7 +89,7 @@
 \selectlanguage{english}
 
 % Abbreviations
-\include{chapters/0_abbreviation}
+\include{chapters/00_abbreviation}
 \newpage
 
 % Table of contents
@@ -103,18 +103,19 @@
 \setcounter{page}{1} % set pagecount style to 1, 2, ...
 \pagenumbering{arabic}
 
-\include{chapters/1_introduction}
-\include{chapters/2_design}
-\include{chapters/6_evaluation}
-\include{chapters/7_conclusion}
-\include{chapters/8_future}
+\include{chapters/10_introduction}
+\include{chapters/20_ibeacons}
+\include{chapters/30_sensors}
+\include{chapters/40_algorithm}
+\include{chapters/50_evaluation}
+\include{chapters/60_conclusion}
 
 \appendix
-\include{chapters/9_appendix}
+\include{chapters/90_appendix}
 
 \addcontentsline{toc}{chapter}{References}
 \bibliographystyle{IEEEtranS}
 \nocite{*}
-\bibliography{bib/references}
+\bibliography{chapters/99_references}
 
 \end{document}
