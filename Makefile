@@ -5,7 +5,11 @@ CHAPTER = chapters/
 TEMPLATE = template/
 PDFLATEX = pdflatex --shell-escape
 
+
 pdf:
+	$(PDFLATEX) $(MAINTEX).tex
+
+all:
 	$(PDFLATEX) $(MAINTEX).tex
 	bibtex $(MAINTEX).aux
 	$(PDFLATEX) $(MAINTEX).tex
