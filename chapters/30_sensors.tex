@@ -17,7 +17,7 @@ It also describes the physical properties that can be measure with it and their 
 
 Today most smartphones have a build-in magnetometer to measure the strength and heading of a magnetic field.
 Typically, the magnetometer is build with at least one hall sensor which usually measures the magnetic field resp. the magnetic flux density in microteslas.
-For instance, Apple's iPhones includes a three-axis magnetometer, thus it is able to determine the heading in three-dimensional space which is being used by the digital compass, for example \cite{ios_cm, wwdc_2012}.
+For instance, Apple's iPhones includes a three-axis magnetometer, thus it is able to determine the heading in three-dimensional space which is being used by the digital compass, for example \cite{apple:ios_doc_cm, apple:wwdc_2012_pham}.
 %%
 % 3-axis hall-effect sensor
 % measures heading
@@ -31,7 +31,7 @@ For instance, Apple's iPhones includes a three-axis magnetometer, thus it is abl
 The accelerometer, which is also implemented in most of the latest smartphone generation, measures the acceleration applied to the device.
 The measured acceleration is the gravity plus the acceleration that the user applies to the device, measured in $\frac{m}{s^2}$.
 Thus, the measured acceleration is $1g = 9.81 \frac{m}{s^2}$ if the device is stationary, resp. no user acceleration is applied to the device.
-Typically, smartphones include a three-axis accelerometer, to measure the acceleration along the three spatial axis, to determine the device's tip and tilt for example \cite{ios_cm, wwdc_2012}.
+Typically, smartphones include a three-axis accelerometer, to measure the acceleration along the three spatial axis, to determine the device's tip and tilt for example \cite{apple:ios_doc_cm, apple:wwdc_2012_pham}.
 % in a classy static state conditions
 
 \paragraph{Gyroscope}
@@ -39,7 +39,7 @@ Typically, smartphones include a three-axis accelerometer, to measure the accele
 Modern smartphones usually include a three-axis gyroscope to measure the rotation rate along the device's spatial axis.
 Rotation rate is measured in $\frac{rad}{s}$, thus the gyroscope can be used to determine the device's attitude.
 Like every sensor data, also the gyroscope's measurements include some bias.
-Hence, determining the device's attitude with the raw gyroscope measurements includes a growing drift over time \cite{ios_cm, wwdc_2012}.
+Hence, determining the device's attitude with the raw gyroscope measurements includes a growing drift over time \cite{apple:ios_doc_cm, apple:wwdc_2012_pham}.
 
 
 \paragraph{Barometer}
@@ -47,7 +47,7 @@ Hence, determining the device's attitude with the raw gyroscope measurements inc
 Some of the latest smartphones also include a barometer to measure air presure.
 Air presure is measured in $kilopascals$.
 Thus, the relative change in altitude can be calculated.
-The Barometer can be used for hiking apps to determin the change in altitude for example \cite{ios_cm}.
+The Barometer can be used for hiking apps to determin the change in altitude for example \cite{apple:ios_doc_cm}.
 
 
 \section{\acsp{API}}
@@ -71,7 +71,7 @@ Together with the motion co-processor it can also offer more convenient interfac
 Earlier iPhone's used their processor to gather and process the sensor's data.
 This is very energy consuming and unefficient, because it eates up a lot of \acs{CPU} time.
 According to Pham, one of Apple's core motion engineers, the motion co-processor is very energy efficient.
-He mentions, that the energy consumption of 24 hours motion processing, e.g. motion activity classification or pedometer, is equal to a three minute FaceTime\footnote{FaceTime is Apple's video telephony application.} call \cite{wwdc_2014}.
+He mentions, that the energy consumption of 24 hours motion processing, e.g. motion activity classification or pedometer, is equal to a three minute FaceTime\footnote{FaceTime is Apple's video telephony application.} call \cite{apple:wwdc_2014_pham}.
 
 The motion awareness feature gives applications the possiblity, to query a users motion data for the past seven days.
 
@@ -83,7 +83,7 @@ Therefore, the developer needs to provide and register a handler function, which
 
 The pull interface is designed to query historical data within a specified range of time, of the past seven days.
 According to Pham, querying historical data is more accurate than the data provided via the push interface, because the filters can operate better on a bigger amount of data.
-Also, some values ajust over time, like the pedometers stride estimation \cite{wwdc_2014}.
+Also, some values ajust over time, like the pedometers stride estimation \cite{apple:wwdc_2014_pham}.
 
 Both interfaces are providing their data asynchonously to the developers application.
 % pull interface, update, handler asynchronous add time the historical data is beeing stored bey the phone
@@ -92,7 +92,7 @@ Both interfaces are providing their data asynchonously to the developers applica
 \paragraph{MotionActivity}
 
 Apple's \texttt{CMMotionActivityManager}, which is part of the CoreMotion framework, is able to detect and classify different activityies, like walking, running, cycling, etc.
-For the activity detection and classification the motion coprocessor together with the accelerometer is used \cite{wwdc_2014}.
+For the activity detection and classification the motion coprocessor together with the accelerometer is used \cite{apple:wwdc_2014_pham}.
 
 As mentioned before the CoreMotion framework's MotionActivity \acsp{API} provides a push interface to receive motion activity changes, and a pull interface to query historical data between two dates.
 Both \acsp{API} are reporting every single change in motion activity that was detected.
@@ -112,7 +112,7 @@ In ideling vehicle & \textbf{true} & false & false & \textbf{true} & false & fal
 In moving vehicle & false & false & false & \textbf{true} & false & false\\
 After reboot & false & false & false & false & false & \textbf{true}
 \end{tabular}
-\caption{Motion activity example scenarios based on Pham's example \cite{wwdc_2014}.}
+\caption{Motion activity example scenarios based on Pham's example \cite{apple:wwdc_2014_pham}.}
 \label{fig:motionActivity}
 \end{figure}
 \end{center}
@@ -155,7 +155,7 @@ It provides the distance in meters, a person traveled over time.
 Therefore, the iPhone needs to be equipped with a motion coprocessor \footnote{Note: iPads with a motion co-processer do not provide step counting and distance estimation.}.
 The motion coprocessor processes the accelerometer's data to count a person's steps and to estimate the person's stride length.
 The stride estimation adapts over time, thus the more often the pedometer is used, the better the accuracy.
-According to Pham, the pedometer has a consistent performance and accuracy across the phone's body location \cite{wwdc_2014}.
+According to Pham, the pedometer has a consistent performance and accuracy across the phone's body location \cite{apple:wwdc_2014_pham}.
 
 As mentioned before there are two different interfaces to request the pedometer data.
 Via the pull interface the application can ask the pedometer component for the distance a person traveled by passing a start and end date.
@@ -163,9 +163,9 @@ Via the pull interface the application can ask the pedometer component for the d
 The second possibility is the push interface, thus the application can register a handler to receive updates while the person is walking.
 If the user is walking or running, the handler gets called around every 2.5 seconds, assuming the motion processor detects the taken steps.
 If it does not detect steps, the handler is not being called.
-The received steps and distances are the cummulative steps and distance since the start date, which is for all successive \texttt{CMPedometerData} objects the same \cite{wwdc_2014}.
+The received steps and distances are the cummulative steps and distance since the start date, which is for all successive \texttt{CMPedometerData} objects the same \cite{apple:wwdc_2014_pham}.
 
-The received \texttt{CMPedometerData} contains the following values \cite{ios_cm}:
+The received \texttt{CMPedometerData} contains the following values \cite{apple:ios_doc_cm}:
 \begin{itemize}
   \item \texttt{startDate}, absolute start date
   \item \texttt{endDate}, absolute end date
@@ -207,7 +207,7 @@ At the point in time, where the pedometer recognizes that the user continues wal
 This repeated data is usually passed together with the following pedometer data, as you can see in row two and three, for example.
 The two endDates usually have a difference of around 2.5 seconds, whereas the timestamp is roughly the same.
 
-If the user puts the application into brackground and resumes it later on, CoreMotion immediatly provides the application with an update, not just after 2.5 seconds \cite{wwdc_2014}.
+If the user puts the application into brackground and resumes it later on, CoreMotion immediatly provides the application with an update, not just after 2.5 seconds \cite{apple:wwdc_2014_pham}.
 
 
 \paragraph{DeviceMotion}
@@ -230,7 +230,7 @@ The \textbf{device attitude} is provided in three different mathimatical forms: 
 \begin{center}
   \begin{figure}
     \includegraphics[width=0.4\textwidth]{figures/iphone_coordinatesystem}
-    \caption{The iPhones local coordinate system. Source: Pham \cite{wwdc_2012}}
+    \caption{The iPhones local coordinate system. Source: Pham \cite{apple:wwdc_2012_pham}}
     \label{fig:iphone_cs}
   \end{figure}
 \end{center}
@@ -267,7 +267,7 @@ The specified reference frame does also specify the type of sensor fusion as you
         \includegraphics[width=0.4\textwidth]{figures/cm_xTrueNorth}
         \label{fig:cm_referenceframes_xTrueNorth}
       }
-      \caption{Shows the different device attitude reference frames. Source: Andy Pham \cite{wwdc_2012}}
+      \caption{Shows the different device attitude reference frames. Source: Andy Pham \cite{apple:wwdc_2012_pham}}
       \label{fig:cm_referenceframes}
 \end{figure}
 \end{center}
@@ -285,12 +285,12 @@ The specified reference frame does also specify the type of sensor fusion as you
 \paragraph{Compass}
 The compass is part of the CoreLocation framework.
 It provides the device's magnetic heading and also its true north heading in degrees.
-The heading depends on the specified device orientation, for example if it is in portrait, landscape left or landscape right mode \cite{ios_cl}.
-According to Pham, the compass uses sensor fusion and not only the magnetometer \cite{wwdc_2012}.
+The heading depends on the specified device orientation, for example if it is in portrait, landscape left or landscape right mode \cite{apple:ios_doc_cl}.
+According to Pham, the compass uses sensor fusion and not only the magnetometer \cite{apple:wwdc_2012_pham}.
 
 To access the device's heading, the \texttt{CLLocationManager} must be configured.
 It informs the application when the heading changes.
-The developer can specify a heading filter. Thus, a new heading is just reported, if the heading filter was exceeded \cite{ios_cl}.
+The developer can specify a heading filter. Thus, a new heading is just reported, if the heading filter was exceeded \cite{apple:ios_doc_cl}.
 
 As already mentioned before the magnetometer measures the magnetic field, which is not just the earth's magnetic field.
 It is also being biased, for example, by iron bars and AC current.
@@ -309,7 +309,7 @@ Therefor, it evaluates the provided data, and also verifies the above referenced
 \paragraph{MotionActivity}
 
 As mentionend above, the \texttt{CMMotionActivity} component is to detect and classify a users activity.
-To proof the statment concerning the recognition duration of the walking state, made by Apple's engineer Andy Pham, we did some test walks \cite{wwdc_2014}.
+To proof the statment concerning the recognition duration of the walking state, made by Apple's engineer Andy Pham, we did some test walks \cite{apple:wwdc_2014_pham}.
 The results of our experiment show, that the claim of a recognition time of 10 -15 seconds for the walking state is very optimistic.
 Figure \ref{fig:eval:motionActivity} shows the beginning of one of these test walks.
 
@@ -463,7 +463,7 @@ The difference in slope of the regression lines shows, that the phone in hand po
 
 
 Besides the pedometer's accuracy, we also evaluated the duration until the component detects that the user is walking and thus delivers the first distance estimation.
-The \texttt{CMPedometer} on average needs $5 - 10 seconds$ to deliver the first estimation, which is also consistent with Pham's statement \cite{wwdc_2014}.
+The \texttt{CMPedometer} on average needs $5 - 10 seconds$ to deliver the first estimation, which is also consistent with Pham's statement \cite{apple:wwdc_2014_pham}.
 This estimation typically contains a step count of $6 - 8 steps$. Once it detected that the user is walking it regularly delivers estimation data every $\approx 2.5 seconds$.
 Another interesting value is the time it takes the pedometer to recognize that the user continued walking, after short break of $\approx 10 - 15 seconds$.
 Against our expectation, it takes approximately the same amount of time and also the same amount of steps, as the component requires to recognize it the first time.
@@ -506,8 +506,8 @@ In this paragraph we are first going to evaluate the \texttt{CMAttitude} compone
 As mentioned before the \texttt{CMAttitude} data is being provided as euler angles, quaternions and rotation matrix.
 To be able to compare attitude with compass heading, it is of advatage to transform the attitude into a heading in compass degrees.
 This means if the device top is pointing towards magnetic north the heading $\theta = 0^{\circ}$,  east $\theta = 90^{\circ}$,  south $\theta = 180^{\circ}$ and west $\theta = 270^{\circ}$.
-Equation \ref{eq:rotationmatrix} shows the 3-dimensional rotation matrix provided by \texttt{CMAttitude}, as specified in the CoreMotion framework's documentation \cite{ios_cm}.
-The calculation of $\theta$ in compass degrees, where $m_{1,2}$ and $m_{2,2}$ are describing the transformation of the phone's y-axis by the rotation around its z-axis, is shown in equation \ref{eq:rotation2heading}.
+Equation~\ref{eq:rotationmatrix} shows the 3-dimensional rotation matrix provided by \texttt{CMAttitude}, as specified in the CoreMotion framework's documentation \cite{apple:ios_doc_cm}.
+The calculation of $\theta$ in compass degrees, where $m_{1,2}$ and $m_{2,2}$ are describing the transformation of the phone's y-axis by the rotation around its z-axis, is shown in equation~\ref{eq:rotation2heading}.
 
 \begin{equation} \label{eq:rotationmatrix}
   M_{3,3} = \begin{pmatrix}
