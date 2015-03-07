@@ -19,9 +19,90 @@ After forming the foundation, we present our evaluation results of the received 
 
 
 \section{Bluetooth Low Energy}\label{sec:ble}
-- no connection
-- just unidirectional
+\ac{BT} is a wireless short range communication technology with the intend to replace resp.\ reduce the amount of necessary cables. The technologies key features are robustness, low cost and low power consumption.
+It is often being used to connect a car's speaker phone with a smartphone, to connect a wireless keyboard or mouse with a computer, or to exchange files between two cell- or smartphones.
+The \acl{BT} standard is being developed by the \emph{Bluetooth Special Interest Group (Bluetooth SIG)}, which is a large group of companies, that are interested in \acs{BT}.
 
+Originally, the \acs{BT} specification contained just one wireless technology system called \emph{\ac{BR}/\ac{EDR}}.
+Since version 4.0, released in 2010, the specification adds a second technology named \emph{\ac{LE}}.
+Actually, the term \acs{LE} is just the technologies name inside of the specification but today it is also being used by the mainstream.
+The technologies official (marketing) label is \emph{Bluetooth Smart}. Devices labeled with it are just equipped with the \acs{LE} technology.
+Devices labled with \emph{Bluetooth Smart Ready} are equipped with both technologies, the traditional \acs{BR} and the \acs{LE} technology \cite{bluetooth:spec}.
+One of the differences is the speed. \acs{BR}/\acs{EDR} has a max.\ transfer rate of 2-3~Mbps, \acs{LE} is just designed for 1~Mbps.
+But, \acs{LE} has the advantage of having a low current consumption.
+Its complexity is also lower than the one of \acs{BR}/\acs{EDR} \cite{bluetooth:spec}.
+
+iBeacons usually are Bluetooth Smart, not Bluetooth Smart Ready devices \cite{binside:ds}.
+To get a better idea of how the comunication between a smartphone and an iBeacon works, we give an overview of the \acs{BT} technology with focus on \acs{BLE}.
+Both \acs{BT} systems are using the 2.4~GHz frequency band.
+
+
+\paragraph{Channels and Events}
+\acs{BLE} devides the band into 40 channels.
+Three of them are advertisement channels, the others are data channels.
+These channels are being used to send events.
+An event consists of typical (data) packets that are being send over the channels.
+The \acs{BLE} specification distinguishes between two events, the \emph{advertisment} and the \emph{connection} event.
+
+Advertisement events are either being used for unidirectional or broadcast communication between two or more devices, or to establish a pair-wise or bidirectional communication.
+This type of advertisment event is called a \emph{connectable advertisment}.
+ Advertisment events are being send via one of the advertisment channels.
+The device which sends the advertisement is called the \emph{advertiser}.
+The device looking for these events is named \emph{scanner}.
+
+If the device listens for a connectable advertisement it is called the \emph{initiator} and becomes the \emph{master} after establishing the connection.
+The advertising device becomes the \emph{slave}.
+Master and slave(s) are forming a piconet. Slaves in a piconet cannot communicate with each other.
+The connection establishment takes place on one of the advertisement channels.
+After establishing a connection, the communication takes place on the data channels by using frequency hopping instead of one specific channel \cite{bluetooth:spec}.
+
+\paragraph{Operations}
+\acs{BLE} implements different operations for the above mentioned event behaviour\cite{bluetooth:spec}.
+\begin{itemize}
+  \item To send advertisement events the \textbf{Advertismenet Procedure} is being used.
+    It sends unidirectional broadcast messages without a connection between the devices.
+    If the device itself is already connected to an other device, it can just send non-connectable advertisments.
+    Advertisments can contain user data.
+    A scanner can also respond to a advertisement to request more user data.
+  \item The \textbf{Scanning Procedure} must be used to listen for advertisment packets.
+    It can read the user data send in an advertisment.
+    Sanning is possible while being connected to a device.
+  \item It is possible to listen just for a specific set of devices.
+    Therefor the \textbf{Device Filtering Procedure} needs to be used.
+  \item The \textbf{Discovering Procedure} can be used to especially look for devices.
+    It also uses device filtering.
+  \item To establish a connection the \textbf{Connecting Procedure} must be used.
+  \item After the connection establishment the \textbf{Connected Procedure} is used to transfer data.
+\end{itemize}
+
+\paragraph{Security}
+The data is being encrypted with the \emph{AES-CCM} encryption method.
+For authentication it provides three different modes for different device capabilities\cite{bluetooth:spec}.
+\begin{itemize}
+  \item \textbf{Just Works}: Requires just a possibility to tell the device that it should accept a connection request of an unknown device.
+    Therefor, a hardware button can be used, that the user needs to press for a few seconds for the initial connection establishment, which is often the case to connect wireless smartphone headsets. This method is often being used if the slave has no possibility to enter a key.
+  \item \textbf{Passkey Entry}: Requires the input of a PIN code.
+    Therefor, the master needs the possibility to show a PIN code, e.g.\ on screen, and the slave needs some sort of keyboard.
+    A typical example is the pairing process of a bluetooth keyboard with a computer.
+    The computer displays a code and the user has to enter it on the keyboard that wants to connect.
+  \item \textbf{Out of Band}: Requires a seperate channel which is being used for the discovery and also for the exchange of the secure key.
+    This can be a wired connection for example.
+\end{itemize}
+
+\paragraph{Adverting and Response Data}
+Besides the mentionend user data an advertisments can contain, the advertisment and response always contains data such as the \emph{local name} of the device, which can be used to identify it, information about the \emph{manufacturer} and the \emph{Tx-power level} which was being used to send the packets.
+Furthermore, it includes some \emph{flags} which provide information whether the device is in limited discoverable mode, if the device supports also \acs{BR}/\acs{EDR}, if both modes can be used simultaniously and further service specific data.
+
+
+\paragraph{Summary}
+\acl{LE} is a seperate wireless communication technology which was added to the traditional \acl{BT} system.
+Devices equipped with a \acs{BT} chip of version 4 can either support both systems or just one.
+\acs{BLE} is low cost and has low power consumption. Thus, it is possible to produce cheap devices like iBeacons which can be powerd over months with just a coin cell.
+
+Often the question comes up if a beacons can be used to track users resp.\ smartphones.
+Therefor a response from the smartphone must be send. As we have seen, advertisements do not require a response thus tracking would just be possible by establishing or at least trying to establish a connection.
+But due to the fact that just one connection at the same time is possible, and thus a device could just talk to one beacon, connection establishment cannot take place.
+Now we know, that the claim, made by Apple \cite{apple:getting_started}, that tracking or putting ``user's private data at risk'' is not possible, is true.
 
 \section{Beacon}\label{sec:beacon}
 As mentioned before beacons are small System-on-Chip devices that are sending a \acs{BLE} signal.
@@ -352,7 +433,6 @@ Figure~\ref{fig:beacon_eval_ndf} depicts the parameters to model the distance es
 Therefor, the data of figure~\ref{fig:beacon_dispersion_outdoor} and \ref{fig:beacon_dispersion_f007} was being used.
 The two dashed straight lines show the linear function that approximates the standard deviation $\sigma$ depending on the mean value $\mu$ best.\\ \newline
 
-%evtl. multilateration
 \begin{figure}
   \subfloat[Outdoor]{
   \begin{tikzpicture}
@@ -433,4 +513,67 @@ Larger distances cause a much higher dispersion and also a larger error.
 Physical material like humans and walls do cause attenuation, which results in a larger distance as it actually is.
 Thus, the estimated distances are very unreliable due to the fact, that the validity cannot be proofed, without knowing the receivers exact position and the properties of all other influencing factors.
 
+\paragraph{Multilateration}
+After evaluating the distance estimation's quality of one beacon, we decided to deploy some beacons in a lecture hall to get a better feeling of how good the distance estimation actually works.
+On one side the goal was to visualize the estimated distances on a map to proof their plausability, and on the other side to test if indoor self-localization with smartphones is possible by just using iBeacons without integrating additional sensor data.
 
+Lateration is a method to estimate a position by estimating the distance to the sender of a wireless signal by using the \acs{RSS}.
+Thus, multilateration means, to estimate the position by using the distances to several senders.
+Angulation (often named Triangulation) is a similar method. Instead of estimating the distance to a sender it uses the angle resp. the direction where the signal comes from relative to the receiver.
+Trilateration resp. -angulation means that three senders are being used to estimate the position.
+
+The receivers position with just one sender is somewhere on a circle around the sender with the estimated distance as radius of the circle.
+By using two senders $s_1$ and $s_2$, the two circles around the senders can have zero, one or two intersections, if the position of $s_1 \neq s_2$. Thus, the receivers position must be at one of the circles' intersections.
+By adding a third sender $s_3$ the three circles have either no or exactly one common intersection point, which is the reveivers position.
+This applies also to more than three senders.
+
+To be able to use our implementation with variable sender count, we use the \emph{Least Square} method to determine the receivers position. Another advantage is, that the least square method can also estimate a position if no common intersection point exists, e.g. if just two of four circles intersect with each.
+
+For our experiment we used the same lecture hall as before.
+There, we positioned four beacons.
+Then we used our iPhone~5S test device recoded the received beacon identifieres and the by the \texttt{CoreLocation} estimated distances (\texttt{accuracy} values), during our test walk on a defined path.
+To visualize the estimated distances to the beacons and the estimated position resp. the walked path we wrote a small programm in Python.
+Figure~\ref{fig:beacon_eval_multilat} shows four screenshots of the programs output.
+Each of it shows a map, which shows the lecture halls walls in grey.
+The white space in the hall is free space.
+The filled small blue circles next to the walls are the four beacons.
+The big blue cirles are the circles around the beacon where the radius equals the estimated distance to the beacon.
+We did one walk on the green tetragon beginning at the bottom right corner in counter clockwise direction, with holding the test device in front of us. The beacons where positioned in approximately the same hight.
+The red line shows the path estimated by our multilateration implementation.
+
+Screenshot a shows, that the estimated distance sometimes is completely wrong, as the one to the beacon in the top-right corner.
+It also shows that the estimated position is somewhere several meters outside of the lecture hall.
+The second screenshot shows, that the distance to the top-right beacon shrinks, but one to the top-left massively grows. The distances to the other two beacons seem to be plausible.
+The third one shows a plausible position. It also shows that in this step the bottom-right beacon's signal was not received.
+The last screenshot shows also a more or less plausible position. The distances, except the one to the bottom-left beacon, seem to be plausible.
+
+This experiment shows, that the beacons signals must be heavily influenced, due to the very unreliable distance estimations.
+It also shows that pure multilateration method, without filtering the data and without integrating additional data sources, is not sufficient enough for indoor self-localization, because sometimes the positon is several meters outside the room.
+
+\begin{figure}
+  \subfloat[]{
+    \includegraphics[width=0.45\textwidth]{figures/multilat_1}
+  }
+  \subfloat[]{
+    \includegraphics[width=0.45\textwidth]{figures/multilat_2}
+  }
+
+  \subfloat[]{
+    \includegraphics[width=0.45\textwidth]{figures/multilat_3}
+  }
+  \subfloat[]{
+    \includegraphics[width=0.45\textwidth]{figures/multilat_4}
+  }
+  \caption{Screenshots of indoor self-localization experiment using multilateration.}
+  \label{fig:beacon_eval_multilat}
+\end{figure}
+
+
+\paragraph{Summary}
+To summarize, the beacons' signals reps. the estimated distances are very unreliable, due to the signals influences by physical materials.
+Distance estimations for distances larger than 5 meters are often wrong.
+Thus, their plausibility should be proofed to weight or filtered them out.
+But it is very difficult to check their plausibility in large buildings without knowing the receivers position.
+Hence, they can just be ignored.
+
+Another problem are distance estimations, that are less than 5 meters but actually more than 5 meters. These errors can not being detected, without knowing the receivers position and consequently they cannot be ignored.
