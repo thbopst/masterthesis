@@ -81,3 +81,48 @@
 \caption {TODO}
 \end{figure}
 
+\citep{wang:wlan} sagt, dass einfache Integration nicht geht in indoor-env. Geht nur in theorie.
+
+\chapter{Kidnapping}
+
+\begin{figure}
+	\begin{tikzpicture}
+		\begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
+			xlabel={Time (sec)},
+			ylabel={ParticleWeightSum},
+			legend entries={without, $recovery < 0.01$},
+			grid = major]
+			\addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=particleWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_without.csv};
+			\addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=particleWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_less0.01.csv};
+		\end{axis}
+	\end{tikzpicture}
+\caption {Particle Weight Sum (Data: F-Foyer2\_F007-F023-F007\_kidnapping)}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}
+		\begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
+			xlabel={Time (sec)},
+			ylabel={ParticleWeightSum},
+			legend entries={without},
+			grid = major]
+			\addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=particleWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_F007-F023-F022-F007_without.csv};
+			%\addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=particleWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_less0.01.csv};
+		\end{axis}
+	\end{tikzpicture}
+\caption {Particle Weight Sum (Data: F-Foyer2\_F007-F022-F023-F007)}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}
+		\begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
+			xlabel={Time (sec)},
+			ylabel={ParticleWeightSum},
+			legend entries={$recovery < 0.01$},
+			grid = major]
+			\addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=particleWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_F035_5_less0.1.csv};
+			%\addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=particleWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_less0.01.csv};
+		\end{axis}
+	\end{tikzpicture}
+\caption {Particle Weight Sum (Data: F035\_F035\_5)}
+\end{figure}

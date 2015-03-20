@@ -11,10 +11,11 @@
 \usepackage[utf8]{inputenc}
 \usepackage[german, english]{babel}
 \usepackage{courier}
+\usepackage[]{natbib}
 
 \usepackage{listings}
 \lstset{numbers=left, numberstyle=\tiny, numbersep=20pt} % Programmcode einfügen
-\lstset{basicstyle=\footnotesize\ttfamily, breaklines=true}
+\lstset{basicstyle=\normalsize\ttfamily, breaklines=true} % \footnotesize
 \lstset{language=XML}
 
 \usepackage{pgfplots}
@@ -114,7 +115,8 @@
 \include{chapters/90_appendix}
 
 \addcontentsline{toc}{chapter}{References}
-\bibliographystyle{IEEEtranS}
+%\bibliographystyle{IEEEtranS}
+\bibliographystyle{apa}
 \nocite{*}
 \bibliography{chapters/99_references}
 
