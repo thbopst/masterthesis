@@ -1,45 +1,33 @@
 \chapter{Localization Algorithm} \label{chap:pf}
-Our solution is based on \acl{MCL}, as presented in chapter~\ref{chap:fundamentals}. In this chapter we first outline the reasons for choosing \acs{MCL} instead of another algorithm. Next we describe the algorithms \emph{motion model}, which is on one side responsible for tracking the users motion by combining different sources, introduced in chapter~\ref{chap:sensors}, and on the other side for the sampling from the motion model. Afterwards, we give a detailed insight in our solution's \emph{measurement model}. It tracks the beacon's signals, resp.\ the distances to the beacons, and implements the \acs{PF}'s importance factor calculation. In the End, we explain the algorithm's implementation, which builds upon the motion and measurement model.
-\section{Design Decision}
+Our solution is based on \acl{MCL}, introduced in chapter~\ref{chap:fundamentals}. Figure~\ref{fig:algo_architecture} provides an architectural overview of our solution, including the involved sensors and components.
 
-% small pre-deployment effort (scene analysis)
-% integration of map (hui wang)
-% easy to implement (\thrun)
-% multi-modal distribution (whereas kalman just can normal distribution \cite{siddiqi})
-% keine zusätzliche Infrastruktur, keinen zusätzlichen Server
-% sensor fusion 
-% globale localization -> Kidnapping
-% Filter soll funktionieren wenn keine Meßwerte vorliegen bzw. auch wenn nur bewegung da ist
-% geeignet für localisierung mit landmarken
-
-
-
-
-% Decision PF (Map)
-% Particle Filter
-
-% small pre deployment effort
-% no effort for RF maps such as scene analaysis
-
-% according to hui wang, KF only for linear, and EKF must be more or less linear, its impossible to integrate map information
-
-% ease of implementation \citep{siddiqui}, fast-realtime properties
-% mcl easy implement \thrun
-% multimodal whereas kalman just can normal distribution \cite{siddiqi}
-
+In this chapter we first outline the reasons for choosing \acs{MCL} instead of another algorithm. Next we describe the algorithms \emph{motion model}, which is on one side responsible for tracking the users motion by combining different sources, introduced in chapter~\ref{chap:sensors}, and on the other side for the sampling from the motion model. Afterwards, we give a detailed insight in our solution's \emph{measurement model}. It tracks the beacon's signals, resp.\ the distances to the beacons, and implements the \acs{PF}'s importance factor calculation. In the end, we explain the algorithm's implementation, which builds upon the motion and measurement model.
 
 \begin{figure}
 \def\svgwidth{0.9\textwidth}
 \input{algo_architecture.pdf_tex}
-%%\inputSVG[\def\svgheight{0.45\textwidth} \small]{architecture}
-%
-\caption{Architecture}	
+\caption{Architecture}
+\label{fig:algo_architecture}
 \end{figure}
 
 
+\section{Design Decision}
+As mentioned in chapter \ref{chap:fundamentals}, there are different approaches for indoor localization. Our approach is based on \acl{PF}, resp.\ \acl{MCL}, due to the following reasons.
+
+As shown in chapter \ref{chap:ibeacons} and mentionend by \citet{IEEE:survey_wireless_indoor_pos}, wireless signals are heavily influenced by obstacles and the environment, thus we decided not to just rely on the measured distances to the beacons. As outlined in chapter \ref{chap:sensors}, smartphone usually include sensors, such as an accelerometer, gyroscope, and a magnetometer, which can be used to estimate, for instance, a walked distance. Consequently, the algorithm needs to be able to fuse the different sensor data, to improve the location estimation by reducing its uncertainty, which is one of the main reasons for choosing \acs{PF}.
+
+As depicted by \citet{siddiqi:experiments_mcl_wifi} and \citet{wang:wlan}, using the map information additionally to the sensor fusion drastically improves location accuracy. For example, particles resp.\ location hypothesizes, wich are out of bound or not accessible by the person can be weed of \citep{straub:pf,siddiqi:experiments_mcl_wifi}. Sensor fusion would also be possible by using a \acl{KF}, resp.\ \acs{EKF}, but according to \citet{wang:wlan}, ``distributed information like the map information is impossible to be integrated for tracking by \acs{EKF}'', which is the second main point for choosing \acs{PF}.
+
+Another advantage of \acs{PF}, compared to \acs{KF}, is its ability of solving the \emph{global localization problem}. It gives the algorithm the possibility to recover form failure state, e.g.\ if the estimated location is completely wrong, due to short-term sensor failure, which is a important feature.
+
+Compared to other approaches, \acs{PF} has the advantage of taking uncertainties into account, which the other mentioned algorithms, except \acs{KF}, do not. \acs{KF} is just able to model uncertainties in form of gaussians. As mentioned before, \acs{PF} is a non-parametric filter, thus it has the advantage of providing the location estimation in form of a multi-modal posteriori belief, which can be visually expressed very well, as depicted in \ref{fig:pf_approx}, which can be a benefit for the user.
+
+As stated out in chapter \ref{chap:intro}, the requirements of our solution are, a small pre-deployment effort and a simple and cheap infrastructure to reduce the cost of purchase and the ongoing maintenance costs. By using \acs{PF}, based on \acs{RSS} distance estimation and additional build-in sensors, less pre-deployment effort is required, compared to scene analysis approaches, which need an additional time consuming offline stage. Compared to other solutions, e.g.\ the acoustic localization approach proposed by \citet{hoflinger:acoustic}, our infrastructure requirements are very low. The user just requires a capable smartphone, and the building just needs to be equipped with \emph{cheap} beacons. Their, system requires specific hardware with microphones which are being connected with each other. Also the smartphone needs a connection to the measuring unit which is responsible for the location estimation in their solution, or at least, to receive the measurements.
+
+Besides the above mentioned reasons, \acl{PF}, resp.\ \acs{MCL}, is an easy-to-implement algorithm with is additionally a well-known and well-studied localization algorithm in robotics, as mentioned by \citet{thrun:prob_robo}, which is able to do landmark based localization, as requested in indoor self-localization with smartphones using iBeacons.
 
 \section{Motion Model}
 
 \section{Measurement Model}
 
-\section{\acl{MCL}}
+\section{\acl{PF}}
