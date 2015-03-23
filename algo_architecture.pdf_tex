@@ -1,0 +1,92 @@
+%% Creator: Inkscape inkscape 0.91, www.inkscape.org
+%% PDF/EPS/PS + LaTeX output extension by Johan Engelen, 2010
+%% Accompanies image file 'algo_architecture.pdf' (pdf, eps, ps)
+%%
+%% To include the image in your LaTeX document, write
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics{<filename>.pdf}
+%% To scale the image, write
+%%   \def\svgwidth{<desired width>}
+%%   \input{<filename>.pdf_tex}
+%%  instead of
+%%   \includegraphics[width=<desired width>]{<filename>.pdf}
+%%
+%% Images with a different path to the parent latex file can
+%% be accessed with the `import' package (which may need to be
+%% installed) using
+%%   \usepackage{import}
+%% in the preamble, and then including the image with
+%%   \import{<path to file>}{<filename>.pdf_tex}
+%% Alternatively, one can specify
+%%   \graphicspath{{<path to file>/}}
+%% 
+%% For more information, please see info/svg-inkscape on CTAN:
+%%   http://tug.ctan.org/tex-archive/info/svg-inkscape
+%%
+\begingroup%
+  \makeatletter%
+  \providecommand\color[2][]{%
+    \errmessage{(Inkscape) Color is used for the text in Inkscape, but the package 'color.sty' is not loaded}%
+    \renewcommand\color[2][]{}%
+  }%
+  \providecommand\transparent[1]{%
+    \errmessage{(Inkscape) Transparency is used (non-zero) for the text in Inkscape, but the package 'transparent.sty' is not loaded}%
+    \renewcommand\transparent[1]{}%
+  }%
+  \providecommand\rotatebox[2]{#2}%
+  \ifx\svgwidth\undefined%
+    \setlength{\unitlength}{841.88976378bp}%
+    \ifx\svgscale\undefined%
+      \relax%
+    \else%
+      \setlength{\unitlength}{\unitlength * \real{\svgscale}}%
+    \fi%
+  \else%
+    \setlength{\unitlength}{\svgwidth}%
+  \fi%
+  \global\let\svgwidth\undefined%
+  \global\let\svgscale\undefined%
+  \makeatother%
+  \begin{picture}(1,0.70707071)%
+    \put(0,0){\includegraphics[width=\unitlength,page=1]{algo_architecture.pdf}}%
+    \put(0.11505633,0.07960644){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{Location}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=2]{algo_architecture.pdf}}%
+    \put(0.89322858,0.51266004){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{Gyroscope}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=3]{algo_architecture.pdf}}%
+    \put(0.89322858,0.44361169){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{Magnetometer}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=4]{algo_architecture.pdf}}%
+    \put(0.89322858,0.36468745){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{\acs{BLE}}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=5]{algo_architecture.pdf}}%
+    \put(0.89425573,0.58133483){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{Accelerometer}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=6]{algo_architecture.pdf}}%
+    \put(0.62716049,0.64236438){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{CoreMotion}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=7]{algo_architecture.pdf}}%
+    \put(0.62716049,0.60319446){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{CMPedometer}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=8]{algo_architecture.pdf}}%
+    \put(0.62716049,0.54617987){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{CMDeviceMotion}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=9]{algo_architecture.pdf}}%
+    \put(0.62716049,0.45991772){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{CoreLocation}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=10]{algo_architecture.pdf}}%
+    \put(0.62716049,0.42302179){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{CLHeading}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=11]{algo_architecture.pdf}}%
+    \put(0.62716049,0.36563369){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{CLBeacon}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=12]{algo_architecture.pdf}}%
+    \put(0.62716049,0.27937152){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{Map}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=13]{algo_architecture.pdf}}%
+    \put(0.62716049,0.24247559){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{OccupancyGrid}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=14]{algo_architecture.pdf}}%
+    \put(0.62716049,0.18508749){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\tiny\texttt{Landmarks}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=15]{algo_architecture.pdf}}%
+    \put(0.11402918,0.40364342){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{\acl{PF}}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=16]{algo_architecture.pdf}}%
+    \put(0.37162199,0.58418959){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{MotionModel}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=17]{algo_architecture.pdf}}%
+    \put(0.37059484,0.41810702){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{Measurement}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=18]{algo_architecture.pdf}}%
+    \put(0.89425573,0.64236438){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{Sensors}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=19]{algo_architecture.pdf}}%
+    \put(0.37059484,0.38009729){\color[rgb]{0,0,0}\makebox(0,0)[b]{\smash{\small\texttt{Model}}}}%
+    \put(0,0){\includegraphics[width=\unitlength,page=20]{algo_architecture.pdf}}%
+  \end{picture}%
+\endgroup%

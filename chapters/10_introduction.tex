@@ -33,7 +33,7 @@ Map with beacon positions
 \textit{Explain the documents structure}
 
 
-\chapter{Fundamentals}
+\chapter{Fundamentals}\label{chap:fundamentals}
 
 In this chapter, we first introduce the fundamentals of localization. Afterwards, we give an overview of different localization algorithms being used in related work. Then, we point out the reasons for choosing the particle filter for this project, to finally introduce the algorithm itself.
 
@@ -272,14 +272,3 @@ During their tests they found out, that by increasing the amount of access point
 %observatoin model: map constraints, weed out particles that are not on map. This enables good localization without use of signal strength
 % envirionment was split in grid of 0.5 m squares, for each grid signalstrength was measured , mean and variance for each ap in grid
 % \theta is not taken into account in observation model.
-
-%\section{Design Decision}
-
-% small pre deployment effort
-% no effort for RF maps such as scene analaysis
-
-% according to hui wang, KF only for linear, and EKF must be more or less linear, its impossible to integrate map information
-
-% ease of implementation \citep{siddiqui}, fast-realtime properties
-% mcl easy implement \thrun
-% multimodal whereas kalman just can normal distribution \cite{siddiqi}

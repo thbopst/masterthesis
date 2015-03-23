@@ -1,6 +1,45 @@
-\chapter{Algorithm / Filter} \label{chap:pf}
+\chapter{Localization Algorithm} \label{chap:pf}
+Our solution is based on \acl{MCL}, as presented in chapter~\ref{chap:fundamentals}. In this chapter we first outline the reasons for choosing \acs{MCL} instead of another algorithm. Next we describe the algorithms \emph{motion model}, which is on one side responsible for tracking the users motion by combining different sources, introduced in chapter~\ref{chap:sensors}, and on the other side for the sampling from the motion model. Afterwards, we give a detailed insight in our solution's \emph{measurement model}. It tracks the beacon's signals, resp.\ the distances to the beacons, and implements the \acs{PF}'s importance factor calculation. In the End, we explain the algorithm's implementation, which builds upon the motion and measurement model.
+\section{Design Decision}
+
+% small pre-deployment effort (scene analysis)
+% integration of map (hui wang)
+% easy to implement (\thrun)
+% multi-modal distribution (whereas kalman just can normal distribution \cite{siddiqi})
+% keine zusätzliche Infrastruktur, keinen zusätzlichen Server
+% sensor fusion 
+% globale localization -> Kidnapping
+% Filter soll funktionieren wenn keine Meßwerte vorliegen bzw. auch wenn nur bewegung da ist
+% geeignet für localisierung mit landmarken
+
+
+
+
 % Decision PF (Map)
 % Particle Filter
-\section{ActionModel}
-\section{ObservationModel}
-\section{Particle Filter}
+
+% small pre deployment effort
+% no effort for RF maps such as scene analaysis
+
+% according to hui wang, KF only for linear, and EKF must be more or less linear, its impossible to integrate map information
+
+% ease of implementation \citep{siddiqui}, fast-realtime properties
+% mcl easy implement \thrun
+% multimodal whereas kalman just can normal distribution \cite{siddiqi}
+
+
+\begin{figure}
+\def\svgwidth{0.9\textwidth}
+\input{algo_architecture.pdf_tex}
+%%\inputSVG[\def\svgheight{0.45\textwidth} \small]{architecture}
+%
+\caption{Architecture}	
+\end{figure}
+
+
+
+\section{Motion Model}
+
+\section{Measurement Model}
+
+\section{\acl{MCL}}
