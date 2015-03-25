@@ -31,22 +31,7 @@
   \caption{Measurement curicumstances: The measurements where taken indoor (HTWG Konstanz cellar F building).}
 \end{figure}
 
-\centering
-\begin{figure}
-  \begin{tikzpicture}
-    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.9\textheight,
-        title={Accelerometer},
-        xlabel={Time (sec)},
-				ylabel={Acceleration $ms^{-2}$},
-      legend entries={x, y, z},
-      grid = major]
-      \addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=x] {csv/acceleration/acc.csv};
-      \addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=y] {csv/acceleration/acc.csv};
-      \addplot [green, no marks] table[col sep=semicolon, x=timestamp, y=z] {csv/acceleration/acc.csv};
-  \end{axis}
-\end{tikzpicture}
-\caption {TODO}
-\end{figure}
+
 
 %\centering
 %\begin{figure}
@@ -65,21 +50,7 @@
 %\caption {TODO}
 %\end{figure}
 
-\centering
-\begin{figure}
-  \begin{tikzpicture}
-    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.5\textheight,
-				title={Walking detection},
-        xlabel={Time (sec)},
-        ylabel={Acceleration ($ms^{-2}$)},
-        legend entries={$\left| a \right| = \sqrt[2]{x^{2}+y^{2}+z^{2}}$, avg. $\left| a \right|$},
-      grid = major]
-      \addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=norm] {csv/acceleration/vel.csv};
-      \addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=avgnorm] {csv/acceleration/vel.csv};
-  \end{axis}
-\end{tikzpicture}
-\caption {TODO}
-\end{figure}
+
 
 \citep{wang:wlan} sagt, dass einfache Integration nicht geht in indoor-env. Geht nur in theorie.
 

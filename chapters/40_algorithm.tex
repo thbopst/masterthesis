@@ -27,7 +27,227 @@ As stated out in chapter \ref{chap:intro}, the requirements of our solution are,
 Besides the above mentioned reasons, \acl{PF}, resp.\ \acs{MCL}, is an easy-to-implement algorithm with is additionally a well-known and well-studied localization algorithm in robotics, as mentioned by \citet{thrun:prob_robo}, which is able to do landmark based localization, as requested in indoor self-localization with smartphones using iBeacons.
 
 \section{Motion Model}
+Our solution's motion model component is responsible for three tasks, firstly, for tracking the users motion, secondly, to determine if the user is stationary, and thirdly, to allow the \acs{PF} to sample from the motion model. The three tasks are prerequisites for our \acs{PF}'s implementation.
+
+\subsection{Motion Tracking}
+As mentioned in chapter~\ref{chap:sensors}, iOS's CoreMotion framework provides a component called \texttt{CMPedometer}, which estimates distances based on the steps a user has taken. In addition, the CoreLocation framework provides the device heading, based on the magnetic field, called \texttt{CLHeading}. Furthermore, CoreMotion's \texttt{CMDeviceMotion} provides the device \texttt{attitude}, which is being calculated by using sensor fusion. The device's attitude can also be to also calculate the device heading. By combining these three sources, the user's motion can be tracked, and a path can be constructed.
+
+\paragraph{Heading}
+As mentioned in chapter~\ref{chap:sensors}, the heading provided by \texttt{CLHeading} can be influenced by other magnetic fields than the earth's magnetic field, which may cause wrong values. \texttt{CMDeviceMotion}, which relies not just on the magnetometers values, by using sensor fusion, is not being influenced by other magnetic fields, but against the claims made by Apple's engineers, the values tend to drift away \citet(?). Thus, using just the \texttt{CMDeviceMotion.attitude} is also not sufficient. Consequently, we combine both sources to determine the heading.
+
+Both frameworks do provide their values asynchronously. \acs{CL} calls its delegate method if a certain threshold of the heading's change exceeds, which we set to $1^\circ$. Whereas, \acs{CM} calls its delegate periodically, which we set to $50 Hz = 0.02 sec$. The high update rate would not be necessary for the heading, but as mentioned earlier \texttt{CMDeviceMotion} does also include \texttt{userAccleration}, which is being used for the stationary detection, as shown later.
+
+The \texttt{CMDeviceMotion} heading, further denoted as $\theta_A$, measured at time $t$, is being calculated from the rotation matrix, given by \texttt{CMDeviceMotion.attitude}, as explained in chapter~\ref{chap:sensors}. Due to its drift problem just the change, denoted as $\Delta\theta_A$ between two values is being used. For the absolute orientation, \texttt{CLHeading.magneticHeading}, denoted as $\theta_C$, is being used. Internally, the motion tracking uses the heading $\theta$, which also takes the map's orientation $\theta_M$ into account. $\theta$ is being calculated if \acs{CL}'s heading filter is being exceeded and thus, a new magnetic heading is being provided, but not if \acs{CM} provides a new $theta_A$ due to its high update frequency, which would result in lots of updates of $\theta$ with very small change.
+
+Figure~\ref{lst:mm_heading} illustrates the used algorithm to combine the two heading sources to calculate the internally used heading $\theta$, for more robustness against the influence of disturbing magnetic fields, without the drift problem. Furthermore, figure~\ref{tab:mm_heading} provides a calculation example for better understanding.
+
+\begin{figure}
+\begin{lstlisting}[mathescape]
+// instance variables
+$\theta_{A_\text{current}}$, $\theta_{A_\text{last}}$ = nil
+$\theta_{C_\text{last}}$ = nil
+
+// combined internal heading
+$\theta$ = 0.0
+
+// called by CoreMotion if new heading is available
+didMeasureDeviceMotionHeading($\theta_{A_t}$) {
+  $\theta_{A_\text{current}} = \theta_{A_t} - \theta_M$
+}
+
+// called by CoreLocation if new heading is available
+didMeasureCompassHeading($\theta_{C_t}$) {
+  $\theta_{C_\text{current}} = \theta_{C_t} - \theta_M$
+  
+  if $\theta_{A_\text{latest}} \neq \text{nil}$ && $\theta_{A_\text{last}} \neq \text{nil}$ && $\theta_{C_\text{last}} \neq \text{nil}$ {
+    $\Delta\theta_{A} = \theta_{A_\text{current}} - \theta_{A_\text{last}}$
+    $\Delta\theta_{C} = \theta_{C_\text{current}} - \theta_{C_\text{last}}$
+    
+    $\theta_{A_\text{last}} = \theta_{A_\text{current}}$
+    
+    $\theta = \theta_{t-1} + \frac{\Delta\theta_{C} + \Delta\theta_{A}}{2}$
+  } else {
+    $\theta = \theta_{C_\text{current}}$
+  }
+  
+  $\theta_{C_\text{last}} = \theta_{C_\text{current}}$
+}
+\end{lstlisting}
+\caption{Illustrates the calculation of the internal heading $\theta$, by combining $\theta_C$ and $\theta_A$, relative to the maps orientation $\theta_M$}
+\label{lst:mm_heading}
+\end{figure}
+
+\begin{figure}
+\begin{tabular}{c|ccc|c|ccc||c}
+\textbf{$t$} & \textbf{$\theta_C$} & \textbf{$\theta_A$} & \textbf{$\theta_M$} & $\theta_{C_\text{current}}$ & $\theta_{C_\text{last}}$ & $\theta_{A_\text{current}}$ & $\theta_{A_\text{last}}$ & \textbf{$\theta$}\\
+\hline
+$t_0$ & $90.3$ & & $20.0$ & $70.3$ & & & & $70.3$\\
+$t_1$ & & $78.2$ & $20.0$ & & $70.3$ & $58.2$ & &\\
+$t_2$ & & $79.0$ & $20.0$ & & $70.3$ & $59.0$ & $58.2$ &\\
+$t_3$ & $91.3$ & & $20.0$ & $71.3$ & $70.3$ & $59.0$ & $58.2$ & $71.2$\\
+$t_4$ & & $79.7$ & $20.0$ & & $71.3$ & $59.7$ & $59.0$ &\\
+$t_5$ & $92.3$ & & $20.0$ & $72.3$ & $71.3$ & $59.7$ & $59.0$ & $72.1$\\
+
+\end{tabular}
+\caption{Example illustrating the calculation of the internal heading $\theta$, according to the algorithm depicted in figure~\ref{lst:mm_heading}}
+\label{tab:mm_heading}
+\end{figure}
+
+\paragraph{Motion Path Construction}
+As explained in chapter~\ref{chap:sensors}, \acs{CM} delivers every $\sim 2.5\text{sec}$ a new \texttt{CMPedometer} object with the estimation of the distance $d$ a user traveled. Besides the distance the object contains the start date $t_\text{start}$, which is the start date of the very first distance estimation, which is the same for all successive estimations. Additionally, it contains the $t_\text{end}$ date. Thus the user walked a estimated distance $d$ beginning at $t_\text{start}$ and ending at $t_\text{start}$.
+During the walk, the user's direction $\theta$ changes several times at a certain point in time, denoted with $t$.
+
+A user's motion path is being stored as an array of motions $u$. A motion consists of $u = (\theta, d, t_\text{start}, t_\text{end})^T$, the orientation $\theta$ at the motions start date $t_\text{start}$, the distance $d$ in meters and the motions end date $t_\text{end}$. $t_\text{start}$ and $t_\text{end}$ are not really necessary for constructing the estimated motion path, but are necessary for the later explained importance factoring.
+
+To calculate the motion $u$ of a walked distance $d$, the distance is being split up according to the timestamps corresponding to the orientational changes, which occurred during the estimated distance. Therefor, constant velocity over the distance $d$ is being assumed. Figure~\ref{fig:mm_path} illustrates the estimated path a user traveled in 2-dimensional space. The individual distances $d_1, d_2$, estimated by \acs{CM}, are colored differently. By integrating the measured headings $\theta_0, \ldots, \theta_4$, the path is split up in motion $u_0, \ldots, u_5$.
+
+
+\begin{figure}
+	\begin{tikzpicture}
+	  \draw[->] (0,0) -- (8,0); 
+  	  \draw[->] (0,0) -- (0,7);
+  	  \draw (8.5,0)node(y){$x$};
+  	  \draw (0,7.5)node(y){$y$};
+  	  
+  	  
+  	  \draw[blue] (1,6)--(5,6);
+  	  \draw (1,6.5)node(a){$\theta_0$};
+  	  \draw[blue] (3,6.5)node(b){$d_0$};
+  	  \draw(3,5.5)node(b){$u_0$};
+%  	  \fill[red] (5,6) circle (2pt);
+  	  
+  	  \draw[blue] (5,6)--(7,4);
+  	  \draw (5,6.5)node(c){$\theta_1$};
+  	  \draw(5.6,4.7)node(b){$u_1$};
+  	  
+  	  \draw[blue] (7,4)--(7,3);
+  	  \draw (7.5,4)node(d){$\theta_2$};
+  	  \draw(6.5,3.5)node(b){$u_2$};
+  	  
+  	  \draw[red] (7,3)--(7,1);
+  	  \draw (7,0.5)node(e){$\theta_3$};
+  	  \draw(6.5,2.0)node(b){$u_3$};
+
+  	  \draw[red] (7,1)--(3,1);
+  	  \draw[red] (5,0.5)node(b){$d_1$};
+  	  \draw(5,1.5)node(b){$u_4$};
+  	  
+  	  
+  	  \draw[red] (3,1)--(3,4);
+  	  \draw (3,0.5)node(e){$\theta_4$};
+  	  \draw(3.5,2.5)node(b){$u_5$};
+  	    	  
+  	  
+  	  
+	\end{tikzpicture}
+\caption{Illustration of motion path construction, by integrating heading $\theta_0, \ldots, \theta_4$ into the two estimated walked distances $d_1, d_2$. $u_0, \ldots, u_5$ depict the resulting motions.}
+\label{fig:mm_path}
+\end{figure}
+
+
+\subsection{Stationary Detection}
+As mentioned in chapter~\ref{chap:sensors}, iOS \texttt{CMPedometer} component requires at the beginning approx.\ 6--8 steps to deliver the first distance estimation. During a walk it continuously updates the estimation every $\sim 2.5\text{sec}$. Due to the asynchronous incoming motion and \acs{BLE} measurement data, the filter cannot be run continuously, with a fixed time interval, because the later discussed measurements need to be integrated at the right position on the users walk. Therefor, it is important to know if the user is currently walking resp.\ is stationary or not.
+
+\citet{wang:wlan} proposes a system based on acceleration data to detect a users steps by detecting the acceleration's zero-crossing. Whereas we do not actually need to count the users steps, this approach needs to much effort. \citet{shanklin:embedded_sensors} use the acceleration data to also estimate the distance the user traveled but they just integrate the values two times to get the distance, with a preceding low pass filter. Thus, for our implementation one integration of the acceleration would be enough to get the user's velocity, which could be used to determine the users stationary state. Therefor, the a projection of the measured acceleration data into the global coordinate system is required, as also described in their work. Unfortunately, their solution, especially the was very unreliable. Another problem is, that their projection is being based on \texttt{CMDeviceMotion}'s attitude, which has the drift problem.
+
+But, \citet{shanklin:embedded_sensors} also considered another solution for step detection which uses the user's minimum acceleration, which is being detected by using a threshold that needs to be exceeded by the acceleration's Euclidian-Norm $\left\lVert a \right\rVert$, shown in equation~\ref{eq:a}. Figure~\ref{fig:mm_stationary_1} depicts the user's 3-axis acceleration during a walk with two, clearly visible, stops. The corresponding Euclidian-Norm is being shown in figure~\ref{fig:mm_stationary_2}. For the actual detection of the stationary and not stationary state, we added a simple moving average, which is being calculated over the last $50$ values, resp.\ by $50\text{Hz}$ the last second. If our threshold of $\left\lVert a \right\rVert > 0.1 ms^{-2}$ is exceeded the user is walking, if not, the user is stationary.
+
+The solution's advantage is, that it is quite easy to implement and does not need a projection of the acceleration data. As a result, the later discussed integration of measurements, resp.\ the importance factoring can be delayed when the user starts walking until \acs{CM} provides its distance estimation.
+ 
+\begin{equation} \label{eq:a}
+	\left\lVert a \right\rVert = \sqrt[2]{x^{2}+y^{2}+z^{2}}
+\end{equation}
+
+\begin{figure}
+  \begin{tikzpicture}
+    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
+        legend pos=north west,
+        xlabel={Time (sec)},
+		ylabel={User Acceleration ($ms^{-2}$)},
+      legend entries={x, y, z},
+      grid = major]
+      \addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=x] {csv/acceleration/acc.csv};
+      \addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=y] {csv/acceleration/acc.csv};
+      \addplot [green, no marks] table[col sep=semicolon, x=timestamp, y=z] {csv/acceleration/acc.csv};
+  \end{axis}
+\end{tikzpicture}
+\caption{Depicts the 3-axis \texttt{userAcceleration} provided by \acs{CM}'s \texttt{CMDeviceMotion} object. The user's two stationary phases are clearly depicted by the low amplitude.}
+\label{fig:mm_stationary_1}
+\end{figure}
+
+\begin{figure}
+  \begin{tikzpicture}
+    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
+		legend pos=north east,
+        xlabel={Time (sec)},
+        ylabel={User Acceleration ($ms^{-2}$)},
+        legend entries={$\left\lVert a \right\rVert = \sqrt[2]{x^{2}+y^{2}+z^{2}}$, moving avg.\ of $\left\lVert a \right\rVert$},
+      grid = major]
+      \addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=norm] {csv/acceleration/vel.csv};
+      \addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=avgnorm] {csv/acceleration/vel.csv};
+  \end{axis}
+\end{tikzpicture}
+\caption{Depicts the euclidian norm of the three-axis user acceleration shown in figure~\ref{fig:mm_stationary_1} and its simple moving average with a window of $1 \text{sec}$ which corresponds to $50$ measurements.}
+\label{fig:mm_stationary_2}
+\end{figure}
+
+
+
+\subsection{Sample Motion}
+As described in chapter~\ref{chap:fundamentals}, \acs{MCL} has a \texttt{sample\_motion\_model} function to sample from the motion model, resp.\ to apply a motion $u$ to a state hypothesis $x^{[m]}_{t-1}$ by taking the motion's uncertainties into account. The new state hypothesis is being denoted as $x^{[m]}_t$. A state in our implementation is defined as $x^{[m]} = (x, y, \theta)^T$, where $x$ and $y$ denote the position in 2-dimensional space and $\theta$ the user's orientation. Equation~\ref{eq:sample_motion} shows how the new state hypothesis is being calculated. $d_u$ and $\theta_u$ are the distance and heading of motion $u$. The added noise $d_\text{noise}$ and $\theta_\text{noise}$ model the translational and rotational uncertainties.
+
+\begin{equation}\label{eq:sample_motion}
+	x^{[m]}_t = \left(
+    \begin{array}{c}
+      x_t\\
+      y_t\\
+      \theta_t
+    \end{array}
+  \right) = \left(\begin{array}{c} x_{t-1} + \cos(\theta_u + \theta_{\text{noise}})\cdot (d_u + d_\text{noise}) \\ y_{t-1} + \sin(\theta_u + \theta_{\text{noise}})\cdot (d_u + d_\text{noise}) \\ \theta_u + \theta_{\text{noise}}
+    \end{array}
+  \right)
+\end{equation}
+
+The uncertainties are modeled as Gaussians. First we used the uncertainties determined during our sensor evaluation, shown in chapter~\ref{chap:sensors}, but then we empirically found out that the following values do better fit. $d_\text{noise}$ depends on the motions distance $d_u$, shown in equation~\ref{eq:sigma_d}, $\theta_\text{noise}$ uses a constant $\sigma_\text{rot} = 20^{\circ}$ with $\mu = 0$. Due to the lack of a build in algorithm to sample from a Gaussian distribution, we use the \texttt{sample\_normal\_distribution} algorithm proposed by \citet[p.~124]{thrun:prob_robo}.
+
+\begin{equation}\label{eq:sigma_d}
+	\sigma_{\text{trans}} = \left\{ 
+  \begin{array}{l l}
+    0.3 \cdot d_u & \quad \text{if $d_u > 0$}\\
+    0.3 & \quad \text{else}
+  \end{array} \right. ,\quad \mu = 0
+\end{equation}
+
+% drift of attitude, deshalb nur delta
+
+% sensors and apis being used
+% Motion tracking (heading calculation + distance estimation -> path), map orientation
+% stationary?
+% sample motion
+
 
 \section{Measurement Model}
 
+% weighting for importance factoring (distance to beacon < 5m, occupancy grid = map)
+
+% signals worse than 5 meters are being ignored
+
 \section{\acl{PF}}
+
+
+\subsection{Initial ParticleSet Generation / Distribution}
+
+\subsection{Importance Factoring}
+
+\subsection{Motion Integration}
+
+\subsection{Resampling / Roulette}
+
+\subsection{Recovery / Kidnapping Problem}
+
+
+% initial generation around beacons
+% recovery
+% motion integration + filtering
+% roulette filtering
+% buffering (stationary)
