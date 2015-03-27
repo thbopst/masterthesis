@@ -157,7 +157,7 @@ In the end, the new state $x_t$ and its covariance $\Sigma_t$ being returned. Th
 
 As mentioned by \citet{kotanen:exp_local_pos_bt}, the ``main source of errors is unreliability of \acs{RSSI}''. Their position estimation is based on filtered values instead of raw values, compared to triangulation, but in fact, it relies just on the wireless measurements and does not include additional sensors or information, as it is usually done in the robotics field.
 
-\subsection{Particle Filter}
+\subsection{Particle Filter}\label{sec:fund_pf}
 The \ac{PF} is a non-parametric filter. The before introduced \acs{KF} is a parametric filter, it has fixed parameters wich describe its functional form, the form of the gaussian. By contrast, \acs{PF} does not have fixed parameters, it approximates the functional form by a finite number of values, resp.\ particles. The approximation's quality depends on the particle set's size. Figure~\ref{fig:pf_approx} illustrates the approximation of a posteriori distribution by particles, aka.\ samples. It also shows, that particle filter is well-suited for multi-modal beliefs \citep{thrun:prob_robo}.
 
 \begin{figure}
