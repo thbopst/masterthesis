@@ -30,22 +30,3 @@
   }
   \caption{Measurement curicumstances: The measurements where taken indoor (HTWG Konstanz cellar F building).}
 \end{figure}
-
-
-\chapter{Kidnapping}
-
-%Maybe plot weightsum with and without recovery%
-
-\begin{figure}
-	\begin{tikzpicture}
-		\begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
-			xlabel={Time (sec)},
-			ylabel={ParticleWeightSum},
-			legend entries={F-Foyer2\_F007-F023-F007\_kidnapping, F-Foyer\_F007-F023-F022-F007},
-			grid = major]
-			\addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=normalizedWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight.csv};
-			\addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=normalizedWeightSum] {csv/F-Foyer_F007-F023-F022-F007/ParticleWeight.csv};
-		\end{axis}
-	\end{tikzpicture}
-\caption {$recovery < 10$}
-\end{figure}

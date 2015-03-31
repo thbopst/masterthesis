@@ -578,17 +578,22 @@ PART_3($\chi_{t-1}$) {
 
 
 \subsection{Recovery / Kidnapping Problem}
-Recovery has to purposes in our application. Firstly, it can happen, that all particles are moving out of bounds, and thus are being filtered out. Secondly, the particles are on a totally wrong position, which can happen if the user walked to soft, and thus, the pedometer could not recognize the users steps, or the orientation does not fit the actual one, because the user's phone pointed not straight forward during the walk.
+Recovery has two purposes in our application. Firstly, it can happen, that all particles are moving out of bounds, and thus are being filtered out. Secondly, the particles are on a totally wrong position, which can happen if the user walked to soft, and thus, the pedometer could not recognize the users steps, or the orientation does not fit the actual one, because the user's phone pointed not straight forward during the walk.
 
-To determine both situations, we enhanced our \texttt{filter} function shown in figure~\ref{lst:pf_filter}. The enhanced version is shown in~\ref{lst:pf_recovery}. During the resampling, the new particle set's \texttt{weightSum}, which is the $\texttt{weightSum} = \sum_{m = 0}^{M-1} w^{[m]}_t$ of all drawn particles during the resampling.
+To determine both situations, we enhanced our \texttt{filter} function shown in figure~\ref{lst:pf_filter}. The enhanced version is shown in~\ref{lst:pf_recovery}. During the resampling, the new particle set's $\texttt{weightSum} = \sum_{m = 0}^{M-1} w^{[m]}_t$, which is the sum of all drawn particles, during the resampling, is being calculated.
 
-If the $\texttt{weightSum} == 0$, the $\chi_t$ is empty, thus all particles are moved out of bounds or are placed at occupied positions and thus are being ignored. Consequently, a new random particle set is being generated. The particles are being distributed as described in section~\ref{sec:algo_initial}, in other words, the position estimation is restarted.
+If the $\texttt{weightSum} == 0$, $\chi_t$ is empty, thus all particles are moved out of bounds or their location is already occupied and thus, they are being ignored. Consequently, a new random particle set is being generated. The particles are being distributed as described in section~\ref{sec:algo_initial}, in other words, the position estimation is restarted.
 
-If the $\texttt{weightSum} > 0$ the it gets normalized by the particle sets size. Then it is being stored in an array \texttt{particleSums}, which stores the latest three weightSums (line 24). When the \texttt{filter} function gets called the next time it first checks if the array already contains three weight sums, and if true, the average of the three weight sums is being calculated (line 8). If the average drops below $1.0$, we know, that the posteriori's distribution does not match users true position, resp.\ it is totally wrong. To recover from this state we add additional $20\%$ of the particle set's size, random particles. The random particles are also being distributed as described in section~\ref{sec:algo_initial}. Due to the fact, that the particles are added before the importance factoring and resampling, the added particles should help to recover from the state by getting higher importance factors, and thus are being drawn multiple times.
+If the $\texttt{weightSum} > 0$, it gets normalized by the particle sets size. Then, it is being stored in an array \texttt{particleSums}, which contains the latest three weightSums (line 24). When the \texttt{filter} function gets called the next time, it first checks if the array already contains three weight sums, and if true, the average of the three weight sums is being calculated (line 8). If the average drops below a certain threshold ($1.0$), we know, that the posteriori's distribution does not match the user's true position, resp.\ it is totally wrong. To recover from this state we add additional $20\%$ random particles. The random particles are also being distributed as described in section~\ref{sec:algo_initial}. Due to the fact, that the particles are added before the importance factoring and resampling, the added particles should help to recover from the state, by getting higher importance factors, and thus are being drawn multiple times.
 
-We tested different random particle counts, and $20\%$ seems to bring the best result. Adding to less particles does not really help to recover, but adding to much results in a heavily jumping position estimation. The reason for taking the average over the last three weight sums is, that it sometimes can happen, that weight sum drastically drops during one filtering, because the measurements to the beacons where heavily influenced and thus totally wrong.
+We tested different random particle counts, and $20\%$ seems to bring the best result. Adding to less particles does not really help to recover, but adding to much results in a heavily jumping position estimation. The reason for taking the average over the last three weight sums is, that it sometimes can happen, that the weight sum drastically drops during one filter call. This happens for instance, if the measurements to the beacons where heavily influenced, and thus totally wrong.
 
-% Insert figure with weight sums
+Figure~\ref{fig:algo_recovery} illustrates the recovery. The shown weight sums correspond to the two screenshots. During the experiment, we simulated the kidnapping problem, by walking very smooth from the lower lecture hall through the buildings foyer, by passing the large obstacle at the left side, into the upper right lecture hall. After being their stationary for a few seconds, we returned, by passing the obstacle on the other side. The walk's start and end are at the position, where the particles are being concentrated in figure~\ref{fig:algo_recovery_withRecovery}. During the walk, the iPhone's pedometer was not able to recognize any step. Both experiments, the one with recovery (fig.~\ref{fig:algo_recovery_withRecovery}) and the one without recovery (fig.~\ref{fig:algo_recovery_withoutRecovery}), are being simulated by using real recorded data as input.
+
+We empirically found out, that a threshold of $1.0$ fits best. After $\sim 90~\text{sec}$ the recovery was being executed the first time. During the long break from $60 - 90~\text{sec}$, the walk through the foyer, no beacons, with an estimated distance less than $5~m$, where ranged. After, receiving measurements again, the average particle weight sum dropped below the threshold, and recovery took place. Thus, the particles jumped from the lower to the upper lecture hall. The same happened at $\sim 155~\text{sec}$ on the way back. The third recovery was being executed at $\sim 184~\text{sec}$, which caused the small jump to the end point.
+
+With disabled recovery, we can see that the algorithm is not possible to find the true location. After $\sim 90~\text{sec}$ the weight sum drops to $\sim 0$ and stays there.
+
 
 % FILTER
 \begin{figure}
@@ -628,13 +633,40 @@ filter($\chi_{t-1}$, $z_t$, map) {
 \label{lst:pf_recovery}
 \end{figure}
 
+\begin{figure}
+\subfloat{
+	\begin{tikzpicture}
+		\begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.4\textheight,
+			xlabel={Time (sec)},
+			ylabel={ParticleWeightSum},
+			legend entries={with recovery, without recovery},
+			grid = major]
+			\addplot [red, mark=x] table[col sep=semicolon, x=timestamp, y=normalizedWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_withRecovery.csv};
+			\addplot [blue, mark=x] table[col sep=semicolon, x=timestamp, y=normalizedWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_withoutRecovery.csv};
+		\end{axis}
+	\end{tikzpicture}
+}
 
-\subsection{Locaton Estimation}
-weighted mean, mean, 1sigma ellipse
+\subfloat[with recovery] {
+  \includegraphics[height=0.5\textheight]{figures/algo_withRecovery}
+  \label{fig:algo_recovery_withRecovery}
+}
+\subfloat[without recovery] {
+  \includegraphics[height=0.5\textheight]{figures/algo_withoutRecovery}
+  \label{fig:algo_recovery_withoutRecovery}
+}
+\caption {Depicts the build in recovery, which adds additional $20\%$ particles if the average weight sum drops below a threshold of $1.0$.}
+\label{fig:algo_recovery}
 
+\end{figure}
 
-% initial generation around beacons
-% recovery
-% motion integration + filtering
-% roulette filtering
-% buffering (stationary)
+\subsection{Location Estimation}
+To be able to display a concrete location estimation instead of a particle cloud, the \acs{PF}'s posteriori belief, which is a multi-modal distribution, represented by the particle set $\chi_t$, needs to be converted into another distribution. As mentioned in chapter~\ref{chap:fundamentals}, uncertainties are typically modeled as gaussians. Consequently, it is applicable to transform \acs{PF}'s posteriori into a two-dimensional gaussian $N(\mu, \Sigma)$, where the mean $\mu = (x, y)^T$ represents the concrete location, and the location's uncertainty is being expressed as the covariance matrix $\Sigma = \bigl(\begin{smallmatrix} \sigma_{x}^2&\sigma_{xy}\\ \sigma_{yx}&\sigma_{y}^2 \end{smallmatrix} \bigr)$.
+
+The mean $\mu$, can either be $\chi$'s arithmetic mean or its weighted mean, by using the particle's importance factors as weights. Based on the estimated mean the covariance $\Sigma$ can be determined. The gaussian's parameters can then be used to visualize the user's location on the map in form of a $1\sigma\text{-ellipse}$, thus the user's true location is with a probability of $68\%$ somewhere in the $1\sigma\text{-ellipse}$. Figure~\ref{fig:algo_sigellipse}, depicts the transformation of the particle set $\chi$ into a gaussian, shown as $1\sigma\text{-ellipse}$.
+
+\begin{figure}
+	\includegraphics[width=0.7\textwidth]{figures/sigellipse}
+	\caption{Depicts the transformation of $\chi$ into a gaussian, shown as $1\sigma\text{-ellipse}$, with a weighted mean.}
+	\label{fig:algo_sigellipse}
+\end{figure}
