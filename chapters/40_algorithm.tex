@@ -11,7 +11,7 @@ In this chapter we first outline the reasons for choosing \acs{MCL} instead of a
 \end{figure}
 
 
-\section{Design Decision}
+\section{Design Decision} \label{sec:algo_decision}
 As mentioned in chapter \ref{chap:fundamentals}, there are different approaches for indoor localization. Our approach is based on \acl{PF}, resp.\ \acl{MCL}, due to the following reasons.
 
 As shown in chapter \ref{chap:ibeacons} and mentionend by \citet{IEEE:survey_wireless_indoor_pos}, wireless signals are heavily influenced by obstacles and the environment, thus we decided not to just rely on the measured distances to the beacons. As outlined in chapter \ref{chap:sensors}, smartphone usually include sensors, such as an accelerometer, gyroscope, and a magnetometer, which can be used to estimate, for instance, a walked distance. Consequently, the algorithm needs to be able to fuse the different sensor data, to improve the location estimation by reducing its uncertainty, which is one of the main reasons for choosing \acs{PF}.
