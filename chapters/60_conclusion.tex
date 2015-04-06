@@ -1,15 +1,47 @@
 \chapter{Conclusion} \label{chap:conclusion}
+At the beginning we mentioned three different example use-cases for indoor self-localization, which would enhance our lives. Theses and other use-cases are now, from our perspective, an achievable goals, because as of now, the problem was rather the localization approach, than the large beacon deployments, as recently shown at the \emph{South By South West (SXSW)} music and film festival in Austin (TX, USA), where the festivals organizers deployed more than 1000 beacons to enhance the festival with social networking features.
+% Also, companies such as Walmart and Walgreens did already announce in May 2014, that they will deploy beacons by using General Electric's in-store LED lighting fixtures, that additionally act as beacons.
+
+In this work we presented, an indoor self-localization approach for smartphones using iBeacons, to exactly solve this problem. Our solution is a cross-platform solution, that works with common smartphones, equipped with build-in sensors and a Bluetooth Smart, resp.\ \acl{BLE}, chip.
+
+The system's complexity is very low; besides, the smartphones and the beacons, no additional hardware or infrastructure is required, which also reduces the initial and ongoing costs. The whole localization takes place on the user's device. Furthermore, our location estimation is very robust compared to other approaches.
+
+Due to the high uncertainty of the \acs{RSS} based distance estimation to the deployed known beacons, our solution relies not just on the wireless signals. We additionally, use the smartphones build in sensors, to determine the user's motion. Furthermore, we integrate the building's map, which represents its free and occupied space. Finally, our application combines all three sources by using a particle filter, to estimate the user's location and to reduce the overall uncertainty.
+
+As a result, our approach solves the global localization problem, and is also able, to detect and to recover from failure state. During our experiments, we where able estimate a user's stationary location, with a mean error of 2.29~m. Furthermore, we were able to track a user's path in our test environment. 
+
+
+% http://sxsw.com/mobile
+
+% besser als multilateration
+% lokalisierung in einem gang sollte gut gehen
+% hersteller der beacons in lampen verbaut in supermarkt
+
 % starke verzögerung (2.5 sec - 3sec)
 % also usability während dem drauf schauen lackt
 % stark von der qualität der odometrie und signalen abhänig
 \section{Future Work} \label{sec:future}
+There are still a few open questions. Some of them are just interesting, others are necessary for future improvement.
 
-\begin{itemize}
-	\item Beacons an die Decke hängen
-	\item Noch mehr Beacons verteilen
-	\item Beacons anderer Hersteller testen
-	\item Barometer von iPhone 6 + Neuer Motion Chip M8
-	\item nicht nur 2D sondern auch 3D
-	\item Multi-Robot localization problem. Smartphone could appear as an additional beacon or tell new devices that are very close to it its localized position
-	\item Define beacon regions to adjust parameters of filter to be more accurate (zwischen Einkaufsregalen)
-\end{itemize}
+Companies such as Walmart and Walgreens did announce in May 2014, that they will deploy beacons, by using General Electric's in-store LED lighting fixtures, that additionally act as beacons. Thus, it would be interesting to know, if the localization could be improved by deploying beacons at the building's ceiling, resp.\ above the users.
+
+Additionally, it would be interesting to know, if a better location estimation could be achieved by using Apple's new iPhone~6 / iPhone~6 Plus, which is shipped with a new motion coprocessor.
+
+The new iPhone also is equipped with a new sensor, a barometer. Thus, it would be worthwhile to extend our solution to three-dimensional space and to integrate \acl{CM}'s floor ascending and descending capability.
+
+Furthermore, it would be good to know, if there are differences in the beacon signal's quality, especially if a more accurate proximity estimation would be possible, by using beacons from other manufacturers.
+
+Another very interesting topic, maybe a research topic, would be to find out, if the solution would benefit from solving the multi-robot problem, by turning the device itself in an beacon, and additionally by communicating with other devices.
+
+But of course, the most interesting is to see, how good the application performs in large deployments, for instance on a trade fair.
+
+%\begin{itemize}
+%	\item Beacons an die Decke hängen
+%	\item Noch mehr Beacons verteilen
+%	\item Beacons anderer Hersteller testen
+%	\item Barometer von iPhone 6 + Neuer Motion Chip M8
+%	\item nicht nur 2D sondern auch 3D
+%	\item Multi-Robot localization problem. Smartphone could appear as an additional beacon or tell new devices that are very close to it its localized position
+%	\item Define beacon regions to adjust parameters of filter to be more accurate (zwischen Einkaufsregalen)
+%\end{itemize}
+%Funktioniert gut bei korridore folgen, da wenig platz zum abweichen von motion, es werden wenige partikel benötigt.
