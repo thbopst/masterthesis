@@ -1,17 +1,335 @@
 \chapter{Evaluation} \label{chap:evaluation}
+After presenting our solution for indoor self-localization, we are now going to evaluate the in chapter~\ref{chap:pf} presented implementation, based on the criteria according to \citet{IEEE:survey_wireless_indoor_pos}, introduced in section~\ref{sec:fund_loc}.
 
-% real world example. WiFi was not turned off.
-% Evaluieren sollte man evtl. auch implementierung mit absolut korrekten simulierten werten und dann einmal durch laufen lassen.
+\section{Accuracy \& Precision}
+To determine our solutions accuracy and its precision, we did different tests in a real world experiment. Therefor, we deployed the 10 beacons, we bought from BEACONinside, in parts of a building of our university. We tested it in a static environment; thus, the test person was the only dynamic subject in the our experiment. Besides the deployed beacons, the building is also equipped with several WiFi access points, which are also sending on 2.4~GHz, and thus, may influence the bacons's signal's.
 
-\begin{itemize}
-	\item Accuracy
-	\item Precision
-	\item Complexity
-	\item Robustness % kidnapping, wrong compass / device motion / distance
-	\item Scalability % mehr beacons hinzufügen und dann entfernen
-	\item Cost
-\end{itemize}
+\subsection*{Experiment~1}
+In our first experiment we equipped just one lecture hall with our 10 beacons. Figure~\ref{fig:f007} shows a picture of the lecture hall, to give a better insight. On the following screenshots, it is depicted on the map's lower part, taken from the lower left corner.
+
+\begin{figure}
+	\includegraphics[width=0.9\textwidth]{figures/F007}
+	\caption{Shows the lecture hall depicted on the map's lower part.}
+	\label{fig:f007}
+\end{figure}
+
+\begin{figure}
+	\subfloat[Path] {
+		\includegraphics[height=0.45\textheight]{figures/eval_1_path}
+		\label{fig:exp1_path}
+	}
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_1_1}
+		\label{fig:exp1_img_1}
+	}
+	
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_1_2}
+		\label{fig:exp1_img_2}
+	}
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_1_3}
+		\label{fig:exp1_img_3}
+	}
+	\caption{Screenshots illustrate some results of Experiment~1.}
+	\label{fig:exp1_screenshot}
+\end{figure}
+
+During the experiment we tested how good our localization works inside the shown lecture hall. The lecture hall, depicted in the lower part of figure~\ref{fig:exp1_path}, is approx.\ 15~meters long and 8–11 meters wide. The 10 beacons's positions are depicted as blue circles.
+
+To determine the algorithms accuracy, we walked on the green path, beginning and ending at the upper left corner. At the end of each walk we compared the application's estimated end position with the true end position, by calculating the error, in form of the euclidian distance. As mentioned in section~\ref{sec:algo_locEstimation}, the location can be estimated by either calculating the mean of $\chi$, or by calculating its weighted mean. To be able to compare their results, we calculated the error for both approaches.
+
+Additionally, we calculated the error of the motion tracking's end position with the true position. To be able to compare the motions error with the applications error, by taking the motions drift into account, we split up the experiment in three scenarios. First, we walked just one round on the green path. Second, two rounds and third, three rounds. For each scenario we did three walks in clockwise and three in counter-clockwise direction on the path.
+
+Furthermore, we wanted to find out, if the accuracy improves after being stationary for a short time at the end position. Consequently, we calculated the error for the estimated position directly after integrating the last reported distance, estimated by \ac{CM}'s \texttt{CMPedometer} component, and additionally, $\approx 5~sec$ after integrating the last distance estimation.
 
 
+\begin{figure}
 
-% scenario: Alle 10 beacons in F007, und in simulation später die Anzahl reduzieren. 10 Messungen durchführen. Immer 10 Sekunden am Schluss warten. 2 mal 1 Runde, 2 mal 2 Runden, 2 mal 3 Runden, in beide Richtungen.
+\subfloat[Error at stop]{
+	\begin{tabular}{c||cc|cc}
+		Scenario & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
+		\hline
+		1 & 2.23 & 2.74 & 2.08 & 2.55\\
+		2 & 2.16 & 2.53 & 2.16 & 2.53\\
+		3 & 3.00 & 3.64 & 3.55 & 4.23\\
+		\hline
+		1--3 & 2.47 & 2.83 & 2.60 & 3.01\\
+	\end{tabular}
+	\label{fig:exp1_results_1}
+}
+\subfloat[Error after $\approx 5~sec$]{
+	\begin{tabular}{c||cc|cc}
+		Scenario & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
+		\hline
+		1 & 2.19 & 3.13 & 2.17 & 3.13\\
+		2 & 1.94 & 2.52 & 1.95 & 2.53\\
+		3 & 2.73 & 3.71 & 2.74 & 3.72\\
+		\hline
+		1--3 & 2.29 & 2.97 & 2.29 & 2.97\\
+	\end{tabular}
+	\label{fig:exp1_results_2}
+}
+
+\subfloat[Error of motion tracking]{
+	\begin{tabular}{c||cc}
+		Scenario & $\mu$ & $\sigma$\\
+		\hline
+		1 & 3.63 & 4.24\\
+		2 & 7.11 & 8.05\\
+		3 & 10.81 & 13.21\\
+		\hline
+		1--3 & 7.19 & 13.21\\
+	\end{tabular}
+	\label{fig:exp1_results_3}
+}
+\caption{Depicts the results of experiment~1.}
+\label{fig:exp1_results}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}
+	\begin{axis}[trim axis left, trim axis right, height=0.4\textheight,
+		xlabel={Scenario},
+		ylabel={Error (m)},
+		legend entries={$\mu$ (fig.\ \ref{fig:exp1_results_1}), $\mu_w$ (fig.\ \ref{fig:exp1_results_1}), $\mu$ (fig.\ \ref{fig:exp1_results_2}), $\mu_w$ (fig.\ \ref{fig:exp1_results_2}), $\mu$ (fig.\ \ref{fig:exp1_results_3})},
+		legend pos=north west,
+		grid = major,
+		xtick=data]
+		\addplot [blue, only marks] table[col sep=semicolon, x=scenario, y=mean] {csv/eval/Eval_1_ep1/NDFScenario.csv};
+		\addplot [blue, only marks, mark=square*] table[col sep=semicolon, x=scenario, y=w_mean] {csv/eval/Eval_1_ep1/NDFScenario.csv};
+		\addplot [red, only marks] table[col sep=semicolon, x=scenario, y=mean] {csv/eval/Eval_1_ep2/NDFScenario.csv};
+		\addplot [red, only marks, mark=square*] table[col sep=semicolon, x=scenario, y=w_mean] {csv/eval/Eval_1_ep2/NDFScenario.csv};
+		\addplot [green, only marks] table[col sep=semicolon, x=scenario, y=mean] {csv/eval/Eval_1_motion/NDFScenario.csv};
+	\end{axis}
+\end{tikzpicture}
+\caption{Visualizes the results shown in figure~\ref{fig:exp1_results}.}
+\label{fig:exp1_visualization}
+\end{figure}
+
+\subsubsection*{Result}
+The experiments results are shown in figure~\ref{fig:exp1_results} and are being visualized in figure~\ref{fig:exp1_visualization}.
+
+Figure~\ref{fig:exp1_results_1} depicts the average distance error and the error's spreading, for each scenario, directly after integrating the last motion; whereas, figure~\ref{fig:exp1_results_2} values are being calculating by using the estimated position $\approx 5~\text{sec}$ after the last motion integration. The calculated average error by using $\chi$'s mean, as location, is denoted with $\mu$ and the errors standard deviation is denoted with $\sigma$. $\mu_w$ and $\sigma_w$, are the average error and its standard deviation by using the weighted mean of $\chi$ for the position estimation.
+Figure~\ref{fig:exp1_results_3} shows the motion tracking's error $\mu$ and the errors spreading, in form of its standard deviation $\sigma$.
+
+The results show, that during the experiment an accuracy of $2.29~m$--$2.6~m$ was achieved. It also shows, that the location estimation, tends to improves after being stationary at the end position, as expected.
+
+The difference of the two position estimation approaches, is very small. The result sways, sometimes $\chi$'s mean, and sometimes its weighted mean is more accurate. We assume, that the minimal difference is based on the particle clouds concentration.
+
+The result's visualization also clearly states, that the motion's error grows with increasing rounds; whereas, the estimated pose error just grows minimal. We assume, that the minimal grow is the result of a few outlaws in the motion error, which of course also infects the position estimation. Figure~\ref{fig:exp1_img_1,fig:exp1_img_2,fig:exp1_img_3} depict three examples of the experiment. They clearly show, that the motions accuracy influences the position estimation. If the motion is completely wrong (Fig.\ \ref{fig:exp1_img_3}), the in section~\ref{sec:algo_stationary} introduced recovery feature, often needs to intervene, which causes several jumps in the position estimation. Whereas, figure~\ref{fig:exp1_img_2} shows, that if the motion is acceptably wrong, the algorithm can correct the path (of course not perfectly). If the motion estimation fits the true path, the estimated path depends just on the beacon's signals quality, as shown in figure~\ref{fig:exp1_img_1}.
+
+\subsection*{Experiment~2}
+The purpose of our second experiment is, on one side to double check our implementations accuracy by using another position, and on the other side, to demonstrate the dependency of the estimations accuracy and the amount of deployed beacons.
+
+This time, our test person walked not on a random path. The person started at the orange circle, shown in figure~\ref{fig:exp2_imgs} in the upper left corner, and stopped at the green circle, approx.\ in the figure's center.
+
+To demonstrate the reduction of the deployed beacon, we recorded 5 test walks with 10 beacons deployed. Then we used our simulation, to play back the recorded values by reducing the deployed beacons. Thus, the values are directly comparable, because for all test cases the exact same input data was being used. Also in this case we calculated the location error directly after integrating the last motion and $\approx 5~\text{sec}$ later.
+
+\subsubsection*{Result}
+The experiment's results are shown in figure~\ref{fig:exp2_results} and visualized in figure~\ref{fig:exp2_visualization}; furthermore, the corresponding beacon deployment, is shown in figure~\ref{fig:exp2_imgs}.
+
+First of all, the result clearly approves, that the difference between $\chi$'s mean and its weighted mean, for the location estimation, is negligible.
+
+Secondly, it clearly shows, that the estimated location compared to the motion is more accurate. Additionally, it depicts, that the location estimation drastically improves after being a few seconds stationary.
+
+The result also approves, that the estimations accuracy depends on the deployed beacons. Thus, the more beacons the less error in the position estimation. But it also shows, that at a specific amount of beacons the error is not much being reduced. Furthermore, it shows, that to much beacons can also reduce the accuracy, at it seems to be the case at 4 and 2 deployed beacons. We assume, that the signal's of the two beacons, that we removed from case 4 to 2, where too bad and actually produced a worse estimation result, and thus, the case with just two beacons results in a better accuracy.
+
+\begin{figure}
+\subfloat[Error at stop] {
+	\begin{tabular}{c||cc|cc}
+		Beacons & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
+		\hline
+		10 & 3.38 & 4.04 & 3.33 & 3.99\\
+		8 & 3.18 & 3.94 & 3.15 & 3.91\\
+		6 & 4.39 & 5.72 & 4.37 & 5.70\\
+		4 & 4.48 & 5.28 & 4.50 & 5.30\\
+		2 & 3.68 & 4.63 & 3.69 & 4.66\\
+	\end{tabular}
+	\label{fig:exp2_results_1}
+}
+\subfloat[Error after $\approx 5~sec$] {
+	\begin{tabular}{c||cc|cc}
+		Beacons & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
+		\hline
+		10 & 1.52 & 1.80 & 1.52 & 1.79\\
+		8 & 1.67 & 2.07 & 1.67 & 2.06\\
+		6 & 2.87 & 3.96 & 2.89 & 3.96\\
+		4 & 3.23 & 3.88 & 3.23 & 3.88\\
+		2 & 2.95 & 3.60 & 2.98 & 3.63\\
+	\end{tabular}
+	\label{fig:exp2_results_2}
+}
+
+\subfloat[Error of motion tracking]{
+	\begin{tabular}{c||cc}
+		Beacons & $\mu$ & $\sigma$\\
+		\hline
+		2--10 & 5.68 & 7.04
+	\end{tabular}
+	\label{fig:exp2_results_3}
+}
+\caption{Depicts the results of experiment~2.}
+\label{fig:exp2_results}
+\end{figure}
+
+\begin{figure}
+	\begin{tikzpicture}
+	\begin{axis}[trim axis left, trim axis right, height=0.45\textheight,
+		xlabel={Deployed beacons},
+		ylabel={Error (m)},
+		legend entries={$\mu$ (fig.\ \ref{fig:exp2_results_1}), $\mu_w$ (fig.\ \ref{fig:exp2_results_1}), $\mu$ (fig.\ \ref{fig:exp2_results_2}), $\mu_w$ (fig.\ \ref{fig:exp2_results_2}), $\mu$ (fig.\ \ref{fig:exp2_results_3})},
+		legend pos=south east,
+		grid = major,
+		xtick=data, x dir=reverse]
+		\addplot [blue, only marks] table[col sep=semicolon, x=beacon, y=mean] {csv/eval/Eval_2_ep1/NDFBeacon.csv};
+		\addplot [blue, only marks, mark=square*] table[col sep=semicolon, x=beacon, y=w_mean] {csv/eval/Eval_2_ep1/NDFBeacon.csv};
+		\addplot [red, only marks] table[col sep=semicolon, x=beacon, y=mean] {csv/eval/Eval_2_ep2/NDFBeacon.csv};
+		\addplot [red, only marks, mark=square*] table[col sep=semicolon, x=beacon, y=w_mean] {csv/eval/Eval_2_ep2/NDFBeacon.csv};
+		\addplot [green, only marks] table[col sep=semicolon, x=beacon, y=mean] {csv/eval/Eval_2_motion/NDF.csv};
+	\end{axis}
+\end{tikzpicture}
+\caption{Visualizes the results shown in figure~\ref{fig:exp2_results}.}
+\label{fig:exp2_visualization}
+\end{figure}
+
+
+\begin{figure}
+	\subfloat[10 Beacons] {
+		\includegraphics[width=0.45\textwidth]{figures/eval_2_10B}
+	}
+	\subfloat[8 Beacons] {
+		\includegraphics[width=0.45\textwidth]{figures/eval_2_8B}
+	}
+	
+	\subfloat[6 Beacons] {
+		\includegraphics[width=0.45\textwidth]{figures/eval_2_6B}
+	}
+	\subfloat[4 Beacons] {
+		\includegraphics[width=0.45\textwidth]{figures/eval_2_4B}
+	}
+	
+	\subfloat[2 Beacons] {
+		\includegraphics[width=0.45\textwidth]{figures/eval_2_2B}
+	}
+
+	\caption{Shows the different beacon deployments during the experiment.}
+	\label{fig:exp2_imgs}
+\end{figure}
+
+
+\subsection*{Experiment~3}
+After evaluating the solution's accuracy in the first two experiments, this experiment shows how good the solution is able to track an users path in a larger scenario. Therefor, we additionally used the buildings foyer, depicted in figure~\ref{fig:f-foyer}, and one, resp.\ two additional lecture halls. During the examples, we still used just 10 beacons, as shown on the maps, which depicts an actual space of $22.22~m \times 33.06~m$.
+
+The first example is depicted in figure~\ref{fig:exp2_imgs}. The green line depicts the actual path, beginning at the top right. The black dashed line shows the motion path; thus, the estimated path by combining pedometer and heading. The estimated path is marked as blue dashed path. Figure~\ref{fig:exp2_imgs_1} shows, an example where the motion was very accurate, actually more accurate than the actual estimated path; whereas figure~\ref{fig:exp2_imgs_2}, \ref{fig:exp2_imgs_3} and~\ref{fig:exp2_imgs_4} depict examples where the motion path is bad, resp.\ completely wrong, but the algorithm was more or less able to approximate the actual path.
+
+Figure~\ref{fig:exp2_imgs_5} depicts another example, where the test person walked around the big stair in the middle of the buildings foyer. The screenshot shows, that the algorithm also was able to approximate this path. During this example the foyer was equipped with just 4 beacons. We found out, that 4 beacons for for this large area to less, if the motion is incorrectly.
+
+Another example path is shown in figure~\ref{fig:exp2_imgs_6}. During this example the wall between the two upper rooms was opened. As we can see, the algorithm was able to track the path, but fairly we have to say, that this would also not be possible without having such an accurate motion, by using just 10 beacons. The screenshot also shows, that the estimated end pose is actually not at the right position, but rather $\approx 4-5~m$ too distant. But it also shows, that two particles are located next to the right position, and that the plotted $\sigma-\text{ellipse}$ is oriented towards these two particles.  The reason therefore is, that the algorithms weight sum dropped below the threshold and recovery was executed. Unfortunately, we stopped the recording at this point in time, otherwise the its very likely that the particle cloud would jump to the true location. 
+
+
+\begin{figure}
+	\includegraphics[width=0.9\textwidth]{figures/F-Foyer}
+	\caption{Shows the buildings Foyer depicted on the map's middle.}
+	\label{fig:f-foyer}
+\end{figure}
+
+\begin{figure}
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_3_1}
+		\label{fig:exp2_imgs_1}
+	}
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_3_2}
+		\label{fig:exp2_imgs_2}
+	}
+	
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_3_3}
+		\label{fig:exp2_imgs_3}
+	}
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_3_4}
+		\label{fig:exp2_imgs_4}
+	}
+	\caption{Shows the different beacon deployments during the experiment.}
+	\label{fig:exp2_imgs}
+\end{figure}
+
+\begin{figure}
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_3_5}
+		\label{fig:exp2_imgs_5}
+	}
+	\subfloat[] {
+		\includegraphics[height=0.45\textheight]{figures/eval_3_6}
+		\label{fig:exp2_imgs_6}
+	}
+	\caption{Shows the different beacon deployments during the experiment.}
+\end{figure}
+
+
+\subsection*{Summary}
+To summarize, we tested our algorithm in a typical environment, with enabled WiFi, obstacles and lots of reflecting material.
+
+The experiments approved, that the estimations accuracy depends on the amount of deployed beacons, but also on their position and attitude relative to the user, which influences the beacon's signal. Furthermore, we found out, that the estimated position not just depends on the beacons signal's, it also depends on the motions quality. As shown by experiment~3, location estimation is possible with having too less beacons deployed, but therefor the motion must be relatively correct. But, it also shows, that if enough beacons are deployed, our solution is able to correct path on the basis of the beacon's signals.
+
+We found out, that the location estimation improves after being stationary for a few seconds, if enough beacons are deployed.
+
+Due to the fact that the applications accuracy and precision depends on so many different factors, we can just point out, what the system reached during our experiments, but we cannot provide, in general valid precision and accuracy values for the system. During our experiments we reached an accuracy up to 1.52~meters (experiment 2). By combining the results of experiment 1 and 2 (with 10 beacons), our application reached an accuracy of 2.12~meters ($\mu=2.12$, $\sigma=2.72$). Our applications precision, expressed as commutative distribution function (CDF), is shown in figure~\ref{fig:eval:precision}.
+
+\pgfmathdeclarefunction{cdf}{2}{%
+  \pgfmathparse{1/(1 + exp(-0.07056*((x-#1)/#2)^3 - 1.5976*(x-#1)/#2))}%
+}
+
+
+\begin{figure}
+	\begin{tikzpicture}
+	\begin{axis}[trim axis left, trim axis right, height=0.4\textheight,
+		xlabel={Error / Accuracy $x$ (m)},
+		ylabel={$CDF(x)$},
+		legend entries={Exp.\ 1, Exp.\ 2, Exp.\ 1+2},
+		legend pos=south east,
+		grid = major]
+		\addplot[red, smooth, mark=no, domain=-6.08:10.66] {cdf(2.29, 2.97)};
+		\addplot[blue, smooth, mark=no, domain=-6.08:10.66] {cdf(1.52, 1.79)};
+		\addplot[green, smooth, mark=no, domain=-6.08:10.66] {cdf(2.12, 2.72)};
+	\end{axis}
+\end{tikzpicture}
+\caption{Depicts our solutions precision during the experiments.}
+\label{fig:eval:precision}
+\end{figure}
+
+
+% depends on the beacons position
+% on the location in the room
+% on the building
+% on the beacons itself
+% -> on beacons signals, and motion quality
+
+\section{Scalability}
+The area covered from our localization system, depends just on the provided map and deployed beacons. Thus, our system is highly scalable. It can just be used within a single room, but it also can be extended, to a very large, two-dimensional space.
+
+\section{Robustness}
+The system is very robust. It can deal with wrong and / or missing beacon signals, which is a very common problem. Furthermore, it is able to deal with wrong motion data, caused by influenced heading or wrong distance estimation provided by the pedometer, as shown by the experiments.
+
+Due to the implemented recovery from failure state, it is also able to detect completely wrong position estimations; for instance, caused by the kidnapping problem. The only requirement for the recovery is, that the application needs to at least receive the signal of one beacon.
+
+\section{Complexity}
+The solutions complexity is relatively low. Besides the beacons, and a common smartphone, no additional infrastructure such as, a network connection or external power supply, is required.
+	
+Also, the software complexity is relatively low, due to the used particle filter algorithm. Of course, if a platform does not provide such high level \acs{API}'s, especially such as \acl{CM}'s pedometer, to estimate the walked distance, this low level of complexity would not be possible.
+
+\section{Cost}
+The the system's biggest advantages regarding costs are, that besides the beacons no additional infrastructure is required, and the users can use their own smartphones.
+
+Consequently, the system's costs mainly depends on the to be covered area, and thus, on the required amount of beacons, and the initial deployment and setup costs. 100 beacons (incl.\ batteries) from BEACONinside do cost 1790~EUR, but there are also cheaper manufacturers.
+
+Furthermore, the system's maintenance effort is relatively low. Typically, the beacons's batterie's lifetime is up to a year or more. And, as long as no big changes are made to the beacon's environment, they also do not need to be recalibrate.
+
+\section{Usability}
+The localization system is very easy to use. The user just has to download the App from the platform's app store. After enabling and giving the application access to bluetooth, the localization can start.
+
+The user interface can also be reduced to a minimum, by just showing the environments map, the estimated position and the corresponding $\sigma-\text{ellipse}$, instead of showing the beacons, the motions path, the users estimated path and the particle cloud.
+
+There is just one disadvantage from a usability point of view, which is the position estimation's delay. If the user walks, the estimated position is just being updated ever $\approx 3~\text{sec}$, due to the fact, that \acs{CM}'s just provide a distance estimation every $\approx 2.5~\text{sec}$, as mentioned in chapter~\ref{chap:pf}. If the user is stationary, the delay of $\approx 1~\text{sec}$ is from our point of view negligible. 

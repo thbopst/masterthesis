@@ -580,7 +580,7 @@ PART_3($\chi_{t-1}$) {
 \end{figure}
 
 
-\subsection{Recovery / Kidnapping Problem}
+\subsection{Recovery / Kidnapping Problem}\label{sec:algo_recovery}
 Recovery has two purposes in our application. Firstly, it can happen, that all particles are moving out of bounds, and thus, are being filtered out. Secondly, the particles are on a totally wrong position, which can happen if the user walked to soft, and thus, the pedometer could not recognize the users steps. It can also happen that the orientation does not fit the actual one; for instance, the user's phone points not straight forward during the walk.
 
 To determine both situations, we enhanced our \texttt{filter} function shown in figure~\ref{lst:pf_filter}. The enhanced version is shown in~\ref{lst:pf_recovery}. During the resampling, the new particle set's $\texttt{weightSum} = \sum_{m = 0}^{M-1} w^{[m]}_t$, which is the sum of all drawn particles, during the resampling, is being calculated.
@@ -663,7 +663,7 @@ filter($\chi_{t-1}$, $z_t$, map) {
 
 \end{figure}
 
-\subsection{Location Estimation}
+\subsection{Location Estimation}\label{sec:algo_locEstimation}
 To be able to display a concrete location estimation instead of a particle cloud, the \acs{PF}'s posteriori belief, which is a multi-modal distribution, represented by the particle set $\chi_t$, needs to be converted into another distribution. As mentioned in chapter~\ref{chap:fundamentals}, uncertainties are typically modeled as gaussians. Consequently, it is applicable to transform the \acs{PF}'s posteriori into a two-dimensional gaussian $N(\mu, \Sigma)$, where the mean $\mu = (x, y)^T$ represents the concrete location, and the location's uncertainty is being expressed as the covariance matrix $\Sigma = \bigl(\begin{smallmatrix} \sigma_{x}^2&\sigma_{xy}\\ \sigma_{yx}&\sigma_{y}^2 \end{smallmatrix} \bigr)$.
 
 The $\mu$, can either be $\chi$'s arithmetic mean or its weighted mean, by using the particle's importance factors as weights. Based on the estimated mean, the covariance $\Sigma$ can be determined. The gaussian's parameters can then be used to visualize the user's location on the map in form of a $1\sigma\text{-ellipse}$. Thus the user's true location is with a probability of $68\%$ somewhere in the $1\sigma\text{-ellipse}$. Figure~\ref{fig:algo_sigellipse}, illustrates the transformation of the particle set $\chi$ into a gaussian, shown as $1\sigma\text{-ellipse}$.

@@ -1,8 +1,12 @@
 ## Mac OSX
 .DS_Store
 
+## texpad
+.texpadtmp/
+
 ## exclude PDF
 thesis.pdf
+*.pdf
 
 ## Core latex/pdflatex auxiliary files:
 *.aux
