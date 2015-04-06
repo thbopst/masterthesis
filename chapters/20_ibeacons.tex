@@ -60,7 +60,7 @@ As mentioned before beacons are small System-on-Chip devices, which send \acs{BL
 
 In this section we are first giving an insight in the generally valid details. Afterwards, we focus on the possible configuration parameters of the beacons hardware, we use. Finally, we describe the necessary steps, after deploying the beacons.
 
-\subsection{General details}
+\subsection{General Details}
 In general, each beacon sends a \acs{BLE} signal in a fixed time interval. On one side, the signal contains information to uniquely identify a beacon, and on the other side, data to be able to estimate the proximity, i.e.\ the distance, between the beacon and the device itself.
 
 \paragraph{Identifier} The unique identifier consists of three parts, the \texttt{proximityUUID}, \texttt{major}, and \texttt{minor}, which together form a unique identifier. Usually, a smartphones application is not being interested in all beacons that are around, but rather in a specific subset. Thus, the application has to tell the \ac{OS} in which it is interested in. The intention of the identifier's three parts is, to build a hierarchical identifier system for beacons, to be able to range just for a subset. The following example explains the three parts and their purposes:
@@ -77,7 +77,7 @@ By building such an hierarchy, an application can also just range for beacons of
 
 \paragraph{Proximity estimation} As mentioned in chapter~\ref{chap:fundamentals}, there are several physical methods to estimate the distance between a sender of an radio frequency signal and the receiver. In this case the \acl{RSS} is used to estimate the proximity. Therefor, the receiver needs to know which Tx-power level was used to send the radio frequency signal. As mentioned in section~\ref{sec:ble}, \ac{BLE}, uses the 2.4~GHz frequency. According to \citet{apple:getting_started} and \citet{binside:ds}, signals in this frequency band are heavily attenuated in obstructed environments and especially by water. Consequently, the knowledge of the sender's Tx-power level is not sufficient enough to estimate the distance. Thus, a calibration value, which is the \acl{RSS} in a distance of 1~meter, is also being send to the receiver. Therefore, the below described calibration step, after deploying the beacons is necessary.
 
-\subsection{Hardware specific} To test and evaluate our implementation we bought ten beacons from a company called \emph{BEACONinside GmbH} from Berlin, Germany. Our beacons have the Model No.: B0001-A (HW: Rev 1.1, SW: 1.0). Figure~\ref{fig:bi:beacons} shows a 3D slice of the beacons. According to \citet{binside:ds}, the beacon's signal have a range from 0 up to 40 meters. The chipset they used is manufactured by Texas Instruments (Model CC2541). The company obtained a licensed from Apple to manufacture the beacons, which are compatible to Apple's iBeacon specification~\citep{binside:ds}.
+\subsection{Hardware Specification} To test and evaluate our implementation we bought ten beacons from a company called \emph{BEACONinside GmbH} from Berlin, Germany. Our beacons have the Model No.: B0001-A (HW: Rev 1.1, SW: 1.0). Figure~\ref{fig:bi:beacons} shows a 3D slice of the beacons. According to \citet{binside:ds}, the beacon's signal have a range from 0 up to 40 meters. The chipset they used is manufactured by Texas Instruments (Model CC2541). The company obtained a licensed from Apple to manufacture the beacons, which are compatible to Apple's iBeacon specification~\citep{binside:ds}.
 
 \begin{figure}
 \includegraphics[width=0.6\textwidth]{figures/BEACONinside_beacons}
@@ -119,7 +119,7 @@ The next step is the calibration step. To be able to estimate the distance betwe
 
 According to \citet{apple:getting_started}, the smartphone needs to be positioned in $1~m$ distance to the beacon in portrait mode, with the device's top half uncovered. Than the \ac{RSSI} values where collected for at least 10~seconds. Meanwhile, the user should slowly move the device on an approx.\ 30~cm line in front of the beacon, by maintaining distance and orientation. After collecting the values, the average value is being calculated and configured on the beacon. It is advisable, to double check the device's estimated distance, after setting the calibration value. Due to the above mentioned problems, this needs to be repeated for every single beacon.
 
-\section{iOS 8.1 --- API}
+\section{API --- iOS 8.1}
 After imparting, what beacons are and how they work, we now focus on the receivers side, especially on the \acs{API} provided by Apple's iOS~8.1 platform. The \ac{CL} framework, provides in terms of iBeacons two functionalities, called \emph{region monitoring} and \emph{beacon ranging} \citep{apple:ios_doc_cl}.
 
 \subsection*{Region monitoring}
