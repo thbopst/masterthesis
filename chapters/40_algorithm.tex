@@ -3,13 +3,79 @@ Our solution is based on \acl{MCL}, introduced in section~\ref{sec:fund_pf}. Fig
 
 In this chapter we first outline the reasons for choosing \acs{MCL} instead of another algorithm. Next we describe the algorithms \emph{motion model}, which is on one side responsible for tracking the users motion by combining different sources, and on the other side, for the sampling from the motion model. Afterwards, we give a detailed insight in our solution's \emph{measurement model}. It tracks the beacon's signals, resp.\ the distances to the beacons, and implements the \acs{PF}'s importance factor calculation. In the end, we explain the algorithm's implementation, which builds upon the motion and measurement model.
 
-\begin{figure}
-\def\svgwidth{0.9\textwidth}
-\input{algo_architecture.pdf_tex}
-\caption{Architecture}
-\label{fig:algo_architecture}
-\end{figure} % TODO Fix architecture
+%\begin{figure}
+%\def\svgwidth{0.9\textwidth}
+%\input{algo_architecture.pdf_tex}
+%\caption{Architecture}
+%\label{fig:algo_architecture}
+%\end{figure}
 
+\begin{figure}
+\begin{tikzpicture} 
+ %\draw[style=help lines] (0,0) grid (15,10); 
+ 
+ % sensors
+ \node (A) at (13,9) {Accelerometer};
+ \node (G) at (13,7) {Gyroscope};
+ \node (M) at (13,5) {Magnetometer};
+ \node (B) at (13,2) {\acs{BLE}};
+ 
+ \draw (A) ellipse (1.5 and 0.5);
+ \draw (G) ellipse (1.5 and 0.5);
+ \draw (M) ellipse (1.5 and 0.5);
+ \draw (B) ellipse (1.5 and 0.5);
+ 
+ % Frameworks
+ \node (CMP) at (8,8) {\texttt{CMPedometer}};
+ \node (CMDM) at (8,6) {\texttt{CMDeviceMotion}};
+ \node (CLH) at (8,4) {\texttt{CLHeading}};
+ \node (CLB) at (8,2) {\texttt{CLBeacon}};
+ \node (MAP) at (8,0) {Map};
+ 
+ \draw (6,7.5) rectangle (10,8.5);
+ \draw (6,5.5) rectangle (10,6.5);
+ \draw (6,3.5) rectangle (10,4.5);
+ \draw (6,1.5) rectangle (10,2.5);
+ \draw (6,-0.5) rectangle (10,0.5);
+ 
+ 
+ \draw[very thick] (11.5,9) -- ++(-0.5,0) -- ++(0,-2) -- ++(0.5,0) -- ++(-0.5,0) -- ++(0,-1.9) -- ++(0.5,0);
+ \draw[->, very thick] (11,8) to (10,8);
+ \draw[->, very thick] (11,6) to (10,6);
+ 
+ 
+ \draw[->, very thick] (11.5,4.9) -- ++(-0.5,0) -- ++(0,-0.9) -- ++(-1,0);
+ \draw[->, very thick] (11.5,2) to (10,2);
+ 
+ % Particle Filter
+ \draw (-0.5,-1) rectangle (4.5,9);
+ \node (MM) at (2,8.5) {\textbf{Particle Filter}};
+ 
+ % Motion Model
+ \draw (0,5) rectangle (4,7);
+ \node (MM) at (2,6) {Motion Model};
+ 
+ \draw[->, very thick] (6,8) to (4,6.2);
+ \draw[->, very thick] (6,6) to (4,6);
+ \draw[->, very thick] (6,4) to (4,5.8);
+ 
+ % Measurement Model
+ \draw (0,0) rectangle (4,2);
+ \node (MM) at (2,1) {Measurement Model};
+ 
+ \draw[->, very thick] (6,2) to (4,1.1);
+ \draw[->, very thick] (6,0) to (4,0.9);
+ 
+ % Location
+ \node (L) at (2,-2.5) {$\chi$};
+ \draw (L) ellipse (0.5 and 0.5);
+ \draw[->, very thick] (2,-1) -- ++(0,-1);
+ \draw[->, very thick] (1.5,-2.5) -- ++(-2.25,0) -- ++(0,12.5) -- ++(2.75,0) -- ++(0,-1);
+
+\end{tikzpicture}
+\caption{Depicts the solution's architecture}
+\label{fig:algo_architecture}
+\end{figure}
 
 \section{Design Decision} \label{sec:algo_decision}
 As mentioned in chapter \ref{chap:fundamentals}, there are different approaches for indoor localization. Our approach is based on \acl{PF}, resp.\ \acl{MCL}, due to the following reasons.
