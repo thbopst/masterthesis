@@ -1,8 +1,8 @@
 \chapter{Evaluation} \label{chap:evaluation}
 After presenting our solution for indoor self-localization, we are now going to evaluate the in chapter~\ref{chap:pf} presented implementation, based on the criteria according to \citet{IEEE:survey_wireless_indoor_pos}, introduced in section~\ref{sec:fund_loc}.
 
-\section{Accuracy \& Precision}
-To determine our solutions accuracy and its precision, we did different tests in a real world experiment. Therefor, we deployed the 10 beacons, we bought from BEACONinside, in parts of a building of our university. We tested it in a static environment; thus, the test person was the only dynamic subject in the experiment. Besides the deployed beacons, the building is also equipped with several WiFi access points, which are also sending on 2.4~GHz, and thus, may influence the bacons's signal's.
+\section{Accuracy and Precision}
+To determine our solution's accuracy and its precision, we did different tests in a real world experiment. Therefor, we deployed the 10 beacons, we bought from BEACONinside, in parts of a building of our university. We tested it in a static environment; thus, the test person was the only dynamic subject in the experiment. Besides the deployed beacons, the building is also equipped with several WiFi access points, which are also sending on 2.4~GHz, and thus, may influence the bacons's signal's. During the experiments, we used a static particle set size of 200 particles, as mentioned in chapter~\ref{chap:pf}.
 
 \subsection*{Experiment~1}
 In our first experiment we equipped just one lecture hall with our 10 beacons. Figure~\ref{fig:f007} shows a picture of the lecture hall, to give a better insight. On the following screenshots, it is depicted on the map's lower part, taken from the lower left corner.
@@ -37,7 +37,7 @@ In our first experiment we equipped just one lecture hall with our 10 beacons. F
 
 During the experiment we tested how good our localization works inside the shown lecture hall. The lecture hall, depicted in the lower part of figure~\ref{fig:exp1_path}, is approx.\ 15~meters long and 8–11 meters wide. The 10 beacons's positions are depicted as blue circles.
 
-To determine the algorithms accuracy, we walked on the green path, beginning and ending at the upper left corner. At the end of each walk we compared the application's estimated end position with the true end position, by calculating the error, in form of the euclidian distance. As mentioned in section~\ref{sec:algo_locEstimation}, the location can be estimated by either calculating the mean of $\chi$, or by calculating its weighted mean. To be able to compare their results, we calculated the error for both approaches.
+To determine the algorithms accuracy, we walked on a specified path, depicted in green, beginning and ending at the upper left corner. At the end of each walk we compared the application's estimated end position with the true end position, by calculating the error, in form of the euclidian distance. As mentioned in section~\ref{sec:algo_locEstimation}, the location can be estimated by either calculating the mean of $\chi$, or by calculating its weighted mean. To be able to compare their results, we calculated the error for both approaches.
 
 Additionally, we calculated the error of the motion tracking's end position with the true position. To be able to compare the motions error with the applications error, by taking the motions drift into account, we split up the experiment in three scenarios. First, we walked just one round on the green path. Second, two rounds and third, three rounds. For each scenario we did three walks in clockwise and three in counter-clockwise direction on the path.
 
@@ -221,7 +221,7 @@ The result also approves, that the estimations accuracy depends on the deployed 
 \subsection*{Experiment~3}
 After evaluating the solution's accuracy in the first two experiments, this experiment shows how good the solution is able to track an users path in a larger scenario. Therefor, we additionally used the buildings foyer, depicted in figure~\ref{fig:f-foyer}, and one, resp.\ two additional lecture halls. During the examples, we still used just 10 beacons, as shown on the maps, which depict an actual space of $22.22~m \times 33.06~m$.
 
-The first example is depicted in figure~\ref{fig:exp2_imgs}. The green line depicts the actual path, beginning at the top right. The black dashed line shows the motion path; which is just the combination of pedometer and heading. The estimated path is marked as blue dashed path. Figure~\ref{fig:exp2_imgs_1} shows, an example where the motion was very accurate, actually more accurate than the actual estimated path; whereas, figure~\ref{fig:exp2_imgs_2}, \ref{fig:exp2_imgs_3}, and~\ref{fig:exp2_imgs_4} depict examples, where the motion path is bad, resp.\ completely wrong, but the algorithm was more or less able to approximate the actual path.
+The first example is depicted in figure~\ref{fig:exp2_imgs}. The green line illustrates approximately the actual path, beginning at the top right. The black dashed line shows the motion path; which is just the combination of pedometer and heading. The estimated path is marked as blue dashed path. Figure~\ref{fig:exp2_imgs_1} shows, an example where the motion was very accurate, actually more accurate than the actual estimated path; whereas, figure~\ref{fig:exp2_imgs_2}, \ref{fig:exp2_imgs_3}, and~\ref{fig:exp2_imgs_4} depict examples, where the motion path is bad, resp.\ completely wrong, but the algorithm was more or less able to approximate the actual path.
 
 Figure~\ref{fig:exp2_imgs_5} depicts another example, where the test person walked around the big stair in the middle of the buildings foyer. The screenshot shows, that the algorithm also was able to approximate this path. During this example the foyer was equipped with just 4 beacons, as shown on the map. But, we found out, that 4 beacons are to less for such a large area, if the motion is incorrectly.
 
@@ -270,13 +270,15 @@ Another example path is shown in figure~\ref{fig:exp2_imgs_6}. During this examp
 
 
 \subsection*{Summary}
-To summarize, we tested our algorithm in a typical environment, with enabled WiFi, obstacles and lots of reflecting material, as shown on the building's images.
+We tested our algorithm in a typical environment, with enabled WiFi, obstacles and lots of reflecting material, as shown on the building's images.
 
-The experiments approved, that the estimation's accuracy depends on the amount of deployed beacons, but also on their position and attitude relative to the user, which influences the beacons's signals. Furthermore, we found out, that the estimated position not just depends on the beacons's signal's, it also depends on the motion's quality. As shown by experiment~3, location estimation is possible with having too less beacons deployed, but therefor the motion must be relatively correct. But, it also shows, that if enough beacons are deployed, our solution is able to correct the path, on the basis of the beacon's signals.
+The experiments approve, that the estimation's accuracy depends on the amount of deployed beacons, but also on their position and attitude relative to the user, which influences the beacons's signals. Furthermore, we found out, that the estimated position not just depends on the beacons's signal's, it also depends on the motion's quality. As shown by experiment~3, location estimation is possible with having too less beacons deployed, but therefor the motion must be relatively correct. But, it also shows, that if enough beacons are deployed, our solution is able to correct the path, on the basis of the beacon's signals.
 
 We also found out, that the location estimation improves after being stationary for a few seconds, if enough beacons are deployed.
 
 Due to the fact that the application's accuracy and precision depends on so many different factors, we can just point out, what the system reached during our experiments, but we cannot provide, in general valid precision and accuracy values for the system. During our experiments we reached an accuracy up to 1.52~meters (experiment 2). By combining the results of experiment 1 and 2 (with 10 beacons), our application reached an accuracy of 2.12~meters ($\mu=2.12$, $\sigma=2.72$). Our applications precision, expressed as commutative distribution function (CDF), is shown in figure~\ref{fig:eval:precision}.
+
+To summarize, our solution provides at least room level accuracy, even better accuracy, depending on the deployed beacon count and other parameters. Furthermore, our solution is able to track a user's path, in environments with lots of free space, as shown by the experiments; thus, its ability to track a user in corridors should also be very good, due to the fact that we take the map's free space into account. The solutions only disadvantage is, that the user has to hold the device in hand pointing into the user's walking direction, otherwise the motion's orientation is completely wrong, and thus, recovery often needs to be executed.
 
 \pgfmathdeclarefunction{cdf}{2}{%
   \pgfmathparse{1/(1 + exp(-0.07056*((x-#1)/#2)^3 - 1.5976*(x-#1)/#2))}%
