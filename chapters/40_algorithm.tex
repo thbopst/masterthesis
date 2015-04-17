@@ -5,78 +5,11 @@ For our implementation, we used Apple's new programming language \emph{Swift} (v
 
 In this chapter we first outline the reasons for choosing \acs{MCL} instead of another algorithm. Next we describe the algorithms \emph{motion model}, which is on one side responsible for tracking the users motion by combining different sources, and on the other side, for the sampling from the motion model. Afterwards, we give a detailed insight in our solution's \emph{measurement model}. It tracks the beacon's signals, resp.\ the distances to the beacons, and implements the \acs{PF}'s importance factor calculation. In the end, we explain the algorithm's implementation, which builds upon the motion and measurement model.
 
-%\begin{figure}
-%\def\svgwidth{0.9\textwidth}
-%\input{algo_architecture.pdf_tex}
-%\caption{Architecture}
-%\label{fig:algo_architecture}
-%\end{figure}
 
 \begin{figure}
-\begin{tikzpicture} 
- %\draw[style=help lines] (0,0) grid (15,10); 
- 
- % sensors
- \node (A) at (13,9) {Accelerometer};
- \node (G) at (13,7) {Gyroscope};
- \node (M) at (13,5) {Magnetometer};
- \node (B) at (13,2) {\acs{BLE}};
- 
- \draw (A) ellipse (1.5 and 0.5);
- \draw (G) ellipse (1.5 and 0.5);
- \draw (M) ellipse (1.5 and 0.5);
- \draw (B) ellipse (1.5 and 0.5);
- 
- % Frameworks
- \node (CMP) at (8,8) {\texttt{CMPedometer}};
- \node (CMDM) at (8,6) {\texttt{CMDeviceMotion}};
- \node (CLH) at (8,4) {\texttt{CLHeading}};
- \node (CLB) at (8,2) {\texttt{CLBeacon}};
- \node (MAP) at (8,0) {Map};
- 
- \draw (6,7.5) rectangle (10,8.5);
- \draw (6,5.5) rectangle (10,6.5);
- \draw (6,3.5) rectangle (10,4.5);
- \draw (6,1.5) rectangle (10,2.5);
- \draw (6,-0.5) rectangle (10,0.5);
- 
- 
- \draw[very thick] (11.5,9) -- ++(-0.5,0) -- ++(0,-2) -- ++(0.5,0) -- ++(-0.5,0) -- ++(0,-1.9) -- ++(0.5,0);
- \draw[->, very thick] (11,8) to (10,8);
- \draw[->, very thick] (11,6) to (10,6);
- 
- 
- \draw[->, very thick] (11.5,4.9) -- ++(-0.5,0) -- ++(0,-0.9) -- ++(-1,0);
- \draw[->, very thick] (11.5,2) to (10,2);
- 
- % Particle Filter
- \draw (-0.5,-1) rectangle (4.5,9);
- \node (MM) at (2,8.5) {\textbf{Particle Filter}};
- 
- % Motion Model
- \draw (0,5) rectangle (4,7);
- \node (MM) at (2,6) {Motion Model};
- 
- \draw[->, very thick] (6,8) to (4,6.2);
- \draw[->, very thick] (6,6) to (4,6);
- \draw[->, very thick] (6,4) to (4,5.8);
- 
- % Measurement Model
- \draw (0,0) rectangle (4,2);
- \node (MM) at (2,1) {Measurement Model};
- 
- \draw[->, very thick] (6,2) to (4,1.1);
- \draw[->, very thick] (6,0) to (4,0.9);
- 
- % Location
- \node (L) at (2,-2.5) {$\chi$};
- \draw (L) ellipse (0.5 and 0.5);
- \draw[->, very thick] (2,-1) -- ++(0,-1);
- \draw[->, very thick] (1.5,-2.5) -- ++(-2.25,0) -- ++(0,12.5) -- ++(2.75,0) -- ++(0,-1);
-
-\end{tikzpicture}
-\caption{Depicts the solution's architecture}
-\label{fig:algo_architecture}
+	\input{figures/algorithmArchitecture}
+	\caption{Depicts the solution's architecture}
+	\label{fig:algo_architecture}
 \end{figure}
 
 \section{Design Decision} \label{sec:algo_decision}
@@ -107,59 +40,15 @@ Both frameworks do provide their values asynchronously. \acs{CL} calls its deleg
 
 The \texttt{CMDeviceMotion} heading, further denoted as $\theta_A$, measured at time $t$, is being calculated from the rotation matrix, given by \texttt{CMDeviceMotion.attitude}, as explained in chapter~\ref{chap:sensors}. Due to its drift problem just the change, denoted as $\Delta\theta_A$ between two values is being used. For the absolute orientation, \texttt{CLHeading.magneticHeading}, denoted as $\theta_C$, is being used. Internally, the motion tracking uses the heading $\theta$, which also takes the map's orientation $\theta_M$ into account. $\theta$ is being calculated if \acs{CL}'s heading filter is being exceeded and thus, a new magnetic heading is being provided. Its not being updated if \acs{CM} provides a new $theta_A$, due to its high update frequency, which would result in lots of updates of $\theta$ with very small change.
 
-Figure~\ref{lst:mm_heading} illustrates the used algorithm to combine the two heading sources to calculate the internally used heading $\theta$, for more robustness against the influence of disturbing magnetic fields, without the drift problem. Furthermore, figure~\ref{tab:mm_heading} provides a calculation example for better understanding.
+Listing~\ref{lst:motionModelHeadingCalculation} illustrates the used algorithm to combine the two heading sources to calculate the internally used heading $\theta$, for more robustness against the influence of disturbing magnetic fields, without the drift problem. Furthermore, table~\ref{tab:motionModelHeadingCalculationExample} provides a calculation example for better understanding.
 
-\begin{figure}
-\begin{lstlisting}[mathescape]
-// instance variables
-$\theta_{A_\text{current}}$, $\theta_{A_\text{last}}$ = nil
-$\theta_{C_\text{last}}$ = nil
+\input{listings/motionModelHeadingCalculation}
 
-// combined internal heading
-$\theta$ = 0.0
-
-// called by CoreMotion if new heading is available
-didMeasureDeviceMotionHeading($\theta_{A_t}$) {
-  $\theta_{A_\text{current}} = \theta_{A_t} - \theta_M$
-}
-
-// called by CoreLocation if new heading is available
-didMeasureCompassHeading($\theta_{C_t}$) {
-  $\theta_{C_\text{current}} = \theta_{C_t} - \theta_M$
-  
-  if $\theta_{A_\text{latest}} \neq \text{nil}$ && $\theta_{A_\text{last}} \neq \text{nil}$ && $\theta_{C_\text{last}} \neq \text{nil}$ {
-    $\Delta\theta_{A} = \theta_{A_\text{current}} - \theta_{A_\text{last}}$
-    $\Delta\theta_{C} = \theta_{C_\text{current}} - \theta_{C_\text{last}}$
-    
-    $\theta_{A_\text{last}} = \theta_{A_\text{current}}$
-    
-    $\theta = \theta_{t-1} + \frac{\Delta\theta_{C} + \Delta\theta_{A}}{2}$
-  } else {
-    $\theta = \theta_{C_\text{current}}$
-  }
-  
-  $\theta_{C_\text{last}} = \theta_{C_\text{current}}$
-}
-\end{lstlisting}
-\caption{Illustrates the calculation of the internal heading $\theta$, by combining $\theta_C$ and $\theta_A$, relative to the maps orientation $\theta_M$}
-\label{lst:mm_heading}
-\end{figure}
-
-\begin{figure}
-\begin{tabular}{c|ccc|c|ccc||c}
-\textbf{$t$} & \textbf{$\theta_C$} & \textbf{$\theta_A$} & \textbf{$\theta_M$} & $\theta_{C_\text{current}}$ & $\theta_{C_\text{last}}$ & $\theta_{A_\text{current}}$ & $\theta_{A_\text{last}}$ & \textbf{$\theta$}\\
-\hline
-$t_0$ & $90.3$ & & $20.0$ & $70.3$ & & & & $70.3$\\
-$t_1$ & & $78.2$ & $20.0$ & & $70.3$ & $58.2$ & &\\
-$t_2$ & & $79.0$ & $20.0$ & & $70.3$ & $59.0$ & $58.2$ &\\
-$t_3$ & $91.3$ & & $20.0$ & $71.3$ & $70.3$ & $59.0$ & $58.2$ & $71.2$\\
-$t_4$ & & $79.7$ & $20.0$ & & $71.3$ & $59.7$ & $59.0$ &\\
-$t_5$ & $92.3$ & & $20.0$ & $72.3$ & $71.3$ & $59.7$ & $59.0$ & $72.1$\\
-
-\end{tabular}
-\caption{Example illustrating the calculation of the internal heading $\theta$, according to the algorithm depicted in figure~\ref{lst:mm_heading}}
-\label{tab:mm_heading}
-\end{figure}
+\begin{table}
+	\input{tables/motionModelHeadingCalculationExample}
+	\caption{Example illustrating the calculation of the internal heading $\theta$, according to the algorithm depicted in listing~\ref{lst:motionModelHeadingCalculation}}
+	\label{tab:motionModelHeadingCalculationExample}
+\end{table}
 
 \paragraph{Motion Path Construction}
 As explained in chapter~\ref{chap:sensors}, \acs{CM} delivers every $\approx 2.5~\text{sec}$ a new \texttt{CMPedometer} object with the estimation of the distance $d$, a user traveled. Besides the distance the object contains the start date $t_\text{start}$, which is the start date of the very first distance estimation. It is the same for all successive estimations. Additionally, it contains the end date $t_\text{end}$. Thus, the user walked a estimated distance $d$ beginning at $t_\text{start}$ and ending at $t_\text{end}$. During the walk, the user's direction $\theta$ changes several times at a certain point in time.
@@ -170,45 +59,9 @@ To calculate the motion $u$ of a walked distance $d$, the distance is being spli
 
 
 \begin{figure}
-	\begin{tikzpicture}
-	  \draw[->] (0,0) -- (8,0); 
-  	  \draw[->] (0,0) -- (0,7);
-  	  \draw (8.5,0)node(y){$x$};
-  	  \draw (0,7.5)node(y){$y$};
-  	  
-  	  
-  	  \draw[blue] (1,6)--(5,6);
-  	  \draw (1,6.5)node(a){$\theta_0$};
-  	  \draw[blue] (3,6.5)node(b){$d_0$};
-  	  \draw(3,5.5)node(b){$u_0$};
-%  	  \fill[red] (5,6) circle (2pt);
-  	  
-  	  \draw[blue] (5,6)--(7,4);
-  	  \draw (5,6.5)node(c){$\theta_1$};
-  	  \draw(5.6,4.7)node(b){$u_1$};
-  	  
-  	  \draw[blue] (7,4)--(7,3);
-  	  \draw (7.5,4)node(d){$\theta_2$};
-  	  \draw(6.5,3.5)node(b){$u_2$};
-  	  
-  	  \draw[red] (7,3)--(7,1);
-  	  \draw (7,0.5)node(e){$\theta_3$};
-  	  \draw(6.5,2.0)node(b){$u_3$};
-
-  	  \draw[red] (7,1)--(3,1);
-  	  \draw[red] (5,0.5)node(b){$d_1$};
-  	  \draw(5,1.5)node(b){$u_4$};
-  	  
-  	  
-  	  \draw[red] (3,1)--(3,4);
-  	  \draw (3,0.5)node(e){$\theta_4$};
-  	  \draw(3.5,2.5)node(b){$u_5$};
-  	    	  
-  	  
-  	  
-	\end{tikzpicture}
-\caption{Illustration of the motion path construction, by integrating heading $\theta_0, \ldots, \theta_4$ into the two estimated walked distances $d_1, d_2$. $u_0, \ldots, u_5$ depict the resulting motions.}
-\label{fig:mm_path}
+	\input{figures/algorithmMotionModel_Path}
+	\caption{Illustration of the motion path construction, by integrating heading $\theta_0, \ldots, \theta_4$ into the two estimated walked distances $d_1, d_2$. $u_0, \ldots, u_5$ depict the resulting motions.}
+	\label{fig:mm_path}
 \end{figure}
 
 
@@ -226,36 +79,15 @@ The solution's advantage is, that it is quite easy to implement and does not nee
 \end{equation}
 
 \begin{figure}
-  \begin{tikzpicture}
-    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
-        legend pos=north west,
-        xlabel={Time (sec)},
-		ylabel={User Acceleration ($ms^{-2}$)},
-      legend entries={x, y, z},
-      grid = major]
-      \addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=x] {csv/acceleration/acc.csv};
-      \addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=y] {csv/acceleration/acc.csv};
-      \addplot [green, no marks] table[col sep=semicolon, x=timestamp, y=z] {csv/acceleration/acc.csv};
-  \end{axis}
-\end{tikzpicture}
-\caption{Depicts the 3-axis \texttt{userAcceleration} provided by \acs{CM}'s \texttt{CMDeviceMotion} object. The user's two stationary phases are clearly depicted by the low amplitude.}
-\label{fig:mm_stationary_1}
+	\input{figures/algorithmMotionModel_Stationary3Axis}
+	\caption{Depicts the 3-axis \texttt{userAcceleration} provided by \acs{CM}'s \texttt{CMDeviceMotion} object. The user's two stationary phases are clearly depicted by the low amplitude.}
+	\label{fig:mm_stationary_1}
 \end{figure}
 
 \begin{figure}
-  \begin{tikzpicture}
-    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.45\textheight,
-		legend pos=north east,
-        xlabel={Time (sec)},
-        ylabel={User Acceleration ($ms^{-2}$)},
-        legend entries={$\left\lVert a \right\rVert = \sqrt[2]{x^{2}+y^{2}+z^{2}}$, moving avg.\ of $\left\lVert a \right\rVert$},
-      grid = major]
-      \addplot [blue, no marks] table[col sep=semicolon, x=timestamp, y=norm] {csv/acceleration/vel.csv};
-      \addplot [red, no marks] table[col sep=semicolon, x=timestamp, y=avgnorm] {csv/acceleration/vel.csv};
-  \end{axis}
-\end{tikzpicture}
-\caption{Depicts the euclidian norm of the three-axis user acceleration shown in figure~\ref{fig:mm_stationary_1} and its simple moving average with a window of $1 \text{sec}$ which corresponds to $50$ measurements.}
-\label{fig:mm_stationary_2}
+	\input{figures/algorithmMotionModel_StationaryNorm}
+	\caption{Depicts the euclidian norm of the three-axis user acceleration shown in figure~\ref{fig:mm_stationary_1} and its simple moving average with a window of $1 \text{sec}$ which corresponds to $50$ measurements.}
+	\label{fig:mm_stationary_2}
 \end{figure}
 
 
@@ -289,65 +121,19 @@ The uncertainties are modeled as Gaussians. First, we used the uncertainties det
 \section{Measurement Model}\label{sec:algo_measurement_model}
 Our measurement model component is just responsible for one task, which is the calculation of the importance factor $w^{[m]}$ of a given state hypothesis $x^{[m]}_t$ by taking the measurements $z_t$ and its uncertainties, and also the environment's map $m$, which is just a simple occupancy grid, into account.
 
-\begin{figure}
-\begin{lstlisting}[mathescape]
-measurement_model($z = \{z_0, z_1, z_{k-1}\}$, $x$, $m$) {
-  $\text{weight} = 0.0$
-  
-  if position $x$ on $m$ && $x$ is free {
-    
-    for $z_i$ in $z$ {
-      
-      $z_{i_\text{dist}}$ = measured distance between phone and beacon
-      $z_{i_\text{pos}}$ = beacons position on $m$
-    
-      $\mu_d$ = euclidian distance between $x$ and $z_{i_\text{pos}}$
-      $\sigma_d = 0.25 \cdot z_{i_\text{dist}}$
-      
-      $w$ = PDF($z_{i_\text{dist}}$, $\mu_d$, $\sigma_d$)
-      
-      $\text{weight}$ = $\text{weight} \cdot w \cdot 10.0$ 
-    }
-  }
-  return $\text{weight}$
-}
-\end{lstlisting}
-\caption{Algorithm to calculate the importance factor $w$ of a state hypothesis $x$ by taking the measurements $z$ and the map $m$ into account.}
-\label{lst:mm_importancefactor}
-\end{figure}
+\input{listings/measurementModelImportanceFactorCalculation}
 
-The algorithm depicted in figure~\ref{lst:mm_importancefactor} illustrates the calculation of the importance factor \texttt{weight} for one state hypothesis. If the state is out of the map's bounds or the position is not free, e.g.\ the map contains an obstacle at this position, the weight for the state is set to $0.0$. If the states is valid, an importance factor $w$ is being calculated for each of the measurements, resp.\ for each distance estimation between the smartphone and the beacon, where the signal came from.
+The algorithm depicted in listing~\ref{lst:measurementModelImportanceFactorCalculation} illustrates the calculation of the importance factor \texttt{weight} for one state hypothesis. If the state is out of the map's bounds or the position is not free, e.g.\ the map contains an obstacle at this position, the weight for the state is set to $0.0$. If the states is valid, an importance factor $w$ is being calculated for each of the measurements, resp.\ for each distance estimation between the smartphone and the beacon, where the signal came from.
 
 To calculate $w$, the euclidian distance between the smartphone and beacon needs to be determined. It is the mean value $\mu_d$, required by the \emph{Probability Density Function} \texttt{PDF}. The \texttt{PDF}'s standard deviation $\sigma_d$ depends on the distance $z_{i_\text{dist}}$ between smartphone and the beacon. Empirically we found out, that a $\frac{1}{4}$ of $z_{i_\text{dist}}$ fits best. The weight is than being calculated by the \texttt{PDF}, shown in line 16. It is important to note, that just measurements $z_{i_\text{dist}} < 5~\text{meters}$ are taken into account. Larger values are being sorted out and not passed to the \texttt{measurement\_model} function, due to the fact, that estimated distance to a beacon larger than 5~meters are very unreliable, as shown in section~\ref{sec:beacon_eval}.
 
-Finally, the weights $w$ of each measurement are being multiplied with each other, which is the importance factor \texttt{weight} of the state hypothesis $x$. The reason for adding the additional factor of $10$ for each subsequent weight is, that otherwise the weights order of magnitude depends on the count of beacons. Figure~\ref{fig:addWeightFactor} illustrates the exponential decline of the \texttt{weight} by increasing beacon count $k$. For the illustration, all subsequent weights $w$, their importance factor \texttt{weight}, do have the same value  $w = 0.1$. If the additional factor of $10$ is being added, the beacon count is irrelevant for the weight's magnitude. Of course, during one run of the \acl{PF} the weight's magnitude is irrelevant, but to compare the sum of all importance factors over time with each other, as we do for the later discussed recovery from failure state, this is very important.
+Finally, the weights $w$ of each measurement are being multiplied with each other, which is the importance factor \texttt{weight} of the state hypothesis $x$. The reason for adding the additional factor of $10$ for each subsequent weight is, that otherwise the weights order of magnitude depends on the count of beacons. Table~\ref{tab:measurementModelWeightFactorIllustration} illustrates the exponential decline of the \texttt{weight} by increasing beacon count $k$. For the illustration, all subsequent weights $w$, their importance factor \texttt{weight}, do have the same value  $w = 0.1$. If the additional factor of $10$ is being added, the beacon count is irrelevant for the weight's magnitude. Of course, during one run of the \acl{PF} the weight's magnitude is irrelevant, but to compare the sum of all importance factors over time with each other, as we do for the later discussed recovery from failure state, this is very important.
 
-\begin{figure}
-
-\subfloat[Without additional factor]{
-\begin{tabular}{ccl}
-\textbf{$k$} & \textbf{$w$} & \texttt{weight}\\
-\hline
-$1$ & $0.1$ & $0.1^1 = 0.1$\\
-$2$ & $0.1$ & $0.1^2 = 0.01$\\
-$3$ & $0.1$ & $0.1^3 = 0.001$\\
-$9$ & $0.1$ & $0.1^9 = 1 \cdot 10^{-9}$
-\end{tabular}
-}
-\subfloat[With additional factor]{
-\begin{tabular}{ccl}
-\textbf{$k$} & \textbf{$w$} & \textbf{weight}\\
-\hline
-$1$ & $0.1$ & $(0.1 \cdot 10)^1 = 1$\\
-$2$ & $0.1$ & $(0.1 \cdot 10)^2 = 1$\\
-$3$ & $0.1$ & $(0.1 \cdot 10)^3 = 1$\\
-$9$ & $0.1$ & $(0.1 \cdot 10)^9 = 1$
-\end{tabular}
-}
-
-\caption{Illustrates the exponential decline of the importance factor \texttt{weight} by increasing beacon count $k$ if no additional factor is being added.}
-\label{fig:addWeightFactor}
-\end{figure}
+\begin{table}
+	\input{tables/measurementModelWeightFactorIllustration}
+	\caption{Illustrates the exponential decline of the importance factor \texttt{weight} by increasing beacon count $k$ if no additional factor is being added.}
+	\label{tab:measurementModelWeightFactorIllustration}
+\end{table}
 
 
 \section{\acl{PF}}
@@ -370,64 +156,21 @@ The particles are being generated with a random orientation $\theta$ where $\the
 
 
 \subsection{Motion Integration}
+The \texttt{integrateMotion} function, shown in listing~\ref{lst:algorithmIntegrateMotion}, is a helper function to reduce the complexity of the later introduced algorithm. It gets passed the current particle set $\chi_{t-1}$ and the motion $u_t$ which it applies to each particle. Therefore, it samples from the motion models as discussed in section~\ref{sec:algo_sample_motion}. In the end, it returns the new particle set $\chi_t$.
 
-% INTEGRATE MOTION
-\begin{figure}
-\begin{lstlisting}[mathescape]
-integrateMotion($\chi_{t-1}$, $u_t$) {
-
-  $\bar{\chi}_t = \emptyset$
-
-  for $m = 1$ to $M$ {
-    $x^{[m]}_t$ = sample_motion_model($u_t$, $x^{[m]}_{t-1}$)
-  }
-  
-  return $\bar{\chi}_t$
-}		
-\end{lstlisting}
-\caption{Helper function to apply the motion $u_t$ to the particle set $\chi_{t-1}$, by sampling from the motion model.}
-\label{lst:pf_integrateMotion}
-\end{figure}
-
-The \texttt{integrateMotion} function, shown in figure~\ref{lst:pf_integrateMotion}, is a helper function to reduce the complexity of the later introduced algorithm. It gets passed the current particle set $\chi_{t-1}$ and the motion $u_t$ which it applies to each particle. Therefore, it samples from the motion models as discussed in section~\ref{sec:algo_sample_motion}. In the end, it returns the new particle set $\chi_t$.
+\input{listings/algorithmIntegrateMotion}
 
 
 \subsection{Filtering}
-
-% FILTER
-\begin{figure}
-\begin{lstlisting}[mathescape]
-filter($\chi_{t-1}$, $z_t$, map) {
-  
-  $\bar{\chi}_t = \emptyset$
-
-  // importance factoring
-  for $m = 1$ to $M$ {
-    $w^{[m]}_t$ = measurement_model($z_t$,$x^{[m]}_t$, map)
-    add $\langle x^{[m]}_t, w^{[m]}_t \rangle$ to $\bar{\chi}_t$
-  }
-  
-  $\chi_t = \emptyset$
-  
-  \\ resampling
-  while size of $\chi_t$ less $M$ {
-    draw $i$ with probability $\propto w^{[m]}_t$
-    add $x^{[i]}_t$ to $\chi_t$
-  }
-  
-  return $\chi_t$
-}		
-\end{lstlisting}
-\caption{Helper function for the importance factoring and resampling.}
-\label{lst:pf_filter}
-\end{figure}
-
-Our \texttt{filter} function is another helper function, which is responsible for the \emph{importance factoring} and the \emph{resampling}, depicted in figure~\ref{lst:pf_filter}. It gets passed the particle set $\chi_{t-1}$, the measurements $z_t$ and the map. Then it determines the importance factor for each particle, as explained in section~\ref{sec:algo_measurement_model}. Afterwards, the resampling takes place to transform the old distribution into the new posteriori distribution, as described in section~\ref{sec:fund_pf}. Our solution uses \emph{roulette wheel resampling}, which is based on the \emph{independent sampling}, proposed by \citet[p. 108--111]{thrun:prob_robo}.
+Our \texttt{filter} function is another helper function, which is responsible for the \emph{importance factoring} and the \emph{resampling}, depicted in listing~\ref{lst:algorithmSimpleFilter}. It gets passed the particle set $\chi_{t-1}$, the measurements $z_t$ and the map. Then it determines the importance factor for each particle, as explained in section~\ref{sec:algo_measurement_model}. Afterwards, the resampling takes place to transform the old distribution into the new posteriori distribution, as described in section~\ref{sec:fund_pf}. Our solution uses \emph{roulette wheel resampling}, which is based on the \emph{independent sampling}, proposed by \citet[p. 108--111]{thrun:prob_robo}.
 
  The shown implementation is the basic implementation which does not solve the \emph{kidnapped robot} localization problem. To better understand our implementation, we reduce our \acs{PF}'s complexity, by first showing a simplified filter function, which neglects the recovery from failure state. Later in the chapter, we enhance the shown \texttt{filter} function, to explain our recovery feature. 
 
+\input{listings/algorithmSimpleFilter}
+
+
 \subsection{\acl{PF}}
-After explaining all prerequisites of our solution, we now give a detailed insight into our implementation of the \acl{PF}. To reduce complexity, we split up the \acs{PF}'s code into three logical parts, shown in figure~\ref{lst:algo_pf_1}, \ref{lst:algo_pf_2} and \ref{lst:algo_pf_3}. Figure~\ref{lst:algo_pf}, indicates their call order. It also contains several instance variables, which are accessible from the three parts.
+After explaining all prerequisites of our solution, we now give a detailed insight into our implementation of the \acl{PF}. To reduce complexity, we split up the \acs{PF}'s code into three logical parts, shown in listing~\ref{lst:algorithmParticleFilter_1}, \ref{lst:algorithmParticleFilter_2} and \ref{lst:algorithmParticleFilter_3}. Listing~\ref{lst:algorithmParticleFilter}, indicates their call order. It also contains several instance variables, which are accessible from the three parts.
 
 
 \paragraph{Instance Variables} As already mentioned, the motions and measurements are asynchronously being delivered by their framework. Our motion model already reduces this problem by combining the two headings and the estimated walked distance; thus, the \acs{PF}'s implementation has just to deal with two asynchronous sources. To overcome the asynchrony, the motions $u$ and measurements $z$ are buffered in two ascending ordered lists, the \texttt{u\_buffer} and \texttt{z\_buffer}, according their timestamps. The stored motions, resp.\ measurements, are provided by the motion model, resp.\ the measurement model, and defined as described in section~\ref{sec:algo_motion_model}, resp.\ section~\ref{sec:algo_measurement_model}. The instance variable $u_\text{latest}$ stores, as the name already implies, the latest motion that was being calculated by the motion model. The \texttt{map} variable stores the environment's map in form of a occupancy grid, and the landmarks, resp.\ the beacons, with their unique identifier and position on the map.
@@ -436,33 +179,9 @@ After explaining all prerequisites of our solution, we now give a detailed insig
 
 Our implementation uses a static particle set size of 200~particles. We empirically found out, that 200~particles are sufficient enough and increasing the particle set does not really improve the estimation. Due to the low particle count, and the required average runtime of $\approx 10~ms$, for one execution of the \texttt{particleFilter} function, we decided to use a static particle amount.
 
-\begin{figure}
-\begin{lstlisting}[mathescape]
-// instance variables
-u_buffer // list of not jet integrated motions $u_t$
-$u_\text{latest}$ // stores the latest motion
-z_buffer // list of not jet integrated measurements $z^{[k]}_t$
-map // occupancy grid and landmarks
+\input{listings/algorithmParticleFilter}
 
-particleFilter($\chi_{t-1}$) {
-
-  $\bar{\chi}_t = \chi_{t-1}$
-
-  $\bar{\chi}_t$ = PART_1($\bar{\chi}_t$)
-  
-  $\bar{\chi}_t$ = PART_2($\bar{\chi}_t$)
-  
-  $\bar{\chi}_t$ = PART_3($\bar{\chi}_t$)
-    
-  return $\chi_t$
-}
-\end{lstlisting}
-\caption{Shows our \acs{PF}'s implementation and the used instance variables. To reduce the complexity the code is split up into three parts, shown in figure~\ref{lst:algo_pf_1}, \ref{lst:algo_pf_2} and \ref{lst:algo_pf_3}.}
-\label{lst:algo_pf}
-\end{figure}
-
-
-\paragraph{Part 1} The algorithm's first part, shown in figure~\ref{lst:algo_pf_1}, consists of basically one loop, which tries to integrate the buffered motions and to filter with the buffered measurements at the right point in time. The loop is executed as long as both buffers are not empty. The four if-cases are visualized in figure~\ref{fig:algo_pf_1}. In each example, the \texttt{u\_buffer} contains two motions $u_0, u_1$, and \texttt{z\_buffer} contains just $z_0$. Each subfigure illustrates just the first loop iteration; thus, $u_1$ is not relevant during the iteration.
+\paragraph{Part 1} The algorithm's first part, shown in listing~\ref{lst:algorithmParticleFilter_1}, consists of basically one loop, which tries to integrate the buffered motions and to filter with the buffered measurements at the right point in time. The loop is executed as long as both buffers are not empty. The four if-cases are visualized in figure~\ref{fig:algo_pf_1}. In each example, the \texttt{u\_buffer} contains two motions $u_0, u_1$, and \texttt{z\_buffer} contains just $z_0$. Each subfigure illustrates just the first loop iteration; thus, $u_1$ is not relevant during the iteration.
 
 \emph{Case 1} (fig.\ \ref{fig:algo_pf_1_1}): If a motion $u_0$ is in the buffer and also a measurement $z_0$ and the motion endet before the measurement was done ($u.{t_\text{end}} < z.t$), the motion is being integrated and $z$ is reserved for the next iteration.
 
@@ -474,112 +193,12 @@ particleFilter($\chi_{t-1}$) {
 
 If one of the buffers is empty, the algorithm continues with \texttt{Part\_2}.
 
-% PART 1
-\begin{figure}
-\begin{lstlisting}[mathescape]
-PART_1($\chi_{t-1}$) {
-
-  $\bar{\chi}_t = \chi_{t-1}$
-
-  while u_buffer isNotEmpty && z_buffer isNotEmpty {
-    $u$ = u_buffer.first
-    $z$ = z_buffer.first
-    if $u.{t_\text{end}}$ < $z.t$ {
-      $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
-      u_buffer.remove($u$)
-    } else if $u.{t_\text{end}} = z.t$ {
-      $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
-      $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
-      u_buffer.remove($u$)
-      z_buffer.remove($z$)
-    } else if $u.{t_\text{start}} < z.t$ && $z.t < u.{t_\text{end}}$ {
-      split $u$ at timestamp $z.t$ in $u_1$ and $u_2$
-      $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u_1$)
-      $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
-      u_buffer.remove($u$)
-      insert $u_2$ at beginning of u_buffer
-      z_buffer.remove($z$)
-    } else {
-      $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
-      z_buffer.remove($z$)
-    }
-  }
-  
-  return $\bar{\chi}_t$
-}
-\end{lstlisting}
-\caption{Part 1}
-\label{lst:algo_pf_1}
-\end{figure}
+\input{listings/algorithmParticleFilter_1}
 
 \begin{figure}
-\subfloat[Case: $u.{t_\text{end}} < z.t$]{
-	\begin{tikzpicture}
-	  \draw[->] (0,1) -- (6,1);
-  	  \draw (6.5,1)node(y){$t$};
-  	    	  
-  	  \draw[blue] (1,2)--(3,2);
-  	  \draw[blue] (2,2.5)node(a){$u_0$};
-  	  
-  	  \draw[red, dashed] (3,2)--(5,2);
-  	  \draw[red] (4,2.5)node(a){$u_1$};
-  	  
-  	  \draw (4,1)--(4,0.5);
-  	  \draw (4,0)node(a){$z_0$};
-	\end{tikzpicture}
-	\label{fig:algo_pf_1_1}
-}
-\subfloat[Case: $u.{t_\text{end}} = z.t$]{
-	\begin{tikzpicture}
-	  \draw[->] (0,1) -- (6,1);
-  	  \draw (6.5,1)node(y){$t$};
-  	    	  
-  	  \draw[blue] (1,2)--(3,2);
-  	  \draw[blue] (2,2.5)node(a){$u_0$};
-  	  
-  	  \draw[red, dashed] (3,2)--(5,2);
-  	  \draw[red] (4,2.5)node(a){$u_1$};
-  	  
-  	  \draw (3,1)--(3,0.5);
-  	  \draw (3,0)node(a){$z_0$};
-	\end{tikzpicture}
-	\label{fig:algo_pf_1_2}
-}
-
-\subfloat[Case: $u.{t_\text{start}} < z.t < u.{t_\text{end}}$]{
-	\begin{tikzpicture}
-	  \draw[->] (0,1) -- (6,1);
-  	  \draw (6.5,1)node(y){$t$};
-  	    	  
-  	  \draw[blue] (1,2)--(3,2);
-  	  \draw[blue] (2,2.5)node(a){$u_0$};
-  	  
-  	  \draw[red, dashed] (3,2)--(5,2);
-  	  \draw[red] (4,2.5)node(a){$u_1$};
-  	  
-  	  \draw (2,1)--(2,0.5);
-  	  \draw (2,0)node(a){$z_0$};
-	\end{tikzpicture}
-	\label{fig:algo_pf_1_3}
-}
-\subfloat[Case: \texttt{else}]{
-	\begin{tikzpicture}
-	  \draw[->] (0,1) -- (6,1);
-  	  \draw (6.5,1)node(y){$t$};
-  	    	  
-  	  \draw[blue] (1,2)--(3,2);
-  	  \draw[blue] (2,2.5)node(a){$u_0$};
-  	  
-  	  \draw[red, dashed] (3,2)--(5,2);
-  	  \draw[red] (4,2.5)node(a){$u_1$};
-  	  
-  	  \draw (0.5,1)--(0.5,0.5);
-  	  \draw (0.5,0)node(a){$z_0$};
-	\end{tikzpicture}
-	\label{fig:algo_pf_1_4}
-}
-\caption{Visually illustrates the four cases shown in figure~\ref{lst:algo_pf_1}.}
-\label{fig:algo_pf_1}
+	\input{figures/algorithmParticleFilter_4Cases}
+	\caption{Visually illustrates the four cases shown in listing~\ref{lst:algorithmParticleFilter_1}.}
+	\label{fig:algo_pf_1}
 \end{figure}
 
 
@@ -589,32 +208,10 @@ After integrating a motion, the filter method is being called. The filtering is 
 
 The purpose of not just waiting for the next measurement, resp.\ the function's call, to integrate the remaining motions is, that if the user is out of the beacons range, the motion is still being integrated, thus the particles on the view are still moving according to the users motion.
 
-% PART 2
-\begin{figure}
-\begin{lstlisting}[mathescape]
-PART_2($\chi_{t-1}$) {
+\input{listings/algorithmParticleFilter_2}
 
-  $\bar{\chi}_t = \chi_{t-1}$
 
-  // integrate residual motions, filter just with map
-  while u_buffer isNotEmpty {
-    $u$ = u_buffer.first
-    $z = \emptyset$
-    $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
-     u_buffer.remove($u$)
-     
-     // filter without measurements, just with map
-     $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
-  }
-  
-  return $\bar{\chi}_t$
-}
-\end{lstlisting}
-\caption{Part 2}
-\label{lst:algo_pf_2}
-\end{figure}
-
-\paragraph{Part 3}The first two part are important for integrating and filtering during a person's walk. We found out, that integrating measurements if a person is stationary drastically can improve the estimated location accuracy. Therefor, we directly integrate the received measurements instead of buffering them, shown in figure~\ref{lst:algo_pf_3}. Thus, the user sees without a big latency, how the posteriori changes by applying the measurements.
+\paragraph{Part 3}The first two part are important for integrating and filtering during a person's walk. We found out, that integrating measurements if a person is stationary drastically can improve the estimated location accuracy. Therefor, we directly integrate the received measurements instead of buffering them, shown in listing~\ref{lst:algorithmParticleFilter_3}. Thus, the user sees without a big latency, how the posteriori changes by applying the measurements.
 
 To be able to integrate them directly, we need to be sure that the person is stationary. As mentioned in chapter~\ref{chap:sensors}, \acs{CL} has the problem of requiring 6--8~steps to recognize that the person is walking, resp.\ until it delivers the information. Consequently, if a user is stationary and starts to walk, the measurements collected during the first steps need to be buffered until, the motion data is available, otherwise the measurements would be integrated at the wrong position. The second important information is to know, that a person is now stationary, and no further motions are being delivered. Then, the measurements can directly, without latency, being integrated.
 
@@ -624,36 +221,13 @@ To be able to buffer the measurements during the first steps when the user start
 
 Additionally, we found out, that applying a small Gaussian random motion with $\sigma = 0.3~m$ before applying the measurements, by filtering the particle set, helps to faster improve the location accuracy. If a person is stationary, the person's orientation does not matter. Consequently, also the motion's orientation $\theta$ is set randomly between $[0, 2 \cdot \pi)$. Using a random orientation has also the advantage, that the particles can move in any direction.
 
-% PART 3
-\begin{figure}
-\begin{lstlisting}[mathescape]
-PART_3($\chi_{t-1}$) {
-
-  $\bar{\chi}_t = \chi_{t-1}$
-  
-  $\Delta t$ = currentDate - $u_\text{latest}.t_\text{end}$ // in seconds
-
-  if motionModel.deviceIsStationary && $\Delta t \le 2.7$  {
-    $u$ = motion with distance $0.0$
-    $z$ = z_buffer.first
-    
-    $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
-    $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
-    z_buffer.remove($z$)
-  }
-  
-  return $\bar{\chi}_t$
-}
-\end{lstlisting}
-\caption{Part 3}
-\label{lst:algo_pf_3}
-\end{figure}
+\input{listings/algorithmParticleFilter_3}
 
 
 \subsection{Recovery / Kidnapping Problem}\label{sec:algo_recovery}
 Recovery has two purposes in our application. Firstly, it can happen, that all particles are moving out of bounds, and thus, are being filtered out. Secondly, the particles are on a totally wrong position, which can happen if the user walked to soft, and thus, the pedometer could not recognize the users steps. It can also happen that the orientation does not fit the actual one; for instance, the user's phone points not straight forward during the walk.
 
-To determine both situations, we enhanced our \texttt{filter} function shown in figure~\ref{lst:pf_filter}. The enhanced version is shown in~\ref{lst:pf_recovery}. During the resampling, the new particle set's $\texttt{weightSum} = \sum_{m = 0}^{M-1} w^{[m]}_t$, which is the sum of all drawn particles, during the resampling, is being calculated.
+To determine both situations, we enhanced our \texttt{filter} function shown in listing~\ref{lst:algorithmSimpleFilter}. The enhanced version is shown in listing~\ref{lst:algorithmFilter}. During the resampling, the new particle set's $\texttt{weightSum} = \sum_{m = 0}^{M-1} w^{[m]}_t$, which is the sum of all drawn particles, during the resampling, is being calculated.
 
 If the $\texttt{weightSum} == 0$, $\chi_t$ is empty, thus all particles are moved out of bounds or their location is already occupied, and thus, they are being ignored. Consequently, a new random particle set is being generated. The particles are being distributed as described in section~\ref{sec:algo_initial}, in other words, the position estimation is restarted.
 
@@ -668,69 +242,12 @@ We empirically found out, that a threshold of $1.0$ fits best. After $\approx 90
 With disabled recovery, we can see that the algorithm is not possible to find the true location. After $\approx 90~\text{sec}$ the weight sum drops to $\approx 0$, and stays there.
 
 
-% FILTER
-\begin{figure}
-\begin{lstlisting}[mathescape]
-// instance variable
-weightSums // array that stores the last 3 weight sums
-
-filter($\chi_{t-1}$, $z_t$, map) {
-  
-  $\bar{\chi}_t = \emptyset$
-  
-  if size of weightSum == 3 && avg.\ weightSums < 1.0 {
-    add $0.2\%$ additional random particles to $\chi_{t-1}$ 
-  }
-
-  // importance factoring
-  $\ldots$
-    
-  weightSum = $0.0$
-  
-  \\ resampling
-  while size of $\chi_t$ less $M$ {
-    $\ldots$
-    weightSum += $w^{[m]}_t$
-  }
-  
-  if weightSum > 0 { 
-    override oldest value in weightSum with (weightSums/particleSetSize)
-  } else {
-    $\chi_t$ = generate new random particle set
-    clear weightSums
-  }
-  return $\chi_t$
-}		
-\end{lstlisting}
-\caption{Helper function for the importance factoring and resampling.}
-\label{lst:pf_recovery}
-\end{figure}
+\input{listings/algorithmFilter}
 
 \begin{figure}
-\subfloat{
-	\begin{tikzpicture}
-		\begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.4\textheight,
-			xlabel={Time (sec)},
-			ylabel={ParticleWeightSum},
-			legend entries={with recovery, without recovery},
-			grid = major]
-			\addplot [red, mark=x] table[col sep=semicolon, x=timestamp, y=normalizedWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_withRecovery.csv};
-			\addplot [blue, mark=x] table[col sep=semicolon, x=timestamp, y=normalizedWeightSum] {csv/F-Foyer2_F007-F023-F007_kidnapping/ParticleWeight_withoutRecovery.csv};
-		\end{axis}
-	\end{tikzpicture}
-}
-
-\subfloat[with recovery] {
-  \includegraphics[height=0.5\textheight]{figures/algo_withRecovery}
-  \label{fig:algo_recovery_withRecovery}
-}
-\subfloat[without recovery] {
-  \includegraphics[height=0.5\textheight]{figures/algo_withoutRecovery}
-  \label{fig:algo_recovery_withoutRecovery}
-}
-\caption {Depicts the build in recovery, which adds additional $20\%$ particles if the average weight sum drops below a threshold of $1.0$.}
-\label{fig:algo_recovery}
-
+	\input{figures/algorithmParticleFilter_Recovery}
+	\caption {Depicts the build in recovery, which adds additional $20\%$ particles if the average weight sum drops below a threshold of $1.0$.}
+	\label{fig:algo_recovery}
 \end{figure}
 
 \subsection{Location Estimation}\label{sec:algo_locEstimation}

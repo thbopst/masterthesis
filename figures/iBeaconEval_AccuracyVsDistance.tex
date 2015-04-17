@@ -1,0 +1,13 @@
+\begin{tikzpicture}
+    \begin{axis}[width=0.9\textwidth, height=0.45\textheight,
+        xlabel={\texttt{rssi} (dBm)},
+        ylabel={\texttt{accuracy} (m)},
+        legend pos=north west,
+        legend entries={measurement, avg.\ \texttt{accuracy} per \texttt{rssi}, $d = 10^{-\frac{rssi + 65}{10 * 2.1}}$},
+      grid = major,
+      x dir=reverse, ymin=0]
+      \addplot [only marks, mark=x] table[col sep=semicolon, x=rssi, y=accuracy] {csv/2014-10-15_hoehenweg/all.csv};
+      \addplot [red, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=rssi, y=avgAccuracy] {csv/2014-10-15_hoehenweg/all_avg_accuracy_per_rssi.csv};
+      \addplot[blue, domain=-55:-95, samples=100]{10^(-(x+65)/(10*2.1))};
+  \end{axis}
+\end{tikzpicture}

@@ -1,0 +1,37 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption={Helper function for the importance factoring and resampling.},
+  label=lst:algorithmFilter]
+// instance variable
+weightSums // array that stores the last 3 weight sums
+
+filter($\chi_{t-1}$, $z_t$, map) {
+
+  $\bar{\chi}_t = \emptyset$
+
+  if size of weightSum == 3 && avg.\ weightSums < 1.0 {
+    add $0.2\%$ additional random particles to $\chi_{t-1}$
+  }
+
+  // importance factoring
+  $\ldots$
+
+  weightSum = $0.0$
+
+  \\ resampling
+  while size of $\chi_t$ less $M$ {
+    $\ldots$
+    weightSum += $w^{[m]}_t$
+  }
+
+  if weightSum > 0 {
+    override oldest value in weightSum with (weightSums/particleSetSize)
+  } else {
+    $\chi_t$ = generate new random particle set
+    clear weightSums
+  }
+  return $\chi_t$
+}return\end{lstlisting}

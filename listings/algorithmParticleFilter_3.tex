@@ -1,0 +1,25 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption=Part 3,
+  label=lst:algorithmParticleFilter_3]
+PART_3($\chi_{t-1}$) {
+
+  $\bar{\chi}_t = \chi_{t-1}$
+
+  $\Delta t$ = currentDate - $u_\text{latest}.t_\text{end}$ // in seconds
+
+  if motionModel.deviceIsStationary && $\Delta t \le 2.7$  {
+    $u$ = motion with distance $0.0$
+    $z$ = z_buffer.first
+
+    $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
+    $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
+    z_buffer.remove($z$)
+  }
+
+  return $\bar{\chi}_t$
+}
+\end{lstlisting}

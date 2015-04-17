@@ -1,0 +1,38 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption=Part 1,
+  label=lst:algorithmParticleFilter_1]
+PART_1($\chi_{t-1}$) {
+
+  $\bar{\chi}_t = \chi_{t-1}$
+
+  while u_buffer isNotEmpty && z_buffer isNotEmpty {
+    $u$ = u_buffer.first
+    $z$ = z_buffer.first
+    if $u.{t_\text{end}}$ < $z.t$ {
+      $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
+      u_buffer.remove($u$)
+    } else if $u.{t_\text{end}} = z.t$ {
+      $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
+      $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
+      u_buffer.remove($u$)
+      z_buffer.remove($z$)
+    } else if $u.{t_\text{start}} < z.t$ && $z.t < u.{t_\text{end}}$ {
+      split $u$ at timestamp $z.t$ in $u_1$ and $u_2$
+      $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u_1$)
+      $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
+      u_buffer.remove($u$)
+      insert $u_2$ at beginning of u_buffer
+      z_buffer.remove($z$)
+    } else {
+      $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
+      z_buffer.remove($z$)
+    }
+  }
+
+  return $\bar{\chi}_t$
+}
+\end{lstlisting}

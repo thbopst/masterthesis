@@ -1,0 +1,37 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption={Illustrates the calculation of the internal heading $\theta$, by combining $\theta_C$ and $\theta_A$, relative to the maps orientation $\theta_M$},
+  label=lst:motionModelHeadingCalculation]
+// instance variables
+$\theta_{A_\text{current}}$, $\theta_{A_\text{last}}$ = nil
+$\theta_{C_\text{last}}$ = nil
+
+// combined internal heading
+$\theta$ = 0.0
+
+// called by CoreMotion if new heading is available
+didMeasureDeviceMotionHeading($\theta_{A_t}$) {
+  $\theta_{A_\text{current}} = \theta_{A_t} - \theta_M$
+}
+
+// called by CoreLocation if new heading is available
+didMeasureCompassHeading($\theta_{C_t}$) {
+  $\theta_{C_\text{current}} = \theta_{C_t} - \theta_M$
+
+  if $\theta_{A_\text{latest}} \neq \text{nil}$ && $\theta_{A_\text{last}} \neq \text{nil}$ && $\theta_{C_\text{last}} \neq \text{nil}$ {
+    $\Delta\theta_{A} = \theta_{A_\text{current}} - \theta_{A_\text{last}}$
+    $\Delta\theta_{C} = \theta_{C_\text{current}} - \theta_{C_\text{last}}$
+
+    $\theta_{A_\text{last}} = \theta_{A_\text{current}}$
+
+    $\theta = \theta_{t-1} + \frac{\Delta\theta_{C} + \Delta\theta_{A}}{2}$
+  } else {
+    $\theta = \theta_{C_\text{current}}$
+  }
+
+  $\theta_{C_\text{last}} = \theta_{C_\text{current}}$
+}
+\end{lstlisting}

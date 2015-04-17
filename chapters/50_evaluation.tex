@@ -14,23 +14,7 @@ In our first experiment we equipped just one lecture hall with our 10 beacons. F
 \end{figure}
 
 \begin{figure}
-	\subfloat[Path] {
-		\includegraphics[height=0.45\textheight]{figures/eval_1_path}
-		\label{fig:exp1_path}
-	}
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_1_1}
-		\label{fig:exp1_img_1}
-	}
-	
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_1_2}
-		\label{fig:exp1_img_2}
-	}
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_1_3}
-		\label{fig:exp1_img_3}
-	}
+	\input{figures/evaluationExperiment1}
 	\caption{Screenshots illustrate some results of Experiment~1.}
 	\label{fig:exp1_screenshot}
 \end{figure}
@@ -44,74 +28,23 @@ Additionally, we calculated the error of the motion tracking's end position with
 Furthermore, we wanted to find out, if the accuracy improves after being stationary for a short time at the end position. Consequently, we calculated the error for the estimated position directly after integrating the last reported distance, estimated by \ac{CM}'s \texttt{CMPedometer} component, and additionally, $\approx 5~sec$ after integrating the last distance estimation.
 
 
-\begin{figure}
-
-\subfloat[Error at stop]{
-	\begin{tabular}{c||cc|cc}
-		Scenario & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
-		\hline
-		1 & 2.23 & 2.74 & 2.08 & 2.55\\
-		2 & 2.16 & 2.53 & 2.16 & 2.53\\
-		3 & 3.00 & 3.64 & 3.55 & 4.23\\
-		\hline
-		1--3 & 2.47 & 2.83 & 2.60 & 3.01\\
-	\end{tabular}
-	\label{fig:exp1_results_1}
-}
-\subfloat[Error after $\approx 5~sec$]{
-	\begin{tabular}{c||cc|cc}
-		Scenario & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
-		\hline
-		1 & 2.19 & 3.13 & 2.17 & 3.13\\
-		2 & 1.94 & 2.52 & 1.95 & 2.53\\
-		3 & 2.73 & 3.71 & 2.74 & 3.72\\
-		\hline
-		1--3 & 2.29 & 2.97 & 2.29 & 2.97\\
-	\end{tabular}
-	\label{fig:exp1_results_2}
-}
-
-\subfloat[Error of motion tracking]{
-	\begin{tabular}{c||cc}
-		Scenario & $\mu$ & $\sigma$\\
-		\hline
-		1 & 3.63 & 4.24\\
-		2 & 7.11 & 8.05\\
-		3 & 10.81 & 13.21\\
-		\hline
-		1--3 & 7.19 & 13.21\\
-	\end{tabular}
-	\label{fig:exp1_results_3}
-}
-\caption{Depicts the results of experiment~1.}
-\label{fig:exp1_results}
-\end{figure}
+\begin{table}
+	\input{tables/evaluationResultExperiment1}
+	\caption{Depicts the results of experiment~1.}
+	\label{tab:evaluationResultExp1}
+\end{table}
 
 \begin{figure}
-	\begin{tikzpicture}
-	\begin{axis}[trim axis left, trim axis right, height=0.4\textheight,
-		xlabel={Scenario},
-		ylabel={Error (m)},
-		legend entries={$\mu$ (fig.\ \ref{fig:exp1_results_1}), $\mu_w$ (fig.\ \ref{fig:exp1_results_1}), $\mu$ (fig.\ \ref{fig:exp1_results_2}), $\mu_w$ (fig.\ \ref{fig:exp1_results_2}), $\mu$ (fig.\ \ref{fig:exp1_results_3})},
-		legend pos=north west,
-		grid = major,
-		xtick=data]
-		\addplot [blue, only marks] table[col sep=semicolon, x=scenario, y=mean] {csv/eval/Eval_1_ep1/NDFScenario.csv};
-		\addplot [blue, only marks, mark=square*] table[col sep=semicolon, x=scenario, y=w_mean] {csv/eval/Eval_1_ep1/NDFScenario.csv};
-		\addplot [red, only marks] table[col sep=semicolon, x=scenario, y=mean] {csv/eval/Eval_1_ep2/NDFScenario.csv};
-		\addplot [red, only marks, mark=square*] table[col sep=semicolon, x=scenario, y=w_mean] {csv/eval/Eval_1_ep2/NDFScenario.csv};
-		\addplot [green, only marks] table[col sep=semicolon, x=scenario, y=mean] {csv/eval/Eval_1_motion/NDFScenario.csv};
-	\end{axis}
-\end{tikzpicture}
-\caption{Visualizes the results shown in figure~\ref{fig:exp1_results}.}
-\label{fig:exp1_visualization}
+	\input{figures/evaluationExperiment1_Visualization}
+	\caption{Visualizes the results shown in table~\ref{tab:evaluationResultExp1}.}
+	\label{fig:exp1_visualization}
 \end{figure}
 
 \subsubsection*{Result}
-The experiments results are shown in figure~\ref{fig:exp1_results} and are being visualized in figure~\ref{fig:exp1_visualization}.
+The experiments results are shown in table~\ref{tab:evaluationResultExp1} and are being visualized in figure~\ref{fig:exp1_visualization}.
 
-Figure~\ref{fig:exp1_results_1} depicts the average distance error and the error's spreading, for each scenario, directly after integrating the last motion; whereas, figure~\ref{fig:exp1_results_2} values are being calculating by using the estimated position $\approx 5~\text{sec}$ after the last motion integration. The calculated average error by using $\chi$'s mean, as location, is denoted with $\mu$ and the errors standard deviation is denoted with $\sigma$. $\mu_w$ and $\sigma_w$, are the average error and its standard deviation by using the weighted mean of $\chi$ for the position estimation.
-Figure~\ref{fig:exp1_results_3} shows the motion tracking's error $\mu$ and the errors spreading, in form of its standard deviation $\sigma$.
+Table~\ref{tab:evaluationResultExp1_1} depicts the average distance error and the error's spreading, for each scenario, directly after integrating the last motion; whereas, table~\ref{tab:evaluationResultExp1_2} values are being calculating by using the estimated position $\approx 5~\text{sec}$ after the last motion integration. The calculated average error by using $\chi$'s mean, as location, is denoted with $\mu$ and the errors standard deviation is denoted with $\sigma$. $\mu_w$ and $\sigma_w$, are the average error and its standard deviation by using the weighted mean of $\chi$ for the position estimation.
+Table~\ref{tab:evaluationResultExp1_3} shows the motion tracking's error $\mu$ and the errors spreading, in form of its standard deviation $\sigma$.
 
 The results show, that during the experiment an accuracy of $2.29~m$ -- $2.6~m$ was achieved. It also shows, that the location estimation, tends to improves after being stationary at the end position, as expected.
 
@@ -127,7 +60,7 @@ This time, our test person walked on a random path. The person started at the or
 To demonstrate the reduction of the deployed beacon, we recorded 5 test walks with 10 beacons deployed. Then we used our simulation, to play back the recorded values by reducing the deployed beacons. Thus, the values are directly comparable, because for all test cases the exact same input data was being used. Also in this case we calculated the location error directly after integrating the last motion and $\approx 5~\text{sec}$ later.
 
 \subsubsection*{Result}
-The experiment's results are shown in figure~\ref{fig:exp2_results} and visualized in figure~\ref{fig:exp2_visualization}; furthermore, the corresponding beacon deployment, is shown in figure~\ref{fig:exp2_imgs}.
+The experiment's results are shown in table~\ref{tab:evaluationResultExp2} and visualized in figure~\ref{fig:exp2_visualization}; furthermore, the corresponding beacon deployment, is shown in figure~\ref{fig:exp2_imgs}.
 
 First of all, the result clearly approves, that the difference between $\chi$'s mean and its weighted mean, for the location estimation, is negligible.
 
@@ -135,84 +68,21 @@ Secondly, it clearly shows, that the estimated location compared to the motion i
 
 The result also approves, that the estimations accuracy depends on the deployed beacons. Thus, the more beacons the less error in the position estimation. But it also shows, that at a certain beacon density the error can just be minimally reduced. Furthermore, it shows, that to more beacons not always can improve the accuracy, at it seems to be the case in our experiment, with 4 and 2 deployed beacons. We assume, that the signal's of the two beacons, that we removed from the case with 4 to 2 beacons, were too bad, and actually produced a worse estimation result.
 
-\begin{figure}
-\subfloat[Error at stop] {
-	\begin{tabular}{c||cc|cc}
-		Beacons & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
-		\hline
-		10 & 3.38 & 4.04 & 3.33 & 3.99\\
-		8 & 3.18 & 3.94 & 3.15 & 3.91\\
-		6 & 4.39 & 5.72 & 4.37 & 5.70\\
-		4 & 4.48 & 5.28 & 4.50 & 5.30\\
-		2 & 3.68 & 4.63 & 3.69 & 4.66\\
-	\end{tabular}
-	\label{fig:exp2_results_1}
-}
-\subfloat[Error after $\approx 5~sec$] {
-	\begin{tabular}{c||cc|cc}
-		Beacons & $\mu$ & $\sigma$ & $\mu_w$ & $\sigma_w$\\
-		\hline
-		10 & 1.52 & 1.80 & 1.52 & 1.79\\
-		8 & 1.67 & 2.07 & 1.67 & 2.06\\
-		6 & 2.87 & 3.96 & 2.89 & 3.96\\
-		4 & 3.23 & 3.88 & 3.23 & 3.88\\
-		2 & 2.95 & 3.60 & 2.98 & 3.63\\
-	\end{tabular}
-	\label{fig:exp2_results_2}
-}
-
-\subfloat[Error of motion tracking]{
-	\begin{tabular}{c||cc}
-		Beacons & $\mu$ & $\sigma$\\
-		\hline
-		2--10 & 5.68 & 7.04
-	\end{tabular}
-	\label{fig:exp2_results_3}
-}
-\caption{Depicts the results of experiment~2.}
-\label{fig:exp2_results}
-\end{figure}
+\begin{table}
+	\input{tables/evaluationResultExperiment2}
+	\caption{Depicts the results of experiment~2.}
+	\label{tab:evaluationResultExp2}
+\end{table}
 
 \begin{figure}
-	\begin{tikzpicture}
-	\begin{axis}[trim axis left, trim axis right, height=0.45\textheight,
-		xlabel={Deployed beacons},
-		ylabel={Error (m)},
-		legend entries={$\mu$ (fig.\ \ref{fig:exp2_results_1}), $\mu_w$ (fig.\ \ref{fig:exp2_results_1}), $\mu$ (fig.\ \ref{fig:exp2_results_2}), $\mu_w$ (fig.\ \ref{fig:exp2_results_2}), $\mu$ (fig.\ \ref{fig:exp2_results_3})},
-		legend pos=south east,
-		grid = major,
-		xtick=data, x dir=reverse]
-		\addplot [blue, only marks] table[col sep=semicolon, x=beacon, y=mean] {csv/eval/Eval_2_ep1/NDFBeacon.csv};
-		\addplot [blue, only marks, mark=square*] table[col sep=semicolon, x=beacon, y=w_mean] {csv/eval/Eval_2_ep1/NDFBeacon.csv};
-		\addplot [red, only marks] table[col sep=semicolon, x=beacon, y=mean] {csv/eval/Eval_2_ep2/NDFBeacon.csv};
-		\addplot [red, only marks, mark=square*] table[col sep=semicolon, x=beacon, y=w_mean] {csv/eval/Eval_2_ep2/NDFBeacon.csv};
-		\addplot [green, only marks] table[col sep=semicolon, x=beacon, y=mean] {csv/eval/Eval_2_motion/NDF.csv};
-	\end{axis}
-\end{tikzpicture}
-\caption{Visualizes the results shown in figure~\ref{fig:exp2_results}.}
-\label{fig:exp2_visualization}
+	\input{figures/evaluationExperiment2_Visualization}
+	\caption{Visualizes the results shown in table~\ref{tab:evaluationResultExp2}.}
+	\label{fig:exp2_visualization}
 \end{figure}
 
 
 \begin{figure}
-	\subfloat[10 Beacons] {
-		\includegraphics[width=0.45\textwidth]{figures/eval_2_10B}
-	}
-	\subfloat[8 Beacons] {
-		\includegraphics[width=0.45\textwidth]{figures/eval_2_8B}
-	}
-	
-	\subfloat[6 Beacons] {
-		\includegraphics[width=0.45\textwidth]{figures/eval_2_6B}
-	}
-	\subfloat[4 Beacons] {
-		\includegraphics[width=0.45\textwidth]{figures/eval_2_4B}
-	}
-	
-	\subfloat[2 Beacons] {
-		\includegraphics[width=0.45\textwidth]{figures/eval_2_2B}
-	}
-
+	\input{figures/evaluationExperiment2}
 	\caption{Shows the different beacon deployments during the experiment.}
 	\label{fig:exp2_imgs}
 \end{figure}
@@ -221,11 +91,11 @@ The result also approves, that the estimations accuracy depends on the deployed 
 \subsection*{Experiment~3}
 After evaluating the solution's accuracy in the first two experiments, this experiment shows how good the solution is able to track an users path in a larger scenario. Therefor, we additionally used the buildings foyer, depicted in figure~\ref{fig:f-foyer}, and one, resp.\ two additional lecture halls. During the examples, we still used just 10 beacons, as shown on the maps, which depict an actual space of $22.22~m \times 33.06~m$.
 
-The first example is depicted in figure~\ref{fig:exp2_imgs}. The green line illustrates approximately the actual path, beginning at the top right. The black dashed line shows the motion path; which is just the combination of pedometer and heading. The estimated path is marked as blue dashed path. Figure~\ref{fig:exp2_imgs_1} shows, an example where the motion was very accurate, actually more accurate than the actual estimated path; whereas, figure~\ref{fig:exp2_imgs_2}, \ref{fig:exp2_imgs_3}, and~\ref{fig:exp2_imgs_4} depict examples, where the motion path is bad, resp.\ completely wrong, but the algorithm was more or less able to approximate the actual path.
+The first example is depicted in figure~\ref{fig:exp3_imgs}. The green line illustrates approximately the actual path, beginning at the top right. The black dashed line shows the motion path; which is just the combination of pedometer and heading. The estimated path is marked as blue dashed path. Figure~\ref{fig:exp3_imgs_1} shows, an example where the motion was very accurate, actually more accurate than the actual estimated path; whereas, figure~\ref{fig:exp3_imgs_2}, \ref{fig:exp3_imgs_3}, and~\ref{fig:exp3_imgs_4} depict examples, where the motion path is bad, resp.\ completely wrong, but the algorithm was more or less able to approximate the actual path.
 
-Figure~\ref{fig:exp2_imgs_5} depicts another example, where the test person walked around the big stair in the middle of the buildings foyer. The screenshot shows, that the algorithm also was able to approximate this path. During this example the foyer was equipped with just 4 beacons, as shown on the map. But, we found out, that 4 beacons are to less for such a large area, if the motion is incorrectly.
+Figure~\ref{fig:exp3_imgs_5} depicts another example, where the test person walked around the big stair in the middle of the buildings foyer. The screenshot shows, that the algorithm also was able to approximate this path. During this example the foyer was equipped with just 4 beacons, as shown on the map. But, we found out, that 4 beacons are to less for such a large area, if the motion is incorrectly.
 
-Another example path is shown in figure~\ref{fig:exp2_imgs_6}. During this example the wall between the two upper halls was opened. As we can see, the algorithm was able to track the path, but fairly we have to say, that this would also not be possible without having such an accurate motion, by using just 10 beacons. The screenshot also shows, that the estimated end pose is actually not at the true position, but rather $\approx 4-5~m$ too distant. But it also shows, that two particles are located next to the right position, and that the plotted $\sigma-\text{ellipse}$ is oriented towards these two particles.  The reason therefor is, that the algorithms weight sum dropped below the threshold, and thus, recovery was executed. Unfortunately, we stopped the recording at this point in time, otherwise its very likely that the particle cloud would jump to the true location, where the two particles are already being located. 
+Another example path is shown in figure~\ref{fig:exp3_imgs_6}. During this example the wall between the two upper halls was opened. As we can see, the algorithm was able to track the path, but fairly we have to say, that this would also not be possible without having such an accurate motion, by using just 10 beacons. The screenshot also shows, that the estimated end pose is actually not at the true position, but rather $\approx 4-5~m$ too distant. But it also shows, that two particles are located next to the right position, and that the plotted $\sigma-\text{ellipse}$ is oriented towards these two particles.  The reason therefor is, that the algorithms weight sum dropped below the threshold, and thus, recovery was executed. Unfortunately, we stopped the recording at this point in time, otherwise its very likely that the particle cloud would jump to the true location, where the two particles are already being located. 
 
 
 \begin{figure}
@@ -235,36 +105,13 @@ Another example path is shown in figure~\ref{fig:exp2_imgs_6}. During this examp
 \end{figure}
 
 \begin{figure}
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_3_1}
-		\label{fig:exp2_imgs_1}
-	}
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_3_2}
-		\label{fig:exp2_imgs_2}
-	}
-	
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_3_3}
-		\label{fig:exp2_imgs_3}
-	}
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_3_4}
-		\label{fig:exp2_imgs_4}
-	}
+	\input{figures/evaluationExperiment3_1}
 	\caption{Shows the different beacon deployments during the experiment.}
-	\label{fig:exp2_imgs}
+	\label{fig:exp3_imgs}
 \end{figure}
 
 \begin{figure}
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_3_5}
-		\label{fig:exp2_imgs_5}
-	}
-	\subfloat[] {
-		\includegraphics[height=0.45\textheight]{figures/eval_3_6}
-		\label{fig:exp2_imgs_6}
-	}
+	\input{figures/evaluationExperiment3_2}
 	\caption{Shows the different beacon deployments during the experiment.}
 \end{figure}
 
@@ -284,22 +131,10 @@ To summarize, our solution provides at least room level accuracy, even better ac
   \pgfmathparse{1/(1 + exp(-0.07056*((x-#1)/#2)^3 - 1.5976*(x-#1)/#2))}%
 }
 
-
 \begin{figure}
-	\begin{tikzpicture}
-	\begin{axis}[trim axis left, trim axis right, height=0.4\textheight,
-		xlabel={Error / Accuracy $x$ (m)},
-		ylabel={$CDF(x)$},
-		legend entries={Exp.\ 1, Exp.\ 2, Exp.\ 1+2},
-		legend pos=south east,
-		grid = major]
-		\addplot[red, smooth, mark=no, domain=-6.08:10.66] {cdf(2.29, 2.97)};
-		\addplot[blue, smooth, mark=no, domain=-6.08:10.66] {cdf(1.52, 1.79)};
-		\addplot[green, smooth, mark=no, domain=-6.08:10.66] {cdf(2.12, 2.72)};
-	\end{axis}
-\end{tikzpicture}
-\caption{Depicts our solutions precision during the experiments.}
-\label{fig:eval:precision}
+	\input{figures/evaluationPrecision}
+	\caption{Depicts our solutions precision during the experiments.}
+	\label{fig:eval:precision}
 \end{figure}
 
 

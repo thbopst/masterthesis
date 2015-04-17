@@ -1,0 +1,23 @@
+\subfloat[Average accuracy in different situations]{
+  \begin{tikzpicture}
+    \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
+        xlabel={Situation},
+        ylabel={Accuracy (m)},
+        xtick=data,
+      grid = major]
+      \addplot [only marks, mark=*] table[col sep=semicolon, x=measurement, y=accuracy] {csv/2014-10-27_htwg_fk034_angles/all_avg.csv};
+  \end{axis}
+\end{tikzpicture}
+}
+\subfloat[Average \acs{RSSI} in different situations]{
+  \begin{tikzpicture}
+    \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
+        xlabel={Situation},
+        ylabel={RSSI (dBm)},
+        y dir=reverse,
+        xtick=data,
+      grid = major]
+      \addplot [only marks, mark=*] table[col sep=semicolon, x=measurement, y=rssi] {csv/2014-10-27_htwg_fk034_angles/all_avg.csv};
+  \end{axis}
+\end{tikzpicture}
+}

@@ -1,0 +1,27 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption=Algorithm for \acl{PF} based on \citet{thrun:prob_robo},
+  label=lst:pf]
+ParticleFilter($\chi_{t-1}$, $u_t$, $z_t$) {
+
+  $\bar{\chi}_t = \emptyset$
+  for $m = 1$ to $M$ {
+    sample $x^{[m]}_t \sim p(x_t|u_t, x^{[m]}_{t-1})$
+    $w^{[m]}_t = p(z_t|x^{[m]}_t)$
+    add $\langle x^{[m]}_t, w^{[m]}_t \rangle$ to $\bar{\chi}_t$
+  }
+
+
+  \\ resampling
+  $\chi_t = \emptyset$
+  while size of $\chi_t$ less $M$ {
+    draw $i$ with probability $\propto w^{[m]}_t$
+    add $x^{[i]}_t$ to $\chi_t$
+  }
+
+  return $\chi_t$
+}
+\end{lstlisting}

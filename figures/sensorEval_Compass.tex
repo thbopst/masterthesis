@@ -1,0 +1,11 @@
+\begin{tikzpicture}
+\begin{axis}[width=0.6\textwidth, height=0.4\textheight,
+  xlabel={round},
+  ylabel={heading error (degree)},
+  grid = major]
+  \addplot [blue, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_left.csv};
+\addplot [blue, dashed, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_right.csv};
+\addplot [red, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xArbitraryAndCompass.csv};
+\addplot [green, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xArbitraryCorrectedAndCompass.csv};
+\end{axis}
+\end{tikzpicture}

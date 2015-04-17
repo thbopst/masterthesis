@@ -57,16 +57,9 @@ In this section we focus on different localization algorithms. Some algorithms a
 Triangulation is a well-studied localization method which relies on triangle's geometric properties \citep{IEEE:survey_wireless_indoor_pos, wang:bt_pos}. Triangulation is the hypernym of the two characteristics \emph{lateration} and \emph{angulation}.
 
 \begin{figure}[width=0.9\textwidth, height=0.4\textheight]
-\subfloat[Lateration]{
-  \includegraphics[width=0.45\textwidth]{figures/lateration}
-  \label{fig:lateration}
-}
-\subfloat[Angulation]{
-  \includegraphics[width=0.45\textwidth]{figures/angulation}
-  \label{fig:angulation}
-}
-\caption {Triangulation methods. Source:~\citep{wang:bt_pos}}
-\label{fig:triangulation}
+	\input{figures/triangulation}
+	\caption {Triangulation methods. Source:~\citep{wang:bt_pos}}
+	\label{fig:triangulation}
 \end{figure}
 
 \subsubsection*{Lateration}
@@ -115,29 +108,10 @@ The \emph{\ac{KF}}, and the \emph{\ac{EKF}}, are techniques for filtering and pr
 
 The algorithm is based on three probabilities. The \emph{state transition probability} $p(x_t | u_t , x_{t-1})$ is the probability for a state $x$ at time $t$ after the transition from state $x$ at time $t-1$ by applying the control $u$ at time $t$. Transferred to the above mentioned robot localization this means, that it expresses the belief in the robot's new position $x_t$ after a certain motion $u_t$ with being at position $x_{t-1}$. The \emph{measurement probability} $p(z_t|x_t)$ defines the belief in a certain measurement $z$ in state $x$ at time $t$. Thus, it expresses the belief in a measurement, e.g. a distance measurement $z_t$ to an obstacle, at position $x_t$. The last probability is the \emph{initial belief} $bel(x_0)$. Transferred to the example, it is the robot's initial position at time $t = 0$.
 
-\begin{figure}
-\begin{lstlisting}[mathescape]
-KalmanFilter($x_{t-1}$, $\Sigma_{t-1}$, $u_t$, $z_t$) {
-	
-  \\ Prediction
-  $\hat{x}_t = A x_{t-1} + B u_t$
-  $\hat{\Sigma}_t = A \Sigma_{t-1} A^T + B \Sigma_u B^T$
-
-  \\ Correction
-  $\hat{z}_t = C \hat{x}_t$
-  $K = \hat{\Sigma}_t C^T (C\hat{\Sigma}_tC^T + \Sigma_z)^{-1}$
-  $x_t = \hat{x}_t + K(z_t - \hat{z}_t)$
-  $\Sigma_t = (I - KC)\hat{\Sigma}_t$
-  
-  return ($x_t$, $\Sigma_t$)
-}
-\end{lstlisting}
-\caption{Algorithm for \acl{KF} based on \citet{thrun:prob_robo}}
-\label{lst:kf}
-\end{figure}
+\input{listings/kalmanFilter} % label: lst:kf
 
 To provide a better overview, we now present the \acs{KF}'s linear implementation, with focus on the main parts, by not going into much detail. A much more detailed description can be found in \citet{thrun:prob_robo}. 
-The \acs{KF}, shown in figure~\ref{lst:kf}, takes as first argument the current state $x_t$, e.g.\ representing the robot's position $x_t = (x, y)^T$. Together with the second argument $\Sigma_t$ the states uncertainty is being expressed, as multivariate gaussian $NDF(x_t, \Sigma_t)$. $u_t$ is the control vector, which represents the robots motion. The last argument $z_{t+1}$ is the current measurement; for instance, the measured distance to a wall.
+The \acs{KF}, shown in listing~\ref{lst:kf}, takes as first argument the current state $x_t$, e.g.\ representing the robot's position $x_t = (x, y)^T$. Together with the second argument $\Sigma_t$ the states uncertainty is being expressed, as multivariate gaussian $NDF(x_t, \Sigma_t)$. $u_t$ is the control vector, which represents the robots motion. The last argument $z_{t+1}$ is the current measurement; for instance, the measured distance to a wall.
 
 The algorithm first performs the \emph{prediction} step (line 4, 5). The new state $\hat{x}_t$ and $\hat{\Sigma}_t$ is being predicted, based on its predecessor and the current control $u_t$, by taking the \emph{system model} $A$ and the \emph{motion model} $B$ into account.
 
@@ -161,7 +135,7 @@ The \ac{PF} is a non-parametric filter. The before introduced \acs{KF} is a para
 	\label{fig:pf_approx}
 \end{figure} 
 
-According to \citet{thrun:prob_robo}, the idea is the posterior's $bel(x_t)$ representation by a random set of samples, drawn from the posteriori. Each sample (i.e.\ particle) $x$ at time $t$ is a hypothetical state in state space, i.e.\ in true world. The particle set $\chi_t = \left\{ x^{[1]}_t, x^{[2]}_t, \ldots, x^{[m]}_t \right\}$ is the distribution's approximation, containing $M$ particles. The \acs{PF}'s algorithm, depicted in figure~\ref{lst:pf}, transforms the $bel(x_{t-1})$, represented by the particle set $\chi_{t-1}$, by integrating the least control $u_t$ and measurement $z_t$ into the current $bel(x_t)$. Therefor, the algorithm creates first an empty, temporary particle set $\bar{\chi}_t$. Then, the states from $\chi_{t-1}$ are being updated, by integrating the current control $u_t$. Formally, this is done by sampling the new state $x_t$ from the \emph{state transition probability} $p(x_t|u_t, x^{[m]}_{t-1})$ (line 5). Afterwards, an \emph{importance factor} $w^{[m]}_t$ for the new sample $x^{[m]}_t$ is being calculated (line 6). It is defined as $p(z_t|x^{[m]}_t)$, which is the probability for the measurement $z_t$ given the new state hypothesis, representing a value in true world. The new state hypothesis and its importance factor are stored together, as tuple, in the temporary set $\bar{\chi}_t$ (line 7). The weighted set approximates the $bel(x_t)$.
+According to \citet{thrun:prob_robo}, the idea is the posterior's $bel(x_t)$ representation by a random set of samples, drawn from the posteriori. Each sample (i.e.\ particle) $x$ at time $t$ is a hypothetical state in state space, i.e.\ in true world. The particle set $\chi_t = \left\{ x^{[1]}_t, x^{[2]}_t, \ldots, x^{[m]}_t \right\}$ is the distribution's approximation, containing $M$ particles. The \acs{PF}'s algorithm, depicted in listing~\ref{lst:pf}, transforms the $bel(x_{t-1})$, represented by the particle set $\chi_{t-1}$, by integrating the least control $u_t$ and measurement $z_t$ into the current $bel(x_t)$. Therefor, the algorithm creates first an empty, temporary particle set $\bar{\chi}_t$. Then, the states from $\chi_{t-1}$ are being updated, by integrating the current control $u_t$. Formally, this is done by sampling the new state $x_t$ from the \emph{state transition probability} $p(x_t|u_t, x^{[m]}_{t-1})$ (line 5). Afterwards, an \emph{importance factor} $w^{[m]}_t$ for the new sample $x^{[m]}_t$ is being calculated (line 6). It is defined as $p(z_t|x^{[m]}_t)$, which is the probability for the measurement $z_t$ given the new state hypothesis, representing a value in true world. The new state hypothesis and its importance factor are stored together, as tuple, in the temporary set $\bar{\chi}_t$ (line 7). The weighted set approximates the $bel(x_t)$.
 
 Then, the resampling, i.e.\ importance sampling, transforms the weighted set, based on their weights into a new set, which represents the new distribution. Therefor, $M$ particles are drawn according their weight and being inserted into the new set $\chi_t$ (line 14, 15). During this step some particles are duplicated, usually the ones with high weight, and others, the ones with low weight, are lost. \citet{thrun:prob_robo} compares it with the Darwinian idea of \emph{survival of the fittest}. According to them, ``it refocuses the particle set to regions in state space with high posteriori probability''.
  
@@ -169,85 +143,28 @@ Instead of the drawing, it is also possible to have a weighted set $\chi_t$. In 
  
 \acs{PF}'s can be adaptive, for instance based on the available processing power; thus, the particle set is then being increased or decreased \citep{thrun:prob_robo}.
 
-\begin{figure}
-\begin{lstlisting}[mathescape]
-ParticleFilter($\chi_{t-1}$, $u_t$, $z_t$) {
-
-  $\bar{\chi}_t = \emptyset$
-  for $m = 1$ to $M$ {
-    sample $x^{[m]}_t \sim p(x_t|u_t, x^{[m]}_{t-1})$
-    $w^{[m]}_t = p(z_t|x^{[m]}_t)$
-    add $\langle x^{[m]}_t, w^{[m]}_t \rangle$ to $\bar{\chi}_t$
-  }
-  
-  
-  \\ resampling
-  $\chi_t = \emptyset$
-  while size of $\chi_t$ less $M$ {
-    draw $i$ with probability $\propto w^{[m]}_t$
-    add $x^{[i]}_t$ to $\chi_t$
-  }
-  
-  return $\chi_t$
-}
-\end{lstlisting}
-\caption{Algorithm for \acl{PF} based on \citet{thrun:prob_robo}}
-\label{lst:pf}
-\end{figure}
+\input{listings/particleFilter} % label= lst:pf
 
 \subsubsection*{Monte Carlo Localization}\label{sec:fund_mcl}
 \ac{MCL} is a popular localization algorithm often used in the indoor mobile robotics field. The algorithm can deal with a broad range of the before discussed localization problems, especially with the local and global localization problem.
 
-The basic algorithm, shown in figure~\ref{lst:mcl}, is very similar to the \acs{PF}, presented in figure~\ref{lst:pf}. Line~5 is being substituted by a method called \texttt{sample\_motion\_model}, which samples the new hypothesis by integrating the control $u_t$ with respect to the robot's motion and its uncertainties during the execution. Furthermore, line~6 is being substituted by the \texttt{measurement\_model} function, which depends on the used sensor. It uses the sensor measurements and their uncertainty to calculate the particle's importance factor. It additionally takes the environment's map into account. Usually, the map is being used to calculate the importance factor based on the measurement $z_t$; for instance, the distance to a landmark, where the landmark's position is stored in the map. But a map can also be used to detect particles at impossible positions, and thus, to reduce their importance factor. A very detailed description about \acl{MCL} and variations of the algorithm is provided by \citet{thrun:prob_robo}.
+The basic algorithm, shown in listing~\ref{lst:mcl}, is very similar to the \acs{PF}, presented in listing~\ref{lst:pf}. Line~5 is being substituted by a method called \texttt{sample\_motion\_model}, which samples the new hypothesis by integrating the control $u_t$ with respect to the robot's motion and its uncertainties during the execution. Furthermore, line~6 is being substituted by the \texttt{measurement\_model} function, which depends on the used sensor. It uses the sensor measurements and their uncertainty to calculate the particle's importance factor. It additionally takes the environment's map into account. Usually, the map is being used to calculate the importance factor based on the measurement $z_t$; for instance, the distance to a landmark, where the landmark's position is stored in the map. But a map can also be used to detect particles at impossible positions, and thus, to reduce their importance factor. A very detailed description about \acl{MCL} and variations of the algorithm is provided by \citet{thrun:prob_robo}.
 
 A visual example of, how a robot's global localization using \acs{MCL} works, is shown in figure~\ref{fig:mcl}. The three images show the particles, i.e.\ the posteriori $bel(x_k)$, over time. At the beginning uniform random particles are being spread over the whole state space, because the robot actually does not know where it is, and thus, could be positioned anywhere. After moving and gathering sensor data, the particles concentrate in certain regions with higher belief for the robot's position. Thus, the posteriori has changed. In the end, the particles have concentrated on one spot; hence, the robot's confidence of being at this position is very high \citep{thrun:prob_robo}.
 
-\begin{figure}
-\begin{lstlisting}[mathescape]
-mcl($\chi_{t-1}$, $u_t$, $z_t$, map) {
-
-  $\bar{\chi}_t = \emptyset$
-  for $m = 1$ to $M$ {
-    $x^{[m]}_t$ = sample_motion_model($u_t$, $x^{[m]}_{t-1}$)
-    $w^{[m]}_t$ = measurement_model($z_t$,$x^{[m]}_t$, map)
-    add $\langle x^{[m]}_t, w^{[m]}_t \rangle$ to $\bar{\chi}_t$
-  }
-  
-  
-  \\ resampling
-  $\chi_t = \emptyset$
-  while size of $\chi_t$ less $M$ {
-    draw $i$ with probability $\propto w^{[m]}_t$
-    add $x^{[i]}_t$ to $\chi_t$
-  }
-  
-  return $\chi_t$
-}
-\end{lstlisting}
-\caption{Basic \acl{MCL} algorithm based on \citet{thrun:prob_robo}}
-\label{lst:mcl}
-\end{figure}
-
+\input{listings/monteCarloLocalization}
 
 
 \begin{figure}[width=0.9\textwidth, height=0.4\textheight]
-\subfloat[]{
-  \includegraphics[width=0.3\textwidth]{figures/mcl_1}
-}
-\subfloat[]{
-  \includegraphics[width=0.3\textwidth]{figures/mcl_2}
-}
-\subfloat[]{
-  \includegraphics[width=0.3\textwidth]{figures/mcl_3}
-}
-\caption{Visual example of the \acs{MCL} algorithm. Source:~\citep{thrun:prob_robo}}
-\label{fig:mcl}
+	\input{figures/mcl}
+	\caption{Visual example of the \acs{MCL} algorithm. Source:~\citep{thrun:prob_robo}}
+	\label{fig:mcl}
 \end{figure}
 
 
 \subsubsection*{Related Work}
 
-\citet{Siddiqui:tracking} propose a localization system that uses \acs{PF} and \acs{RSS}-based trilateration of WiFi signals, to track a mobile unit. The approach just relies on sensing \acs{RSS} values, no other sensors are being used. First, they collect the \acs{RSS} values in their environment by war-walking. They are stored together with their location in a lookup table. For their MATLAB simulation they generated a random path with 100~points using the before collected values. The path is tracked during the simulation, just based on the \acs{RSS} values. Their simulation simulates a notebook equipped with WiFi, which is tracked. Thus, their \acs{PF}'s implementation does not sample a new state by integrating the control $u_t$ as shown in figure~\ref{lst:pf} (line~5). They used two different weighting functions during their experiment, firstly, a \emph{Gaussian weighting function}, based on the Euclidian distance, and secondly, a \emph{Triangular weighting function} (line 6). According to \citet{Siddiqui:tracking}, they achieved an accurate localization of $\approx$~3~m, as a result of their simulation. During the simulation they assumed, a static environment with sparse activity, and a smooth and continuous motion. They also assumed that no large variations in the signals' strength occur over short distances. During their signal recordings they removed the first and last 10\% of the measurements, when the person placed the measuring unit at the position and picked it up again, because they wanted their values to be independent of a human in proximity. Additionally, they neglected outlaws.
+\citet{Siddiqui:tracking} propose a localization system that uses \acs{PF} and \acs{RSS}-based trilateration of WiFi signals, to track a mobile unit. The approach just relies on sensing \acs{RSS} values, no other sensors are being used. First, they collect the \acs{RSS} values in their environment by war-walking. They are stored together with their location in a lookup table. For their MATLAB simulation they generated a random path with 100~points using the before collected values. The path is tracked during the simulation, just based on the \acs{RSS} values. Their simulation simulates a notebook equipped with WiFi, which is tracked. Thus, their \acs{PF}'s implementation does not sample a new state by integrating the control $u_t$ as shown in listing~\ref{lst:pf} (line~5). They used two different weighting functions during their experiment, firstly, a \emph{Gaussian weighting function}, based on the Euclidian distance, and secondly, a \emph{Triangular weighting function} (line 6). According to \citet{Siddiqui:tracking}, they achieved an accurate localization of $\approx$~3~m, as a result of their simulation. During the simulation they assumed, a static environment with sparse activity, and a smooth and continuous motion. They also assumed that no large variations in the signals' strength occur over short distances. During their signal recordings they removed the first and last 10\% of the measurements, when the person placed the measuring unit at the position and picked it up again, because they wanted their values to be independent of a human in proximity. Additionally, they neglected outlaws.
 
 \citet{straub:pf} implemented an indoor pedestrian localization and tracking system based on \acs{PF}, which uses a system called \emph{PiNav}, developed at the institute where Straub wrote his thesis. It extracts the person's motion in form of step frequency, step size, and heading. The person needs to be equipped with the hip-mounted PiNav-System, which includes an accelerometer, gyroscope and a compass. Additionally, his solution uses an accessibility map, which is based on a neural network, to learn which space on the map is accessible by pedestrians. By fusing the pedestrian's motion and the accessibility map in a \acs{PF}, his solution achieves an average accuracy of 1.1~m \citep{straub:pf}.
 

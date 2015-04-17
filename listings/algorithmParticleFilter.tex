@@ -1,0 +1,26 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption={Shows our \acs{PF}'s implementation and the used instance variables. To reduce the complexity the code is split up into three parts, shown in figure~\ref{lst:algo_pf_1}, \ref{lst:algo_pf_2} and \ref{lst:algo_pf_3}.},
+  label=lst:algorithmParticleFilter]
+// instance variables
+u_buffer // list of not jet integrated motions $u_t$
+$u_\text{latest}$ // stores the latest motion
+z_buffer // list of not jet integrated measurements $z^{[k]}_t$
+map // occupancy grid and landmarks
+
+particleFilter($\chi_{t-1}$) {
+
+  $\bar{\chi}_t = \chi_{t-1}$
+
+  $\bar{\chi}_t$ = PART_1($\bar{\chi}_t$)
+
+  $\bar{\chi}_t$ = PART_2($\bar{\chi}_t$)
+
+  $\bar{\chi}_t$ = PART_3($\bar{\chi}_t$)
+
+  return $\chi_t$
+}
+\end{lstlisting}

@@ -56,22 +56,13 @@ Apple's \texttt{CMMotionActivityManager}, which is part of the \ac{CM} framework
 
 As mentioned before, the \ac{CM} framework's MotionActivity \acsp{API} provides a push interface to receive motion activity changes, and a pull interface to query historical data between two dates. Both \acsp{API} are reporting every single change in motion activity, that was being detected.
 
-Figure~\ref{fig:motionActivity} gives an overview of the different motion activities and illustrates some example scenarios. The states \texttt{walking}, \texttt{running}, \texttt{automotive}, \texttt{cycling}, and \texttt{unknown} are mutually exclusive motion activity types; whereas, \texttt{stationary} is not mutually exclusive, to the other types.
+Table~\ref{tab:motionActivityScenarios} gives an overview of the different motion activities and illustrates some example scenarios. The states \texttt{walking}, \texttt{running}, \texttt{automotive}, \texttt{cycling}, and \texttt{unknown} are mutually exclusive motion activity types; whereas, \texttt{stationary} is not mutually exclusive, to the other types.
 
-\begin{figure}
-\begin{tabular}{l|c|ccccc}
-Device scenarios & stationary & walking & running & automotive & cycling & unknown \\
-\hline
-On table & \textbf{true} & false & false & false & false & false\\
-Person checking email & false & false & false & false & false & false\\
-Person walking & false & \textbf{true} & false & false & false & false\\
-In idling vehicle & \textbf{true} & false & false & \textbf{true} & false & false\\
-In moving vehicle & false & false & false & \textbf{true} & false & false\\
-After reboot & false & false & false & false & false & \textbf{true}
-\end{tabular}
-\caption{Shows motion activity example scenarios based on the example made by \citet{apple:wwdc_2014_pham}.}
-\label{fig:motionActivity}
-\end{figure}
+\begin{table}
+	\input{tables/motionActivityScenarios}
+	\caption{Shows motion activity example scenarios based on the example made by \citet{apple:wwdc_2014_pham}.}
+	\label{tab:motionActivityScenarios}
+\end{table}
 
 
 Thus,
@@ -112,30 +103,14 @@ According to \citet{apple:ios_doc_cm}, the received \texttt{CMPedometerData} con
   \item \texttt{floorsDescended}, M8 coprocessor with barometer required
 \end{itemize}
 
-\begin{center}
-\begin{figure}
-\begin{tabular}{*{5}{l}}
-timestamp & startDate & endDate & distance & steps\\
-\hline
-9.3564 & 0.0019 & 9.2981 & 4.1351 & 7\\
-14.4272 & 0.0019 & 11.8354 & 4.1351 & 7\\
-14.4357 & 0.0019 & 14.3802 & 9.0606 & 15\\
-16.9566 & 0.0019 & 16.9193 & 9.7806 & 16\\
-22.0541 & 0.0019 & 19.4658 & 9.7806 & 16\\
-22.0553 & 0.0019 & 22.0038 & 13.5247 & 22\\
-24.6033 & 0.0019 & 24.5478 & 14.2447 & 23\\
-29.6747 & 0.0019 & 27.0876 & 14.2447 & 23\\
-29.6754 & 0.0019 & 29.6292 & 18.5546 & 30\\
-32.2152 & 0.0019 & 32.1722 & 19.2546 & 31\\
-\end{tabular}
-\caption{Recorded pedometer example data with additional timestamp.
-Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used instead of the absolute timestamps.
-Additionally all values, except the steps, are being truncated.}
-\label{fig:pedometerExampleData}
-\end{figure}
-\end{center}
+\begin{table}
+	\input{tables/pedometerExampleData}
+	\caption{Recorded pedometer example data with additional timestamp. Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used instead of the absolute timestamps. Additionally all values, except the steps, are being truncated.}
+	\label{tab:pedometerExampleData}
+\end{table}
 
-Figure~\ref{fig:pedometerExampleData} depicts a recorded test walk. The first column, shows a relative timestamp to the recording start, when the data was received by the application.
+
+Table~\ref{tab:pedometerExampleData} depicts a recorded test walk. The first column, shows a relative timestamp to the recording start, when the data was received by the application.
 
 The table depicts, some entries with the same step count and distance, but with different timestamp and endDate. In between of these data sets with the same step count and distance, the user actually stopped walking, resp.\ the pedometer did not recognize any steps. At the point in time, where the pedometer recognizes that the user continues walking, it pushes the same step count and distance with different endDate. This repeated data is usually passed together with the successive pedometer data, as shown in row two and three, for example. Their endDates usually have a difference of around 2.5~seconds; whereas, the timestamp is roughly the same.
 
@@ -155,13 +130,11 @@ The mentioned values are all by-products of the device's attitude calculation.
 
 \paragraph{Attitude} The device's attitude is provided in three different mathematical forms, Euler angles, Quaternions, and as rotation matrix.
 
-\begin{center}
-  \begin{figure}
-    \includegraphics[width=0.4\textwidth]{figures/iphone_coordinatesystem}
-    \caption{Depicts the iPhone's local coordinate system. Source:~\citep{apple:wwdc_2012_pham}}
-    \label{fig:iphone_cs}
-  \end{figure}
-\end{center}
+\begin{figure}
+	\includegraphics[width=0.4\textwidth]{figures/iphone_coordinatesystem}
+	\caption{Depicts the iPhone's local coordinate system. Source:~\citep{apple:wwdc_2012_pham}}
+	\label{fig:iphone_cs}
+\end{figure}
 
 To start receiving the device's attitude via the \texttt{CMDeviceMotionManager} a reference frame needs to be specified. Figure~\ref{fig:iphone_cs}, shows the iPhones local coordinate system, which is important to know, to understand the differences between the four possible reference frames. The four \texttt{CMAttitudeReferenceFrame}s, illustrated in figure~\ref{fig:cm_referenceframes}, do have the vertical z-axis aligned with the gravity in common. According to \citet{apple:wwdc_2014_pham}, the specified reference frame, does also specify the type of sensor fusion. The following reference frames do exist \citep{apple:wwdc_2014_pham,apple:ios_doc_cm}:
 \begin{itemize}
@@ -172,27 +145,9 @@ To start receiving the device's attitude via the \texttt{CMDeviceMotionManager} 
 \end{itemize}
 
 \begin{figure}
-      \subfloat[XArbitrary]{
-        \includegraphics[width=0.4\textwidth]{figures/cm_xArbitrary}
-        \label{fig:cm_referenceframes_xArbitrary}
-      }
-      \quad
-      \subfloat[XArbitraryCorrected]{
-        \includegraphics[width=0.4\textwidth]{figures/cm_xArbitraryCorrected}
-        \label{fig:cm_referenceframes_xArbitraryCorrected}
-      }
-      \vspace{1cm}
-      \subfloat[XMagneticNorth]{
-        \includegraphics[width=0.4\textwidth]{figures/cm_xMagneticNorth}
-        \label{fig:cm_referenceframes_xMagneticNorth}
-      }
-      \quad
-      \subfloat[XTrueNorth]{
-        \includegraphics[width=0.4\textwidth]{figures/cm_xTrueNorth}
-        \label{fig:cm_referenceframes_xTrueNorth}
-      }
-      \caption{Shows the different device attitude reference frames. Source:~ \citep{apple:wwdc_2012_pham}}
-      \label{fig:cm_referenceframes}
+    \input{figures/CMReferenceFrames}  
+	\caption{Shows the different device attitude reference frames. Source:~ \citep{apple:wwdc_2012_pham}}
+	\label{fig:cm_referenceframes}
 \end{figure}
 
 
@@ -221,7 +176,7 @@ The purpose of this section is, to find out if the above referenced sensors and 
 
 
 \subsection{MotionActivity}
-As mentioned above, the \texttt{CMMotionActivity} component is to detect and classify a user's activity. To proof the statement concerning the recognition duration of the walking state, made by Apple's engineer \citet{apple:wwdc_2014_pham}, we did some test walks. The results of our experiment show, that the claim of a recognition time of 10--15~seconds, for the walking state, is very optimistic. Figure~\ref{fig:eval:motionActivity} shows the beginning of one of these test walks.
+As mentioned above, the \texttt{CMMotionActivity} component is to detect and classify a user's activity. To proof the statement concerning the recognition duration of the walking state, made by Apple's engineer \citet{apple:wwdc_2014_pham}, we did some test walks. The results of our experiment show, that the claim of a recognition time of 10--15~seconds, for the walking state, is very optimistic. Table~\ref{tab:motionActivityEvaluation} shows the beginning of one of these test walks.
 
 From the begin on, our test user started to walk with constant speed, with the phone in hand. The first line shows, that the component recognized, that the device is moving (not stationary), even before we started the application. In reality we first started the application, before we started to walk, but not stationary means that the user just somehow moves the device. After $\approx 10.7~\text{seconds}$, the component increases its confidence for the current state. Another $\approx 5~\text{seconds}$ later it set the confidence to high; thus, the component is very confident, that the user somehow moves the device. After $\approx 25~\text{seconds}$ of walking, the component finally detects, with medium confidence, that the user actually walks.
 
@@ -229,23 +184,11 @@ Compared to detecting the users walking state, it detects nearly in realtime, th
 
 Our experiment shows, that the user needs to actually walk a very long distance, until the phone recognizes that the user is walking. It also shows, that the user has to hold the device very steady, until the device claims that the device is stationary. Consequently, \ac{CM}'s \texttt{CMMotionActivity} cannot really be used to determine a user's walking state, for short distances. Also the stationary state, cannot be used to claim that the user is not walking, due to the high sensibility.
 
-\begin{figure}
-\begin{tabular}{l*{7}{c}}
-start date & confidence & unknown & stationary & walking & running & automotive & cycling \\
-\hline
--2.0246 & 0 & false & false & false & false & false & false\\
-10.7026 & 1 & false & false & false & false & false & false\\
-15.7922 & 2 & false & false & false & false & false & false\\
-25.9676 & 0 & false & false & \textbf{true} & false & false & false\\
-32.3255 & 1 & false & \textbf{true} & false & false & false & false\\
-32.6434 & 1 & false & false & false & false & false & false\\
-33.2792 & 1 & false & \textbf{true} & false & false & false & false\\
-\dots & \dots & \dots & \dots & \dots & \dots & \dots & \dots
-\end{tabular}
-\caption{Shows a part of the recorded MotionActivity during a test walk.
-Remark: To simplify the table the start date is shown as relative timestamp instead of an absolute date.}
-\label{fig:eval:motionActivity}
-\end{figure}
+\begin{table}
+	\input{tables/motionActivityEvaluation}
+	\caption{Shows a part of the recorded MotionActivity during a test walk. Remark: To simplify the table the start date is shown as relative timestamp instead of an absolute date.}
+	\label{tab:motionActivityEvaluation}
+\end{table}
 
 
 \subsection{Pedometer}
@@ -259,91 +202,19 @@ Figure~\ref{fig:eval:pedometerNDF} depicts the \texttt{CMPedometer}'s standard d
 
 % CMPedometer (step count, distance)  dispersion plots
 \begin{figure}
-      \subfloat[Distance measurements]{
-        \begin{tikzpicture}
-          \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
-              xlabel={Reference distance (m)},
-              ylabel={Distance (m)},
-              legend entries={measurements, average},
-              legend pos=south east,
-            grid = major]
-            \addplot [blue, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inHand.csv};
-            \addplot [blue, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
-          \end{axis}
-        \end{tikzpicture}
-        \label{fig:eval:pedometerHand:dist}
-      }
-      \quad
-      \subfloat[Step count measurements]{
-        \begin{tikzpicture}
-          \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
-              xlabel={Reference distance (m)},
-              ylabel={Step count},
-              legend entries={measurements, average, step count ref.},
-              legend pos=south east,
-            grid = major]
-            \addplot [blue, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inHand.csv};
-            \addplot [blue, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
-            \addplot [green, only marks, mark=*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=stepRef] {csv/2014-10-28_htwg_keller_f/inHand_avg.csv};
-          \end{axis}
-        \end{tikzpicture}
-        \label{fig:eval:pedometerHand:steps}
-      }
-      \caption{Shows the measured distances and step counts for different distances. The measurements where taken indoor on a hard floor with the smartphone in hand.}
- \label{fig:eval:pedometerHand}
+    \input{figures/sensorEval_PedometerInHand}  
+	\caption{Shows the measured distances and step counts for different distances. The measurements where taken indoor on a hard floor with the smartphone in hand.}
+	\label{fig:eval:pedometerHand}
 \end{figure}
 
 \begin{figure}
-  \vspace{1cm}
-  \subfloat[Distance measurements]{
-    \begin{tikzpicture}
-      \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
-          xlabel={Reference distance (m)},
-          ylabel={Distance (m)},
-          legend entries={measurements, average},
-          legend pos=south east,
-        grid = major]
-        \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
-        \addplot [red, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
-      \end{axis}
-    \end{tikzpicture}
-    \label{fig:eval:pedometerPocket:dist}
-  }
-  \quad
-  \subfloat[Step count measurements]{
-    \begin{tikzpicture}
-      \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
-          xlabel={Reference distance (m)},
-          ylabel={Step count},
-          legend entries={measurements, average, step count ref.},
-          legend pos=south east,
-        grid = major]
-        \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
-        \addplot [red, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
-        \addplot [green, only marks, mark=*, mark size=2pt] table[col sep=semicolon, x=distanceRef, y=stepRef] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
-      \end{axis}
-    \end{tikzpicture}
-    \label{fig:eval:pedometerPocket:steps}
-  }
+  \input{figures/sensorEval_PedometerInPocket}
   \caption{Shows the measured distances and step counts for different distances. The measurements where taken indoor on a hard floor with the smartphone in pants pocket.}
   \label{fig:eval:pedometerPocket}
 \end{figure}
 
 \begin{figure}
-  \begin{tikzpicture}
-    \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.4\textheight,
-        xlabel={Distance / Mean $\mu$ (m)},
-        ylabel={Standard deviation $\sigma$ (m)},
-        legend entries={in hand, $f(\mu)=0.0971 \cdot \mu + 1.445$, in pocket, $f(\mu)=0.1971 \cdot \mu + 2.8703$},
-        legend pos=north west,
-      grid = major]
-      \addplot [blue, mark=*] table[col sep=semicolon, x=mu_distanceRef, y=sigma_distanceRef] {csv/2014-10-28_htwg_keller_f/inHand_ndf_parameters.csv};
-      %      \addplot [blue, dashed, domain=0:30, samples=2]{0.0680*x+2.1559};
-      \addplot [blue, dashed, domain=0:30, samples=2]{0.0971*x+1.445};
-      \addplot [red, mark=*] table[col sep=semicolon, x=mu_distanceRef, y=sigma_distanceRef] {csv/2014-10-28_htwg_keller_f/inPocket_ndf_parameters.csv};
-      \addplot [red, dashed, domain=0:30, samples=2]{0.1971*x+2.8703};
-    \end{axis}
-  \end{tikzpicture}
+  \input{figures/sensorEval_PedometerNDF}
   \caption {Shows the \texttt{CMPedometer} component's uncertainty, depending on the walked distance and the phone's position.}
   \label{fig:eval:pedometerNDF}
 \end{figure}
@@ -351,28 +222,13 @@ Figure~\ref{fig:eval:pedometerNDF} depicts the \texttt{CMPedometer}'s standard d
 
 Besides the pedometer's accuracy, we also evaluated the duration, until the component detects that the user is walking, and thus, delivers the first distance estimation. The \texttt{CMPedometer} component on average needs $5--10~\text{seconds}$ to deliver the first estimation, which is also consistent with statement made by \citet{apple:wwdc_2014_pham}. The first estimation typically contains a step count of $6--8~\text{steps}$. Once it detected that the user is walking, it continuously delivers estimation data, every $\approx 2.5 seconds$.
 
-Another interesting value is the time it takes the pedometer, to recognize that the user continued walking, after a short break of $\approx 10--15~\text{seconds}$. Against our expectation, it takes approximately the same amount of time, and also the same amount of steps, as the component requires to recognize it the first time. This behavior is depicted in figure~\ref{fig:eval:pedometerExampleData}. Line 1 shows the amount of time and steps, it took the component, to recognize that the user is walking. After $50~\text{steps}$ the user took a short break of around $15 seconds$. The following lines show, that the component requires $6~\text{steps}$ to recognize, that the user continued walking. The third data block shows another break that the user made during the test walk.
+Another interesting value is the time it takes the pedometer, to recognize that the user continued walking, after a short break of $\approx 10--15~\text{seconds}$. Against our expectation, it takes approximately the same amount of time, and also the same amount of steps, as the component requires to recognize it the first time. This behavior is depicted in table~\ref{tab:pedometerEvaluation}. Line 1 shows the amount of time and steps, it took the component, to recognize that the user is walking. After $50~\text{steps}$ the user took a short break of around $15 seconds$. The following lines show, that the component requires $6~\text{steps}$ to recognize, that the user continued walking. The third data block shows another break that the user made during the test walk.
 
-\begin{figure}
-\begin{tabular}{*{4}{l}}
-startDate & endDate & distance & steps\\
-\hline
-0.0019 & 8.2329 & 4.8273 & 7\\
-0.0019 & 10.7811 & 7.9850 & 11\\
-0.0019 & 13.3238 & 11.4785 & 16\\
-\dots & \dots & \dots & \dots\\
-0.0019 & 31.1349 & 37.2110 & 50\\
-0.0019 & 54.0149 & 37.2110 & 50\\
-0.0019 & 56.5503 & 41.4032 & 56\\
-\dots & \dots & \dots & \dots\\
-0.0019 & 69.2608 & 57.2046 & 78\\
-0.0019 & 84.5138 & 57.2046 & 78\\
-0.0019 & 87.0569 & 64.8046 & 88
-\end{tabular}
-\caption{Shows the recorded pedometer example data.
-Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used, instead of the absolute timestamps. Additionally all values, except the steps, are being truncated.}
-\label{fig:eval:pedometerExampleData}
-\end{figure}
+\begin{table}
+	\input{tables/pedometerEvaluation}
+	\caption{Shows the recorded pedometer example data. Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used, instead of the absolute timestamps. Additionally all values, except the steps, are being truncated.}
+	\label{tab:pedometerEvaluation}
+\end{table}
 
 
 \subsection{Heading}
@@ -402,36 +258,15 @@ The most important requirement for heading is longterm accuracy. Therefor, we wa
 % reagiert nicht auf magnet
 
 \begin{figure}[htbp]
-    \begin{tikzpicture}
-      \begin{axis}[width=0.5\textwidth, height=0.4\textheight,
-          xlabel={round},
-          ylabel={heading error (degree)},
-          legend entries={counter-clockwise, clockwise},
-          legend pos=north west,
-        grid = major]
-        \addplot [blue, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_left.csv};
-        \addplot [blue, dashed, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_right.csv};
-      \end{axis}
-    \end{tikzpicture}
-    \caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with reference frame \texttt{xMagneticNorth}.}
-    \label{fig:evalAttitude:xMagneticNorth}
+	\input{figures/sensorEval_AttitudeXMagneticNorth}
+	\caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with reference frame \texttt{xMagneticNorth}.}
+	\label{fig:evalAttitude:xMagneticNorth}
 \end{figure}
 
 \begin{figure}[htbp]
-    \begin{tikzpicture}
-      \begin{axis}[width=0.5\textwidth, height=0.4\textheight,
-          xlabel={round},
-          ylabel={heading error (degree)},
-          legend entries={xMagneticNorth, xArbitrary, xArbitraryCorrected},
-          legend pos=north west,
-        grid = major]
-        \addplot [blue, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_left.csv};
-        \addplot [red, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xArbitraryAndCompass.csv};
-        \addplot [green, mark=*] table[col sep=semicolon, x=round, y=error_attitude] {csv/deviceAttitudeAndCompass/xArbitraryCorrectedAndCompass.csv};
-      \end{axis}
-    \end{tikzpicture}
-    \caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with three different reference frames.}
-    \label{fig:evalAttitude:referenceframes}
+	\input{figures/sensorEval_AttitudeReferenceframes}
+	\caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with three different reference frames.}
+	\label{fig:evalAttitude:referenceframes}
 \end{figure}
 
 \paragraph{CLHeading} During the experiment also the compass's \texttt{CLHeading} values, where recorded. Figure~\ref{fig:eval:compass} shows the heading's error over time. The values where measured together with the values of figure~\ref{fig:evalAttitude:xMagneticNorth} and \ref{fig:evalAttitude:referenceframes}. The chart shows no drift over time compared to the data measured from \texttt{CMAttitude}. But it also shows, that the compass can be biased by other magnetic fields. The outliers in the experiment with counter-clockwise direction let assume, that another magnetic field biased the before measured magnetic field.
@@ -442,20 +277,9 @@ According to the 40~measurements depicted in figure~\ref{fig:eval:compass}, the 
 % compass ist genau genug
 
 \begin{figure}[htbp]
-  \begin{tikzpicture}
-    \begin{axis}[width=0.6\textwidth, height=0.4\textheight,
-      xlabel={round},
-      ylabel={heading error (degree)},
-      grid = major]
-      \addplot [blue, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_left.csv};
-      \addplot [blue, dashed, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xMagneticNorthAndCompass_right.csv};
-      \addplot [red, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xArbitraryAndCompass.csv};
-      \addplot [green, mark=*] table[col sep=semicolon, x=round, y=error_compass] {csv/deviceAttitudeAndCompass/xArbitraryCorrectedAndCompass.csv};
-    \end{axis}
-  \end{tikzpicture}
-
-  \caption{Shows the compass' magnetic heading error in degree. The measurements where taken by walking 10 times around a table. The initial measurement is being used as reference value. The heading filter was set to 1.0 degree.}
-  \label{fig:eval:compass}
+	\input{figures/sensorEval_Compass}
+	\caption{Shows the compass' magnetic heading error in degree. The measurements where taken by walking 10 times around a table. The initial measurement is being used as reference value. The heading filter was set to 1.0 degree.}
+	\label{fig:eval:compass}
 \end{figure}
 
 \subsection{Summary}

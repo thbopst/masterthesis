@@ -1,0 +1,25 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption=Part 2,
+  label=lst:algorithmParticleFilter_2]
+PART_2($\chi_{t-1}$) {
+
+  $\bar{\chi}_t = \chi_{t-1}$
+
+  // integrate residual motions, filter just with map
+  while u_buffer isNotEmpty {
+    $u$ = u_buffer.first
+    $z = \emptyset$
+    $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
+     u_buffer.remove($u$)
+
+     // filter without measurements, just with map
+     $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
+  }
+
+  return $\bar{\chi}_t$
+}
+\end{lstlisting}

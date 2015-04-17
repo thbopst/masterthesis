@@ -1,0 +1,22 @@
+\begin{lstlisting}[
+  float,
+  floatplacement=H,
+  mathescape,
+  captionpos=b,
+  caption=Algorithm for \acl{KF} based on \citet{thrun:prob_robo},
+  label=lst:kf]
+KalmanFilter($x_{t-1}$, $\Sigma_{t-1}$, $u_t$, $z_t$) {
+
+  \\ Prediction
+  $\hat{x}_t = A x_{t-1} + B u_t$
+  $\hat{\Sigma}_t = A \Sigma_{t-1} A^T + B \Sigma_u B^T$
+
+  \\ Correction
+  $\hat{z}_t = C \hat{x}_t$
+  $K = \hat{\Sigma}_t C^T (C\hat{\Sigma}_tC^T + \Sigma_z)^{-1}$
+  $x_t = \hat{x}_t + K(z_t - \hat{z}_t)$
+  $\Sigma_t = (I - KC)\hat{\Sigma}_t$
+
+  return ($x_t$, $\Sigma_t$)
+}
+\end{lstlisting}
