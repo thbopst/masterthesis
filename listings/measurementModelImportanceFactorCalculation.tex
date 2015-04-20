@@ -3,17 +3,17 @@
   floatplacement=H,
   mathescape,
   captionpos=b,
-  caption={Algorithm to calculate the importance factor $w$ of a state hypothesis $x$ by taking the measurements $z$ and the map $m$ into account.},
+  caption={Algorithm to calculate the importance factor $w$ of a state hypothesis $x$ by taking the measurements $z$ and the \texttt{map} into account.},
   label=lst:measurementModelImportanceFactorCalculation]
-measurement_model($z = \{z_0, z_1, z_{k-1}\}$, $x$, $m$) {
+measurement_model($z = \{z_0, z_1, z_{k-1}\}$, $x$, map) {
   $\text{weight} = 0.0$
 
-  if position $x$ on $m$ && $x$ is free {
+  if position $x$ on map && $x$ is free {
 
     for $z_i$ in $z$ {
 
       $z_{i_\text{dist}}$ = measured distance between phone and beacon
-      $z_{i_\text{pos}}$ = beacons position on $m$
+      $z_{i_\text{pos}}$ = beacons position on map
 
       $\mu_d$ = euclidian distance between $x$ and $z_{i_\text{pos}}$
       $\sigma_d = 0.25 \cdot z_{i_\text{dist}}$
