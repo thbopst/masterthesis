@@ -8,7 +8,7 @@ An iBeacon, in general a beacon\footnote{\emph{iBeacon} is a registered trade ma
   \item Indoor localization and navigation (e.g.\ digital museum guide, airport guide)
 \end{itemize}
 
-\noindent After providing a brief idea what a beacon actually is, the next sections focuses on the beacons itself and the communication technology which is used by a beacon to send its signal. Afterwards, the \acs{API} provided by Apple's mobile operating system iOS~8.1 to receive these signals is described. After providing the basics, the results from the beacon's signals' evaluation are presented. This results are important for the algorithm's implementation as described in chapter~\ref{chap:pf}.
+\noindent After providing a brief idea what a beacon actually is, the next sections focuses on the beacons itself and the communication technology which is used by a beacon to send its signal. Afterwards, the \acs{API} provided by Apple's mobile operating system iOS~8.1 to receive these signals is described. After providing the basics, the results from the beacon's signals' evaluation are presented. This results are important for the algorithm's implementation as described in Chapter~\ref{chap:pf}.
 
 
 \section{Bluetooth Low Energy}\label{sec:ble}
@@ -77,7 +77,7 @@ Imagine a chain of stores' application which needs to support several shops. Eac
 \noindent By building such a hierarchy, an application can also just search for beacons of a specific shop without having a lot of overhead \citep{apple:getting_started,binside:ds}. Typically, these three parts can either be configured on the beacon itself, if not they need to be manufactured with the desired identifiers.
 
 \subsubsection*{Proximity estimation}
-As mentioned in chapter~\ref{chap:fundamentals}, there are several physical methods to estimate the distance between a transmitter of a radio frequency signal and the receiver. In this case the \acf{RSS} is used to estimate the proximity. Consequently, the receiver needs to know which \acs{TX}-power level is used to send the radio frequency signal. As mentioned in section~\ref{sec:ble}, \ac{BLE}, uses the 2.4~GHz frequency. According to \citet{apple:getting_started} and \citet{binside:ds}, signals of this frequency band are heavily attenuated in obstructed environments and especially by water. Consequently, the knowledge of the sender's \acs{TX}-power level is not sufficient to estimate the distance. Thus, a calibration value, which is the \acl{RSS} in a distance of 1m, is also sent to the receiver. Therefore, the below described calibration step, after deploying the beacons is necessary.
+As mentioned in Chapter~\ref{chap:fundamentals}, there are several physical methods to estimate the distance between a transmitter of a radio frequency signal and the receiver. In this case the \acf{RSS} is used to estimate the proximity. Consequently, the receiver needs to know which \acs{TX}-power level is used to send the radio frequency signal. As mentioned in Section~\ref{sec:ble}, \ac{BLE}, uses the 2.4~GHz frequency. According to \citet{apple:getting_started} and \citet{binside:ds}, signals of this frequency band are heavily attenuated in obstructed environments and especially by water. Consequently, the knowledge of the sender's \acs{TX}-power level is not sufficient to estimate the distance. Thus, a calibration value, which is the \acl{RSS} in a distance of 1m, is also sent to the receiver. Therefore, the below described calibration step, after deploying the beacons is necessary.
 
 \subsection{Hardware Specification}
 To test and evaluate the implementation I used ten beacons from a company called \emph{BEACONinside GmbH} from Berlin, Germany. The beacons have the Model No.: B0001-A (HW: Rev 1.1, SW: 1.0). Figure~\ref{fig:bi:beacons} shows a 3D picture of sections of the beacons. According to \citet{binside:ds}, the beacons' signal have a range from 0 up to 40 meters. The chipset they used was manufactured by Texas Instruments (Model CC2541). The company obtained a license from Apple to manufacture the beacons, which are compatible to Apple's iBeacon specification~\citep{binside:ds}.
@@ -142,7 +142,7 @@ The \texttt{CLLocationManager} passes an array of \texttt{CLBeacon} objects to i
 	\label{tab:beaconExampleData}
 \end{table}
 
-A \texttt{CLBeacon} object contains on one hand the beacon's identifiers, as described in section~\ref{sec:beacon}. On the other hand, it contains three values, which express the beacons proximity in different ways.
+A \texttt{CLBeacon} object contains on one hand the beacon's identifiers, as described in Section~\ref{sec:beacon}. On the other hand, it contains three values, which express the beacons proximity in different ways.
 
 \subsubsection*{\acs{RSSI} Property}
 The \texttt{rssi} property, stores the \acl{RSS} measured in dBm. It expresses how strong the received signal is. As mentioned before, a beacons' advertisement time interval can be specified. Remember, the used beacons use send their advertisement per default every 400ms. The framework itself sticks to its $\approx$~1s time interval. It collects all received advertisements and calculates the average since the last reported \texttt{rssi} value. If a beacon's signal was received before, but not during the current time interval, its \texttt{rssi} value is 0 \citep{apple:wwdc_2013_bruins,apple:ios_doc_cl}.
@@ -177,32 +177,32 @@ Figure~\ref{fig:eval_accuracy_vs_distance} illustrates the result and the fact, 
 
 
 \section{Evaluation}\label{sec:beacon_eval}
-After explaining how beacon advertisements can be received with Apple's mobile operating system and which data can be accessed, we evaluate the data, especially the \texttt{accuracy} property's values, which is the data being used for the later discussed algorithm. First, we focus on the distance estimations's quality, in terms of its error, under different environmental circumstances. Afterwards, we present the result of our experiment, of using pure multilateration, as introduced in section~\ref{sec:fund_trilateration}, to implement a simple localization algorithm.
+After explaining how beacon advertisements can be received within an iOS app and which data can be accessed, this Chapter evaluates the \texttt{CLBeacon} object's data especially the \texttt{accuracy} property's values, which are the ones used by the solution's algorithm.
+
+First, the distance estimations's quality i.e.\ its error in different situations is evaluated. Afterwards, the result of an experiment which uses only multilateration to determine a user's position is presented.
 
 \subsection{Distance Estimation}
-%As mentioned before, the signals are heavily influenced by physical materials, which also has an impact on the estimated distance.
-%Thus, obstacles between sender and receiver are impacting the distance estimation and as well the environments construction.
-%But physical materials are not the only reason.
-%The device's relative attitude to the beacon
+The measured distances provided by the \texttt{CLBeacon} object's \texttt{accuracy} property varies in dynamic, but also in steady and unobstructed environments, due to the following reasons.
 
-The measured distances provided by the \texttt{CLBeacon} object's \texttt{accuracy} property varies in dynamic, but also in steady and unobstructed environments.
-
-\paragraph{Mapping} The first reason is, that the \texttt{rssi} values are not directly mapped to the \texttt{accuracy} values. Apple's \ac{CL} framework seems to apply a filter, to estimate the distance. We recorded the \texttt{CLBeacon} object's properties over time at a fixed position, with a distance of 2~m to the beacon. We directly began recording the data after positioning the phone. Figure~\ref{fig:beacon_eval_accuracy-rssi} illustrates the behavior, by showing the \texttt{rssi} values and their corresponding \texttt{accuracy} values over time. The graph shows, that the \texttt{accuracy} values slowly converge against the actual distance of 2~m. It also shows, that outliers in the \texttt{rssi} property, do not have a direct impact, on the estimated distance.
+%\subsubsection*{Dependency of \texttt{rssi} and \texttt{accuracy}}
+\subsubsection*{Filtering}
+The first reason is, that the measured \ac{RSS} is not directly used to calculate the \texttt{accuracy} value. The \acl{CL} framework seems to apply a filter to the \texttt{CLBeacon} object's values. To test this the \texttt{CLBeacon} object's properties were recorded over time. During the test the smartphone was positioned with a distance of 2\,m to the beacon. The data recording started directly after positioning the smartphone. Figure~\ref{fig:beacon_eval_accuracy-rssi} illustrates the recorded \texttt{rssi} values and their corresponding \texttt{accuracy} values over time. The graph shows, that the \texttt{accuracy} values slowly converge against the actual distance of 2\,m. Furthermore, it shows that outliers in the \texttt{rssi} property do not have a direct impact on the estimated distance. Consequently, it is very likely that \ac{CL} filters the values provided by the \texttt{CLBeacon} object. Furthermore, it shows that the \texttt{accuracy}, i.e.\ estimated distance, not only depends on the corresponding \texttt{rssi} value.
 
 \begin{figure}
 	\input{figures/iBeaconEval_AccuracyVsRssi}
-	\caption {Dependency of the \texttt{CLBeacon} object's \texttt{accuracy} and \texttt{rssi} property over time with an actual distance of $2m$.}
+	\caption {Dependency of the \texttt{CLBeacon} object's \texttt{accuracy} and \texttt{rssi} property over time with an actual distance of 2\,m.}
 	\label{fig:beacon_eval_accuracy-rssi}
-\end{figure}
+\end{figure} % TODO Remove last seconds
 
-\paragraph{Attitude \& Obstacles} The second reason is the device's attitude, relative to the beacon. Figure~\ref{fig:beacon_eval_situations} shows the impact on the estimated distance and the \acs{RSS} in typical situations.
-For each situation the actual distance between the two devices was 1~m. The measurements where taken indoor. The values shown in figure~\ref{fig:beacon_eval_situations} are average values. For each situation, 60 -- 100 values where recorded.\newline
+\subsubsection*{Attitude \& Obstacles}
+The second reason is the device's attitude relative to the beacon. Figure~\ref{fig:beacon_eval_situations} illustrates the impact on the estimated distance and the \ac{RSS} in typical situations.
+During the experiment the actual distance between smartphone and beacon was 1\,m. The measurements were taken indoor. The values shown in Figure~\ref{fig:beacon_eval_situations} are average values. For each situation 60~--~100 values were recorded.\newline
 
 \textbf{Situations:}
 \begin{itemize}
   \item \emph{(1)} Horizontal iPhone in front of vertical beacon with \acs{LOS}.
-  \item \emph{(2)} Horizontal iPhone sideways with \acs{LOS} to vertical beacon.
-  \item \emph{(3)} Horizontal iPhone below vertical beacon with \acs{LOS} (Distance 1m, $45^\circ$ below beacon).
+  \item \emph{(2)} Horizontal iPhone sideways to vertical beacon with \acs{LOS}.
+  \item \emph{(3)} Horizontal iPhone with angle of $45~\circ$ below vertical beacon with \acs{LOS}.
   \item \emph{(4)} Vertical iPhone in front of vertical beacon with \acs{LOS}.
   \item \emph{(5)} Horizontal iPhone in front of horizontal beacon with \acs{LOS}.
   \item \emph{(6)} Horizontal iPhone in front of vertical Beacon with person in between.
@@ -211,13 +211,11 @@ For each situation the actual distance between the two devices was 1~m. The meas
   \item \emph{(9)} Horizontal iPhone in front of vertical Beacon with 30 cm ferro concrete wall in between.
 \end{itemize}
 
-Situation 1, 2, 5 and 7 shows, that if the iPhone is horizontal in front of or sideways of the vertical beacon with \acs{LOS}, the \acs{RSS} attenuation is at the least. Against, if the signals are received by the phone, with a different angle to the beacon, shown in situation 3 and 4, the attenuation increases.
+\noindent Situation 1, 2, 5 and 7 shows, that if the iPhone is horizontal in front of, or sideways of the vertical beacon with \acs{LOS}, the \acs{RSS} attenuation is the lowest. In contrast, if the beacon's signals are received with a different angle as shown by situation 3 and 4 the attenuation increases.
 
-Figure~\ref{fig:beacon_eval_accuracy-rssi} depicts also the third reason, which are static obstacles such as walls, or the user's own body.
+Furthermore, Figure~\ref{fig:beacon_eval_accuracy-rssi} depicts the third reason, which is static obstacles such as walls or the user's own body. A human body between the phone and a beacon, shown in situation 6 and 8, has a much higher impact. The estimated distance increases by approximately 3\,m. Whereas a ferro concrete 30\,cm wall, shown in situation 9, drastically impacts the distance. The phone estimates a distance of 9\,m instead of 1\,m.
 
-A human body between the phone and a beacon, shown in situation 6 and 8, has a much higher impact. The estimated distance increases in approx.\ 3 meters. Whereas, a ferro concrete 30~cm wall, shown in situation 9, drastically impacts the distance. The phone estimates a distance of 9~meters instead of 1~meter.
-
-The above illustrated scenarios are very common. The problem is, that it is not distinguishable, if a estimated distance is being impacted by the attitude, a wall, or a person, without knowing its own exact position, the beacons attitude, and the positions of all obstacles.\newline
+The above illustrated scenarios are very common. The problem is, that without knowing its own exact position, the beacons attitude, and the positions of all obstacles one cannot distinguish, whether an estimated distance is impacted by the attitude, a wall, or a person.
 
 \begin{figure}
 	\input{figures/iBeaconEval_Situations}
@@ -226,20 +224,20 @@ The above illustrated scenarios are very common. The problem is, that it is not 
 \end{figure}
 
 
-\paragraph{Spreading \& Error} To depict that the estimated distance also varies in steady unobstructed environments with \acs{LOS}, we recorded the \texttt{accuracy} values, for different reference distances in different environments. Therefor, we recorded for each reference distance 60 values. We calibrated the used beacon for each environment.
+\subsubsection*{Distribution and Error}
+To depict that the estimated distance also varies in steady unobstructed environments with \acs{LOS}, the \texttt{accuracy} values for different reference distances in different environments were measured. For each reference distance 60 values were recorded. For each environment the used beacons were calibrated.
 
-Figure~\ref{fig:beacon_dispersion_outdoor} illustrates the collected \texttt{accuracy} values measured at 1, 2, \ldots, 5, 10, \ldots, 30~meters distance to the beacon. The measurements where taken outdoor with \acl{LOS} between the two devices.
+Figure~\ref{fig:beacon_dispersion_outdoor} illustrates the collected \texttt{accuracy} values measured at 1, 2, \ldots, 5, 10, \ldots, 30\,m distance to the beacon. The measurements were taken outdoor with \acl{LOS} between the beacon and the smartphone.
 
-The graph shows, that the average \texttt{accuracy} measured at 1 -- 4~m distance is very close to the actual distance. It also shows, that the value's spreading for these distances, is very low. For distances $\geq$~5~m, the spreading increases and sways between small and huge; thus, it is not correlated to the reference distance. 
-% Compared to the measurements of 1, \ldots, 4 meters the error increases and sways.
+The graph shows, that the average \texttt{accuracy} measured at 1\,--\,4\,m distance is very close to the actual distance. It also shows that the value's distribution for these distances is very low. For distances $\geq$\,5\,m, the spreading increases and varies between small and large. Thus, it is not correlated to the reference distance.
 
-As mentioned before the beacons manufacturer claims a maximum range of 40~m. We could range the beacon in this scenario, up to a distance of 42~m.
+As mentioned before, the beacons manufacturer claims a maximum range of 40\,m. In this scenario the beacon's signals could be received up to a distance of 42\,m.
 
-We repeated the exact same experiment in an indoor environment. The results are depicted in figure~\ref{fig:beacon_dispersion_f-cellar}. Also in this case the average \texttt{accuracy} comes very close to the actual distance with a very low spreading for the first 4 distances. At 5~m the spreading and error increases and sways, too.
+The exact same experiment was repeated in an indoor environment. The results are depicted in Figure~\ref{fig:beacon_dispersion_f-cellar}. Also in this case the average \texttt{accuracy} comes very close to the actual distance with a very low spreading for the first 4 distances. At 5\,m the distribution and error increases and decreases, too.
 
-Interestingly, the spreading starts to decreases between 10 -- 30~m, from a very large to a much smaller value. At the same time the error grows, because due to the \acs{RSS}, the smartphone estimates a very small distance; whereas, the actual distance is very large. The assumed reason is the test environment's construction form. The measurements where recorded in a straight, long, but slim, corridor in a cellar. There are multiple doors, made of steel, on both sides of the wall, that maybe caused reflections.
+Interestingly, the value's distribution starts to decrease between 10\,--\,30\,m from very large to a much smaller value. At the same time the error grows because the smartphone estimates a very small distance due to the \ac{RSS}; whereas, the actual distance is very large. The assumed reason is the test environment's construction form. The measurements were recorded in a straight, long, but narrow corridor in a basement. There are multiple doors made of steel on both sides of the wall, that maybe caused reflections.
 
-The depicted measurements in figure~\ref{fig:beacon_dispersion_f007} are recorded in an approx.\ 15~m long and 8 -- 11~m wide lecture hall. It shows, that also the first few meters on average are matching best, but it also depicts, that there are sometimes huge differences in the estimated distance, at the same position.
+The depicted measurements in Figure~\ref{fig:beacon_dispersion_f007} were recorded in an $\approx$\,15\,m long and 8\,--\,11\,m wide lecture hall. It shows, that also the first few meters on average are matching best, but it also depicts, that there are sometimes huge differences in the estimated distance at the same position.
 
 \begin{figure}
 	\input{figures/iBeaconEval_SignalSpreading}
@@ -248,7 +246,7 @@ The depicted measurements in figure~\ref{fig:beacon_dispersion_f007} are recorde
 \end{figure}
 
 
-\paragraph{Uncertainty} As mentioned in section~\ref{sec:fund_loc}, it is necessary to know the uncertainty of a measurement, to implement a particle filter. Thus, we determined distance estimations uncertainty based on the data shown in figure~\ref{fig:beacon_dispersion_outdoor} and \ref{fig:beacon_dispersion_f007}. The gaussian's parameters, to model the distance estimation's uncertainty, are depicted in figure~\ref{fig:beacon_eval_ndf}. The two dashed straight lines show the linear function that approximates the standard deviation $\sigma$ depending on the mean $\mu$ best.
+\paragraph{Uncertainty} As mentioned in Section~\ref{sec:fund_loc}, it is necessary to know the uncertainty of a measurement to implement a \acl{PF}. Thus, I determined distance estimation's uncertainty based on the data shown in Figure~\ref{fig:beacon_dispersion_outdoor} and \ref{fig:beacon_dispersion_f007}. The Gaussian's parameters to model the distance estimation's uncertainty are depicted in Figure~\ref{fig:beacon_eval_ndf}. The two dashed straight lines show the linear function that approximates the standard deviation $\sigma$ depending on the mean $\mu$ best.
 
 \begin{figure}
 	\input{figures/iBeaconEval_NDF}
@@ -258,19 +256,19 @@ The depicted measurements in figure~\ref{fig:beacon_dispersion_f007} are recorde
 
 
 \subsection{Multilateration}
-After evaluating the distance estimation's quality of one beacon, we decided to deploy some beacons in a lecture hall to get a better feeling, of how good the distance estimation actually works. On one side, the goal was to visualize the estimated distances on a map, to proof their plausibility, and on the other side, to test if indoor self-localization with smartphones is possible by just using iBeacons, without integrating additional sensor data.
+After evaluating the distance estimation's quality of one beacon, some beacons were deployed in a lecture hall to get a better feeling of how good the distance estimation actually works. On one hand, the goal was to visualize the estimated distances on a map, to proof their plausibility, and on the other hand, to test if indoor self-localization with smartphones is possible by just using iBeacons without integrating additional sensor data.
 
-As already mentioned in section~\ref{sec:fund_trilateration}, \emph{multilateration} is a method to estimate the position, by using the distances to several senders. The receivers position by using just one sender is somewhere on a circle around the sender with the estimated distance as radius of the circle.
-By using two senders $s_1$ and $s_2$, the two circles around the senders can have zero, one or two intersections, if the position of $s_1 \neq s_2$. Thus, the receivers position must be at one of the circles's intersections.
-By adding a third sender $s_3$ the three circles have either no or exactly one, common intersection point, which is the receivers position. This applies also to more than three senders.
+As already mentioned in Section~\ref{sec:fund_trilateration}, \emph{multilateration} is a method to estimate a position by using the distances to several transmitters. If one uses only one sender then the receiver's position is somewhere on a circle around the transmitter with the estimated distance as radius of the circle.
+By using two tranmitters $t_1$ and $t_2$, the two circles around the transmitters can have zero, one or two intersections, if the position of $t_1 \neq t_2$. Thus, the receiver's position must be at one of the circles' intersections.
+By adding a third transmitter $t_3$ the three circles have either no or exactly one, common intersection point, which is the receiver's position. This applies also to more than three transmitters.
 
-To be able to use our implementation with variable sender count, we use the \emph{Least Square} method to determine the receivers position. Another advantage is, that the least square method can also estimate a position if no common intersection point exists.
+To be able to use the implementation with variable transmitter count the \emph{Least Square} method to determine the receiver's position was used. Another advantage is that the least square method can also estimate a position if no common intersection point exists.
 
-For our experiment we used the same lecture hall as before. There, we positioned four beacons. Then we used our test device, which is an iPhone~5S, to recorded the received beacon identifiers with their corresponding estimated distances, resp.\ the \texttt{accuracy} values, provided by \acs{CL}, during our test walk on a defined path.
+For the experiment the same lecture hall as before was used. There, four beacons were positioned. Then the test device, which is an iPhone\,5S, was used to recorded the received beacon identifiers with their corresponding estimated distances, i.e.\ the \texttt{accuracy} values, provided by \acs{CL}, during a test walk on a defined path.
 
-To visualize the estimated distances to the beacons and the device's estimated position, resp.\ the walked path, we wrote a small Python program. Figure~\ref{fig:beacon_eval_multilat} shows four screenshots of the programs output. Each of it shows a map, which shows the lecture halls walls in grey. The white space in the hall, is free space. The filled small blue circles next to the walls are the four beacons. The big blue circles, are the circles around the beacons, where the radius represents the estimated distance to the beacons. We walked on the green tetragon, beginning at the bottom right corner in counter clockwise direction, with holding the test device in front of us. The beacons where positioned in approximately the same hight, as the hold device. The red line shows the path estimated.
+To visualize the estimated distances to the beacons and the device's estimated position, i.e.\ the walked path, I wrote a small Python program. Figure~\ref{fig:beacon_eval_multilat} shows four screenshots of the program's output. Each of it shows a map, which shows the lecture hall walls in grey. The white space in the hall is free space. The filled small blue circles next to the walls are the four beacons. The big blue circles, are the circles around the beacons, where the radius represents the estimated distance to the beacons. The test person walked on the green tetragon, beginning at the bottom right corner in counter clockwise direction by holding the test device in front of oneself. The beacons were positioned at approximately the same height as the device in the test person's hand. The red line shows the estimated path.
 
-The first screenshot, depicted in figure~\ref{fig:beacon_eval_multilat_1}, shows, that the estimated distance sometimes is completely wrong, as shown by the blue circle around the top-right beacon. It also shows that the estimated position is somewhere several meters outside of the lecture hall. The second screenshot shows, that the distance to the top-right beacon shrinks, but the one to the top-left, massively grows. The distances to the other two beacons, seem to be plausible. Figure~\ref{fig:beacon_eval_multilat_3}, shows a plausible position. It also shows, that in this step, beacon's signal, positioned at the bottom-right corner, was not received. The last screenshot shows also a more or less plausible position. The distances, except the one to the beacon, positioned at the bottom-left corner, seem to be plausible.
+The first screenshot depicted in Figure~\ref{fig:beacon_eval_multilat_1} shows, that the estimated distance sometimes is completely wrong, as shown by the blue circle around the top-right beacon. It also shows that the estimated position is somewhere several meters outside of the lecture hall. The second screenshot shows, that the distance to the top-right beacon shrinks, but the one to the top-left massively grows. The distances to the other two beacons seem to be plausible. Figure~\ref{fig:beacon_eval_multilat_3} shows a plausible position. It also shows, that in this step the beacon's signal, positioned at the bottom-right corner, was not received. The last screenshot shows also a more or less plausible position. The distances, except the one to the beacon, positioned at the bottom-left corner, seem to be plausible.
 
 \begin{figure}
   \input{figures/iBeaconEval_Multilateration}
@@ -278,7 +276,7 @@ The first screenshot, depicted in figure~\ref{fig:beacon_eval_multilat_1}, shows
   \label{fig:beacon_eval_multilat}
 \end{figure}
 
-We repeated the experiment with the same data, but just used the beacon's signals where \texttt{accuracy} is $< 5~m$. Signals with larger estimated distances where ignored. Figure~\ref{fig:beacon_eval_multilat_less5m} shows the result. The estimated path actually is inside of the lecture hall. Its not possible to determine that the user walked on the green path, but ignoring values less than 5~m seem to improve the location estimation.
+The experiment was repeated with the same setting and recorded data, but only used those beacon signals where the \texttt{accuracy} was $<$\,5\,m. Signals with larger estimated distances were ignored. Figure~\ref{fig:beacon_eval_multilat_less5m} shows the result. The estimated path actually is inside of the lecture hall. It is not possible to determine that the test person walked on the green path, but ignoring values more than 5\,m seems to improve the location estimation.
 
 \begin{figure}
 	\includegraphics[width=0.45\textwidth]{figures/multilat_less5m}
@@ -286,11 +284,11 @@ We repeated the experiment with the same data, but just used the beacon's signal
 	\label{fig:beacon_eval_multilat_less5m}
 \end{figure}
 
-This experiment shows, that the beacons's signals must be heavily influenced, due to the very unreliable distance estimations. It also shows that pure multilateration, without filtering the data and without integrating additional data sources, is not sufficient enough for indoor self-localization.
+This experiment shows, that due to the very unreliable distance estimations the beacons' signals must be heavily influenced. It also shows that pure multilateration, without filtering the data and without integrating additional data sources, is not sufficient for indoor self-localization.
 
 \subsection{Summary}
-The results show, that the distance estimation not just depend on the beacons calibration, it also depends on the buildings construction form, the phones relative attitude to the beacon, and the obstacles in between.
+The results show, that the distance estimation not just depend on the beacons calibration, it also depends on the buildings construction form, the phones relative orientation to the beacons, and the obstacles in between.
 
-It also points out, that the \texttt{CLBeacon}'s \texttt{accuracy} resp.\ the estimated distance, comes very close to the actual distance up to 4--5~meters with \acs{LOS}. Larger distances cause a much higher spreading, and thus, a larger error. Physical material like humans and walls do cause attenuation, which results in a larger distance as it actually is. Besides that, the estimated distance is sometimes very small, relative to the actual distance.
+It also points out, that the \texttt{CLBeacon}'s \texttt{accuracy} i.e.\ the estimated distance, comes very close to the actual distance up to 4\,--\,5\,m with \acs{LOS}. Larger distances cause a much higher spreading, and thus, a larger error. Physical material like humans and walls cause attenuation, which results in a larger distance estimation than it actually is. Besides that, the estimated distance is sometimes very small compared to the actual distance.
 
-To conclude, the estimated distances are very unreliable; thus, their plausibility should be proofed to filtered the measurements. But, due to the fact, that the validity cannot be proofed, without knowing the receivers exact position and the properties of all other influencing factors, which is a nontrivial problem in large buildings, the only thing that could be done, is to ignore beacons with an estimated distance larger than 5~meters. This solves of course not the problem with beacons, which appear to be closer as the actually are. From our point of view, no solution exists to solve this problem.
+To conclude, the estimated distances are very unreliable. Thus, their plausibility should be proven to filter the measurements. But due to the fact, that the validity cannot be proven without knowing the exact position of the receiver and the properties of all other influencing factors, which is not a trivial problem in large buildings, the only one possible improvement that could be applied, is to ignore beacons with an estimated distance larger than 5~meters. This solves of course not the problem with those beacons, which appear to be closer than they actually are. But from my point of view no real solution exists to solve this problem.
