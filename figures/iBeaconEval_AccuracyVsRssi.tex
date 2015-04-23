@@ -1,5 +1,5 @@
 \begin{tikzpicture}
-    \begin{axis}[width=0.9\textwidth, height=0.45\textheight,
+    \begin{axis}[width=0.9\textwidth, height=0.4\textheight,
       xlabel={Time (sec)},
       axis y line*=left,
       ylabel={Estimated Distance (m)},
@@ -9,7 +9,7 @@
       \addplot [black, dashed, domain=0:54, samples=2]{2};\label{distance}
   \end{axis}
   \pgfplotsset{every axis y label/.append style={rotate=180, yshift=15cm}}
-  \begin{axis}[width=0.9\textwidth, height=0.45\textheight,
+  \begin{axis}[width=0.9\textwidth, height=0.4\textheight,
     axis y line*=right,
     ylabel={\acl{RSS} (dBm)},
     hide x axis,

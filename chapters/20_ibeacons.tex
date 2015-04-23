@@ -90,7 +90,7 @@ To test and evaluate the implementation I used ten beacons from a company called
 
 The beacons's size is 5.8\,cm\,$\times$\,7,96\,cm\,$\times$\,2.25\,cm. They can either be powered by two AAA~batteries to provide a lifespan of approximately one year, or by an external power supply over micro USB~\citep{binside:ds}.
 
-The beacons are configurable with standard \ac{BLE} tools, like compatible smartphone apps. Such an app establishes a \ac{BLE} connection to the beacon. Each of the following configurable values can be accessed with a specific key. To configure the beacons an iOS app called \emph{LightBlue --- Bluetooth Low Energy}\footnote{Link to the LightBlue App in the iOS AppStore (last access: 21.04.2015) \url{https://itunes.apple.com/de/app/lightblue-bluetooth-low-energy/id557428110}} from a company named \emph{Punch Through Design LLC.}, recommended by BEACONinside is used. According to \citet{binside:ds}, the following values are configurable:
+The beacons are configurable with standard \ac{BLE} tools, like compatible smartphone apps. Such an app establishes a \ac{BLE} connection to the beacon. Each of the following configurable values can be accessed with a specific key. To configure the beacons an iOS app called \emph{LightBlue --- Bluetooth Low Energy}\footnote{Link to the LightBlue App in the iOS AppStore (last access: 23.04.2015) \url{https://itunes.apple.com/de/app/lightblue-bluetooth-low-energy/id557428110}} from a company named \emph{Punch Through Design LLC.}, recommended by BEACONinside is used. According to \citet{binside:ds}, the following values are configurable:
 \begin{itemize}
   \item \textbf{\texttt{proximityUUID}:} For instance \texttt{F0018B9B-7509-4C31-A905-1A27D39C003C}
   \item \textbf{\texttt{major}:} A value between 1\,--\,65535
@@ -163,17 +163,14 @@ Thus, I first interpreted this description as the error of the \texttt{proximity
 	d = 10^{-\frac{RSSI + A}{10 * n}}
 \end{equation}
 
-According to \citet{wang:bt_pos}, the distance $d$, between an iBeacon and a smartphone, which depends on the \acl{RSS}, can be calculated with the formula shown in equation~\ref{eq:rssiToDistanceCalc}, where $A$ is the \acs{RSSI} value at a distance of 1m, and $n$ an environmental constant. To prove the assumption, that the \texttt{accuracy} value is actually the distance, test measurements for certain reference distances were performed. The measurements were taken outdoor with \ac{LOS} between beacon and smartphone in order to have the signal's quality as less impacted by physical materials as possible. After collecting the \acs{RSSI} and \texttt{accuracy} values of 60 measurements for each reference distance the data set was sorted according their \texttt{rssi} values. Then the \texttt{accuracy} value's average per \texttt{rssi} was calculated. Afterwards, the above mentioned formula shown in equation~\ref{eq:rssiToDistanceCalc} was used to calculate the distance for each measured \texttt{rssi} value. During the measurements, the beacon's calibration value was set to 65dBm; thus, $A = 65\text{dBm}$. To approximate the \texttt{CLBeacon} object's \texttt{accuracy} property best, an environmental constant of $n = 2.1$ was used, which is similar to the one used by \citet{wang:bt_pos}.
-
-Figure~\ref{fig:eval_accuracy_vs_distance} illustrates the result and the fact, that the \texttt{CLBeacon} object's \texttt{accuracy} property is the estimated distance, between beacon and smartphone. Additionally, it implicitly depicts, that the unit dB is a logarithmic unit.
-
 \begin{figure}
   \input{figures/iBeaconEval_AccuracyVsDistance}
 	\caption{Dependency of the \texttt{CLBeacon} object's \texttt{rssi} and \texttt{accuracy} property. Proves that the \texttt{CLBeacon} object's \texttt{accuracy} is the estimated distance between smartphone and beacon because $d$ is the estimated distance depending on the \ac{RSS} according to \citet{wang:bt_pos,kotanen:exp_local_pos_bt}.}
 	\label{fig:eval_accuracy_vs_distance}
 \end{figure}
 
-% Wenn es genauigkeit wäre müsste es an den Übergängen von klein zu groß ja auch einen sichtbaren unterschied geben
+According to \citet{wang:bt_pos}, the distance $d$, between an iBeacon and a smartphone, which depends on the \acl{RSS}, can be calculated with the formula shown in equation~\ref{eq:rssiToDistanceCalc}, where $A$ is the \acs{RSSI} value at a distance of 1m, and $n$ an environmental constant. To prove the assumption, that the \texttt{accuracy} value is actually the distance, test measurements for certain reference distances were performed. The measurements were taken outdoor with \ac{LOS} between beacon and smartphone in order to have the signal's quality as less impacted by physical materials as possible. After collecting the \acs{RSSI} and \texttt{accuracy} values of 60 measurements for each reference distance the data set was sorted according their \texttt{rssi} values. Then the \texttt{accuracy} value's average per \texttt{rssi} was calculated. Afterwards, the above mentioned formula shown in equation~\ref{eq:rssiToDistanceCalc} was used to calculate the distance for each measured \texttt{rssi} value. During the measurements, the beacon's calibration value was set to 65dBm; thus, $A = 65\text{dBm}$. To approximate the \texttt{CLBeacon} object's \texttt{accuracy} property best, an environmental constant of $n = 2.1$ was used, which is similar to the one used by \citet{wang:bt_pos}.
+Figure~\ref{fig:eval_accuracy_vs_distance} illustrates the result and the fact, that the \texttt{CLBeacon} object's \texttt{accuracy} property is the estimated distance, between beacon and smartphone. Additionally, it implicitly depicts, that the unit dB is a logarithmic unit.
 
 
 \section{Evaluation}\label{sec:beacon_eval}
@@ -186,15 +183,23 @@ The measured distances provided by the \texttt{CLBeacon} object's \texttt{accura
 
 %\subsubsection*{Dependency of \texttt{rssi} and \texttt{accuracy}}
 \subsubsection*{Filtering}
-The first reason is, that the measured \ac{RSS} is not directly used to calculate the \texttt{accuracy} value. The \acl{CL} framework seems to apply a filter to the \texttt{CLBeacon} object's values. To test this the \texttt{CLBeacon} object's properties were recorded over time. During the test the smartphone was positioned with a distance of 2\,m to the beacon. The data recording started directly after positioning the smartphone. Figure~\ref{fig:beacon_eval_accuracy-rssi} illustrates the recorded \texttt{rssi} values and their corresponding \texttt{accuracy} values over time. The graph shows, that the \texttt{accuracy} values slowly converge against the actual distance of 2\,m. Furthermore, it shows that outliers in the \texttt{rssi} property do not have a direct impact on the estimated distance. Consequently, it is very likely that \ac{CL} filters the values provided by the \texttt{CLBeacon} object. Furthermore, it shows that the \texttt{accuracy}, i.e.\ estimated distance, not only depends on the corresponding \texttt{rssi} value.
-
-\begin{figure}
+\begin{figure}[t]
 	\input{figures/iBeaconEval_AccuracyVsRssi}
 	\caption {Dependency of the \texttt{CLBeacon} object's \texttt{accuracy} and \texttt{rssi} property over time with an actual distance of 2\,m.}
 	\label{fig:beacon_eval_accuracy-rssi}
 \end{figure}
 
+The first reason is, that the measured \ac{RSS} is not directly used to calculate the \texttt{accuracy} value. The \acl{CL} framework seems to apply a filter to the \texttt{CLBeacon} object's values. To test this the \texttt{CLBeacon} object's properties were recorded over time. During the test the smartphone was positioned with a distance of 2\,m to the beacon. The data recording started directly after positioning the smartphone. Figure~\ref{fig:beacon_eval_accuracy-rssi} illustrates the recorded \texttt{rssi} values and their corresponding \texttt{accuracy} values over time. The graph shows, that the \texttt{accuracy} values slowly converge against the actual distance of 2\,m. Furthermore, it shows that outliers in the \texttt{rssi} property do not have a direct impact on the estimated distance. Consequently, it is very likely that \ac{CL} filters the values provided by the \texttt{CLBeacon} object. Furthermore, it shows that the \texttt{accuracy}, i.e.\ estimated distance, not only depends on the corresponding \texttt{rssi} value.
+
+
+
 \subsubsection*{Attitude \& Obstacles}
+\begin{figure}[t]
+	\input{figures/iBeaconEval_Situations}
+	\caption {The impact on the beacon signal's quality, i.e.\ the \texttt{CLBeacon} object's \texttt{accuracy} and \texttt{rssi} values in different situations, such as obstacles between smartphone and beacon, and the smartphone's orientation relative to a beacon. For each value 60\,--\,100 measurements were recorded with an actual distance of 1\,m.}
+	\label{fig:beacon_eval_situations}
+\end{figure}
+
 The second reason is the device's attitude relative to the beacon. Figure~\ref{fig:beacon_eval_situations} illustrates the impact on the estimated distance and the \ac{RSS} in typical situations.
 During the experiment the actual distance between smartphone and beacon was 1\,m. The measurements were taken indoor. The values shown in Figure~\ref{fig:beacon_eval_situations} are average values. For each situation 60\,--\,100 values were recorded.\newline
 
@@ -217,14 +222,14 @@ Furthermore, Figure~\ref{fig:beacon_eval_accuracy-rssi} depicts the third reason
 
 The above illustrated scenarios are very common. The problem is, that without knowing its own exact position, the beacons attitude, and the positions of all obstacles one cannot distinguish, whether an estimated distance is impacted by the attitude, a wall, or a person.
 
-\begin{figure}
-	\input{figures/iBeaconEval_Situations}
-	\caption {The impact on the beacon signal's quality, i.e.\ the \texttt{CLBeacon} object's \texttt{accuracy} and \texttt{rssi} values in different situations, such as obstacles between smartphone and beacon, and the smartphone's orientation relative to a beacon. For each value 60\,--\,100 measurements were recorded with an actual distance of 1\,m.}
-	\label{fig:beacon_eval_situations}
-\end{figure}
-
 
 \subsubsection*{Distribution and Error}
+\begin{figure}
+	\input{figures/iBeaconEval_SignalSpreading}
+	\caption{The distribution of the estimated distances, i.e.\ the measured \texttt{accuracy} values, depending on the actual distance and the environment.}
+	\label{fig:beacon_dispersion}
+\end{figure}
+
 To depict that the estimated distance also varies in steady unobstructed environments with \acs{LOS}, the \texttt{accuracy} values for different reference distances in different environments were measured. For each reference distance 60 values were recorded. For each environment the used beacons were calibrated.
 
 Figure~\ref{fig:beacon_dispersion_outdoor} illustrates the collected \texttt{accuracy} values measured at 1, 2, \ldots, 5, 10, \ldots, 30\,m distance to the beacon. The measurements were taken outdoor with \acl{LOS} between the beacon and the smartphone.
@@ -239,12 +244,6 @@ Interestingly, the value's distribution starts to decrease between 10\,--\,30\,m
 
 The depicted measurements in Figure~\ref{fig:beacon_dispersion_f007} were recorded in an $\approx$\,15\,m long and 8\,--\,11\,m wide lecture hall. It shows, that also the first few meters on average are matching best, but it also depicts, that there are sometimes huge differences in the estimated distance at the same position.
 
-\begin{figure}
-	\input{figures/iBeaconEval_SignalSpreading}
-	\caption{The distribution of the estimated distances, i.e.\ the measured \texttt{accuracy} values, depending on the actual distance and the environment.}
-	\label{fig:beacon_dispersion}
-\end{figure}
-
 % paragraph{Uncertainty}
 As mentioned in Section~\ref{sec:fund_loc}, it is necessary to know the uncertainty of a measurement to implement a \acl{PF}. Thus, the distance estimation's uncertainty were determined based on the data shown in Figure~\ref{fig:beacon_dispersion_outdoor} and \ref{fig:beacon_dispersion_f007}. The Gaussian's parameters to model the distance estimation's uncertainty are depicted in Figure~\ref{fig:beacon_eval_ndf}. The two dashed straight lines show the linear function that approximates the standard deviation $\sigma$ depending on the mean $\mu$ best.
 
@@ -256,6 +255,13 @@ As mentioned in Section~\ref{sec:fund_loc}, it is necessary to know the uncertai
 
 
 \subsection{Multilateration}
+
+\begin{figure}
+  \input{figures/iBeaconEval_Multilateration}
+  \caption{Four successive screenshots of the indoor self-localization experiment in a lecture hall (HTWG-KN F007) using multilateration. The screenshots show a map of the lecture hall, the walked path in green, the beacons as blue filled circles and their estimated distances as large blue circles. The red line depicts the estimated path.}
+  \label{fig:beacon_eval_multilat}
+\end{figure}
+
 After evaluating the distance estimation's quality of one beacon, some beacons were deployed in a lecture hall to get a better feeling of how good the distance estimation actually works. On one hand, the goal was to visualize the estimated distances on a map, to proof their plausibility, and on the other hand, to test if indoor self-localization with smartphones is possible by just using iBeacons without integrating additional sensor data.
 
 As already mentioned in Section~\ref{sec:fund_trilateration}, \emph{multilateration} is a method to estimate a position by using the distances to several transmitters. If one uses only one sender then the receiver's position is somewhere on a circle around the transmitter with the estimated distance as radius of the circle.
@@ -268,21 +274,15 @@ For the experiment the same lecture hall as before was used. There, four beacons
 
 To visualize the estimated distances to the beacons and the device's estimated position, i.e.\ the walked path, I wrote a small Python program. Figure~\ref{fig:beacon_eval_multilat} shows four screenshots of the program's output. Each of it shows a map, which shows the lecture hall walls in grey. The white space in the hall is free space. The filled small blue circles next to the walls are the four beacons. The big blue circles, are the circles around the beacons, where the radius represents the estimated distance to the beacons. The test person walked on the green tetragon, beginning at the bottom right corner in counter clockwise direction by holding the test device in front of oneself. The beacons were positioned at approximately the same height as the device in the test person's hand. The red line shows the estimated path.
 
-The first screenshot depicted in Figure~\ref{fig:beacon_eval_multilat_1} shows, that the estimated distance sometimes is completely wrong, as shown by the blue circle around the top-right beacon. It also shows that the estimated position is somewhere several meters outside of the lecture hall. The second screenshot shows, that the distance to the top-right beacon shrinks, but the one to the top-left massively grows. The distances to the other two beacons seem to be plausible. Figure~\ref{fig:beacon_eval_multilat_3} shows a plausible position. It also shows, that in this step the beacon's signal, positioned at the bottom-right corner, was not received. The last screenshot shows also a more or less plausible position. The distances, except the one to the beacon, positioned at the bottom-left corner, seem to be plausible.
-
-\begin{figure}
-  \input{figures/iBeaconEval_Multilateration}
-  \caption{Four successive screenshots of the indoor self-localization experiment in a lecture hall (HTWG-KN F007) using multilateration. The screenshots show a map of the lecture hall, the walked path in green, the beacons as blue filled circles and their estimated distances as large blue circles. The red line depicts the estimated path.}
-  \label{fig:beacon_eval_multilat}
-\end{figure}
-
-The experiment was repeated with the same setting and recorded data, but only used those beacon signals where the \texttt{accuracy} was $<$\,5\,m. Signals with larger estimated distances were ignored. Figure~\ref{fig:beacon_eval_multilat_less5m} shows the result. The estimated path actually is inside of the lecture hall. It is not possible to determine that the test person walked on the green path, but ignoring values more than 5\,m seems to improve the location estimation.
-
 \begin{figure}
 	\includegraphics[width=0.45\textwidth]{figures/multilat_less5m}
 	\caption{Screenshots of the indoor self-localization experiment in a lecture hall (HTWG-KN F007) using multilateration by only ignoring estimated distances more than 5\,m. The screenshots show a map of the lecture hall, the walked path in green, the beacons as blue filled circles and their estimated distances as large blue circles. The red line depicts the estimated path.}
 	\label{fig:beacon_eval_multilat_less5m}
 \end{figure}
+
+The first screenshot depicted in Figure~\ref{fig:beacon_eval_multilat_1} shows, that the estimated distance sometimes is completely wrong, as shown by the blue circle around the top-right beacon. It also shows that the estimated position is somewhere several meters outside of the lecture hall. The second screenshot shows, that the distance to the top-right beacon shrinks, but the one to the top-left massively grows. The distances to the other two beacons seem to be plausible. Figure~\ref{fig:beacon_eval_multilat_3} shows a plausible position. It also shows, that in this step the beacon's signal, positioned at the bottom-right corner, was not received. The last screenshot shows also a more or less plausible position. The distances, except the one to the beacon, positioned at the bottom-left corner, seem to be plausible.
+
+The experiment was repeated with the same setting and recorded data, but only used those beacon signals where the \texttt{accuracy} was $<$\,5\,m. Signals with larger estimated distances were ignored. Figure~\ref{fig:beacon_eval_multilat_less5m} shows the result. The estimated path actually is inside of the lecture hall. It is not possible to determine that the test person walked on the green path, but ignoring values more than 5\,m seems to improve the location estimation.
 
 This experiment shows, that due to the very unreliable distance estimations the beacons' signals must be heavily influenced. It also shows that pure multilateration, without filtering the data and without integrating additional data sources, is not sufficient for indoor self-localization.
 

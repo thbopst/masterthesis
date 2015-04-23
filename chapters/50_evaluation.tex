@@ -1,27 +1,27 @@
 \chapter{Evaluation} \label{chap:evaluation}
-After explaining the solution's implementation this chapter presents the evaluation's results The evaluation is based on the metrics introduced in section~\ref{sec:fund_loc}.
+After explaining the solution's implementation this chapter presents the evaluation's results The evaluation is based on the metrics introduced in Section~\ref{sec:fund_loc}.
 
 \section{Accuracy and Precision}
-To determine the solution's accuracy and its precision different tests in a real world experiment were performed. For this purpose, the 10 beacons, bought from BEACONinside, were deployed in different parts of the university building. The tests were done in a static environment; thus, the test person was the only dynamic object in the experiment. Besides the deployed beacons, the building is equipped with several WiFi access points, which use the 2.4GHz baseband, too. Thus, their signals may influence the bacons' signals. During the experiments a static particle set size of 200~particles was used, as mentioned in chapter~\ref{chap:pf}.
+To determine the solution's accuracy and its precision different tests in a real world experiment were performed. For this purpose, the 10 beacons, bought from BEACONinside, were deployed in different parts of the university building. The tests were done in a static environment; thus, the test person was the only dynamic object in the experiment. Besides the deployed beacons, the building is equipped with several WiFi access points, which use the 2.4GHz baseband, too. Thus, their signals may influence the bacons' signals. During the experiments a static particle set size of 200~particles was used, as mentioned in Chapter~\ref{chap:pf}.
 
 \subsection*{Experiment~1}
 For the first experiment only one lecture hall was equipped with all 10 beacons. Figure~\ref{fig:f007} shows a picture of the lecture hall for illustration purposes. On the following screenshots the lecture hall is depicted on the map's lower part. The picture was taken from the hall's lower left corner.
 
 \begin{figure}
 	\includegraphics[width=0.9\textwidth]{figures/F007}
-	\caption{Shows the lecture hall depicted on the map's lower part.}
+	\caption{The lecture hall depicted on the map's lower part.}
 	\label{fig:f007}
 \end{figure}
 
 \begin{figure}
 	\input{figures/evaluationExperiment1}
-	\caption{The Screenshots illustrate results of Experiment~1.}
+	\caption{The screenshots illustrate example tracks of experiment~1. The green line shows the actual path. The blue filled circles depict the beacons. The blue dashed line shows the estimated path. The particles are depicted as red arrows.}
 	\label{fig:exp1_screenshot}
 \end{figure}
 
-The purpose of this experiment is to test how good the localization works inside the shown lecture hall. The lecture hall, depicted in the lower part of figure~\ref{fig:exp1_path}, is  $\approx$\,15\,m long and 8\,-–\,11\,m wide. The beacons' positions are depicted as blue circles.
+The purpose of this experiment is to test how good the localization works inside the shown lecture hall. The lecture hall, depicted in the lower part of Figure~\ref{fig:exp1_path}, is  $\approx$\,15\,m long and 8\,-–\,11\,m wide. The beacons' positions are depicted as blue circles.
 
-To determine the algorithms accuracy, the test person walked on a specified path, depicted in green, beginning and ending at the upper left corner. At the end of each walk the application's estimated end position is compared with the true end position by calculating the error in form of the euclidian distance. As mentioned in section~\ref{sec:algo_locEstimation}, the location can be estimated by either calculating the mean of $\chi$, or by calculating its weighted mean. To be able to compare them the error of both approaches is calculated.
+To determine the algorithms accuracy, the test person walked on a specified path, depicted in green, beginning and ending at the upper left corner. At the end of each walk the application's estimated end position is compared with the true end position by calculating the error in form of the euclidian distance. As mentioned in Section~\ref{sec:algo_locEstimation}, the location can be estimated by either calculating the mean of $\chi$, or by calculating its weighted mean. To be able to compare them the error of both approaches is calculated.
 
 Additionally, the error of the motion tracking's end position is compared with the true position. To be able to compare the motion error with the estimated location error by taking into account the motion drift, the experiment was divided into three scenarios. First, the test person walked just one round on the green path. Second, two rounds, and third three rounds. For each scenario the test user walks three times in clockwise and three times in counter-clockwise direction on the path.
 
@@ -30,18 +30,18 @@ Furthermore, this experiment is used to determine if the accuracy improves after
 
 \begin{table}
 	\input{tables/evaluationResultExperiment1}
-	\caption{Depicts the results of experiment~1.}
+	\caption{Results of experiment~1.}
 	\label{tab:evaluationResultExp1}
 \end{table}
 
 \begin{figure}
 	\input{figures/evaluationExperiment1_Visualization}
-	\caption{Visualizes the results shown in table~\ref{tab:evaluationResultExp1}.}
+	\caption{Visualization of the results or experiment~1 shown in Table~\ref{tab:evaluationResultExp1}.}
 	\label{fig:exp1_visualization}
 \end{figure}
 
 \subsubsection*{Results}
-The results are shown in table~\ref{tab:evaluationResultExp1} and are visualized in figure~\ref{fig:exp1_visualization}.
+The results are shown in Table~\ref{tab:evaluationResultExp1} and are visualized in Figure~\ref{fig:exp1_visualization}.
 
 Table~\ref{tab:evaluationResultExp1_1} depicts the average distance error and the error's distribution, for each scenario, directly after integrating the last motion. Table~\ref{tab:evaluationResultExp1_2} shows the determined values recorded $\approx$\,5\,s after the last motion integration. The calculated average error using $\chi$'s mean as location is denoted with $\mu$. The errors standard deviation is denoted with $\sigma$. $\mu_w$ and $\sigma_w$ are the average error and its standard deviation using the weighted mean of $\chi$ for the position estimation.
 Table~\ref{tab:evaluationResultExp1_3} shows the motion tracking's error $\mu$ and the error's distribution in form of its standard deviation $\sigma$.
@@ -50,17 +50,29 @@ The results show that during the experiment an accuracy of 2.29\,m\,--\,2.6\,m i
 
 The difference between the two position estimation approaches is very small. The result sways, sometimes $\chi$'s mean, and sometimes its weighted mean is more accurate. Supposedly the minimal difference is based on the particle cloud's high concentration.
 
-The result's visualization also clearly shows that the motion error grows with increasing number of rounds, whereas the estimated position error only grows minimally. Supposedly, the minimally higher error is the result of a few outliers in the motion error, which of course affects the position estimation. Besides the path, figure~\ref{fig:exp1_screenshot} depicts three examples of the experiment. They clearly show, that the motions' accuracy influences the position estimation. If the motion is completely wrong (fig.\ \ref{fig:exp1_img_3}), the in section~\ref{sec:algo_stationary} introduced recovery feature often needs to intervene, which causes several jumps in the position estimation. Whereas figure~\ref{fig:exp1_img_2} shows, that if the motion is acceptably wrong, the algorithm can correct the path (of course not perfectly). If the motion estimation fits the true path the estimated path depends just on the beacons' signal quality, as shown in figure~\ref{fig:exp1_img_1}.
+The result's visualization also clearly shows that the motion error grows with increasing number of rounds, whereas the estimated position error only grows minimally. Supposedly, the minimally higher error is the result of a few outliers in the motion error, which of course affects the position estimation. Besides the path, Figure~\ref{fig:exp1_screenshot} depicts three examples of the experiment. They clearly show, that the motions' accuracy influences the position estimation. If the motion is completely wrong (fig.\ \ref{fig:exp1_img_3}), the in Section~\ref{sec:algo_stationary} introduced recovery feature often needs to intervene, which causes several jumps in the position estimation. Whereas Figure~\ref{fig:exp1_img_2} shows, that if the motion is acceptably wrong, the algorithm can correct the path (of course not perfectly). If the motion estimation fits the true path the estimated path depends just on the beacons' signal quality, as shown in Figure~\ref{fig:exp1_img_1}.
 
 \subsection*{Experiment~2}
 The purpose of the second experiment is on one hand, to double check the implementation's accuracy by using another position, and on the other hand, to demonstrate the dependency of the estimation's accuracy and the amount of deployed beacons.
 
-This time the test person walked on a random path. The person started at the orange circle, shown in figure~\ref{fig:exp2_imgs} on the upper left corner, and stopped at the green circle, approximately in the figure's center.
+This time the test person walked on a random path. The person started at the orange circle, shown in Figure~\ref{fig:exp2_imgs} on the upper left corner, and stopped at the green circle, approximately in the figure's center.
 
 To demonstrate the impact of reducing the number of deployed beacons, five test walks with all 10\,beacons deployed were recorded first. Then the simulation was used to play back the recorded values by reducing the input to a lower number of deployed beacons. Thus, the values are directly comparable, because for all test cases the exact same input data is used. Also for this experiment the location error is calculated directly after integrating the last motion and $\approx$\,5\,s later.
 
 \subsubsection*{Results}
-The experiment's results are shown in table~\ref{tab:evaluationResultExp2} and visualized in figure~\ref{fig:exp2_visualization}. The corresponding beacon deployment is shown in figure~\ref{fig:exp2_imgs}.
+\begin{table}
+	\input{tables/evaluationResultExperiment2}
+	\caption{Results of experiment~2.}
+	\label{tab:evaluationResultExp2}
+\end{table}
+
+\begin{figure}
+	\input{figures/evaluationExperiment2_Visualization}
+	\caption{Visualizes the results of experiment~2 shown in Table~\ref{tab:evaluationResultExp2}.}
+	\label{fig:exp2_visualization}
+\end{figure}
+
+The experiment's results are shown in Table~\ref{tab:evaluationResultExp2} and visualized in Figure~\ref{fig:exp2_visualization}. The corresponding beacon deployment is shown in Figure~\ref{fig:exp2_imgs}.
 
 First of all, the result clearly shows that the difference between $\chi$'s mean and its weighted mean is negligible.
 
@@ -68,53 +80,39 @@ Secondly, it clearly shows that the estimated location compared to the motion is
 
 The result also indicates that the estimation's accuracy depends on the deployed number of beacons. Thus, the more beacons, the less error in the position estimation. But it also shows, that at a certain beacon density the error's reduction converges. Furthermore, deploying more beacons does not always improve accuracy. This seems to be the case in the experiment by reducing the beacon amount from four to two deployed beacons. Supposedly, the signals of the two removed beacons were too bad, and thus produced a worse estimation result.
 
-\begin{table}
-	\input{tables/evaluationResultExperiment2}
-	\caption{Depicts the results of experiment~2.}
-	\label{tab:evaluationResultExp2}
-\end{table}
-
-\begin{figure}
-	\input{figures/evaluationExperiment2_Visualization}
-	\caption{Visualizes the results shown in table~\ref{tab:evaluationResultExp2}.}
-	\label{fig:exp2_visualization}
-\end{figure}
-
-
 \begin{figure}
 	\input{figures/evaluationExperiment2}
-	\caption{Shows the different beacon deployments during the experiment.}
+	\caption{Beacon deployment during experiment~2. The blue circles depict the beacons' positions. The orange circle shows the person's start position. The person's random walk stopped at the green circle.}
 	\label{fig:exp2_imgs}
 \end{figure}
 
 
 \subsection*{Experiment~3}
-After evaluating the solution's accuracy in the first two experiments, this experiment shows how good the solution is able to track a users path in a larger scenario. Hence, the buildings foyer, depicted in figure~\ref{fig:f-foyer}, and one / two lecture halls were additionally used. For the experiments, only 10\,beacons were used, as shown on the maps. The map depicts an actual space of $\approx$\,22.22\,m\,$\times$\,33.06\,m.
-
-The first example is depicted in figure~\ref{fig:exp3_imgs}. The green line approximates the actual path, beginning at the top right. The black dashed line shows the motion path, which is just the combination of pedometer and heading. The estimated path is marked as a blue dashed line. Figure~\ref{fig:exp3_imgs_1} shows an example where the motion was very accurate, actually more accurate than the estimated path. Whereas, Figure~\ref{fig:exp3_imgs_2}, \ref{fig:exp3_imgs_3}, and~\ref{fig:exp3_imgs_4} depict examples, where the motion path is bad or completely wrong, but the algorithm was more or less able to approximate the actual path.
-
-Figure~\ref{fig:exp3_imgs_5} depicts another example, where the test person walked around the big stairs in the middle of the building's foyer. The screenshot shows, that the algorithm was able to approximate this path as well. During this example the foyer was equipped with only 4\,beacons as shown on the map. But, the experiment also showes that 4\,beacons are not sufficient for such a large area if the motion is incorrect.
-
-Another example path is shown in figure~\ref{fig:exp3_imgs_6}. During this example the wall between the two upper halls was opened. As shown, the algorithm was able to track the path. But usually this would not be possible without having such an accurate motion, even by using 10\,beacons. Furthermore, the screenshot shows that the estimated end position is actually not at the true position, but rather $\approx$\,4\,--\,5\,m too distant. The screenshot shows that two particles are located next to the true position, and that the plotted $\sigma-\text{ellipse}$ is oriented towards these two particles. The reason for that is, that the algorithms weight sum dropped below the recovery's threshold, and thus the recovery feature was executed. Unfortunately, the data recording was stopped at this point in time, otherwise it is very likely that the particle cloud would have jumped to the true location where the two particles were already located. 
-
-
 \begin{figure}
-	\includegraphics[width=0.9\textwidth]{figures/F-Foyer}
-	\caption{Shows the buildings Foyer depicted on the map's middle.}
+	\includegraphics[height=0.4\textheight]{figures/F-Foyer}
+	\caption{The building foyer depicted on the map's center.}
 	\label{fig:f-foyer}
 \end{figure}
 
+
 \begin{figure}
 	\input{figures/evaluationExperiment3_1}
-	\caption{Shows the different beacon deployments during the experiment.}
+	\caption{The screenshots illustrate example tracks of experiment~3. The green line shows the actual path. The blue filled circles depict the beacons. The blue dashed line shows the estimated path. The particles are depicted as red arrows. The black dashed line shows the motion path.}
 	\label{fig:exp3_imgs}
 \end{figure}
 
+After evaluating the solution's accuracy in the first two experiments, this experiment shows how good the solution is able to track a users path in a larger scenario. Hence, the buildings foyer, depicted in Figure~\ref{fig:f-foyer}, and one / two lecture halls were additionally used. For the experiments, only 10\,beacons were used, as shown on the maps. The map depicts an actual space of $\approx$\,22.22\,m\,$\times$\,33.06\,m.
+
+The first example is depicted in Figure~\ref{fig:exp3_imgs}. The green line approximates the actual path, beginning at the top right. The black dashed line shows the motion path, which is just the combination of pedometer and heading. The estimated path is marked as a blue dashed line. Figure~\ref{fig:exp3_imgs_1} shows an example where the motion was very accurate, actually more accurate than the estimated path. Whereas, Figure~\ref{fig:exp3_imgs_2}, \ref{fig:exp3_imgs_3}, and~\ref{fig:exp3_imgs_4} depict examples, where the motion path is bad or completely wrong, but the algorithm was more or less able to approximate the actual path.
+
+Figure~\ref{fig:exp3_imgs_5} depicts another example, where the test person walked around the big stairs in the middle of the building's foyer. The screenshot shows, that the algorithm was able to approximate this path as well. During this example the foyer was equipped with only 4\,beacons as shown on the map. But, the experiment also showes that 4\,beacons are not sufficient for such a large area if the motion is incorrect.
+
+Another example path is shown in Figure~\ref{fig:exp3_imgs_6}. During this example the wall between the two upper halls was opened. As shown, the algorithm was able to track the path. But usually this would not be possible without having such an accurate motion, even by using 10\,beacons. Furthermore, the screenshot shows that the estimated end position is actually not at the true position, but rather $\approx$\,4\,--\,5\,m too distant. The screenshot shows that two particles are located next to the true position, and that the plotted $\sigma-\text{ellipse}$ is oriented towards these two particles. The reason for that is, that the algorithms weight sum dropped below the recovery's threshold, and thus the recovery feature was executed. Unfortunately, the data recording was stopped at this point in time, otherwise it is very likely that the particle cloud would have jumped to the true location where the two particles were already located. 
+
 \begin{figure}
 	\input{figures/evaluationExperiment3_2}
-	\caption{Shows the different beacon deployments during the experiment.}
+	\caption{The screenshots illustrate example tracks of experiment~3. The green line shows the actual path. The blue filled circles depict the beacons. The blue dashed line shows the estimated path. The particles are depicted as red arrows. The black dashed line shows the motion path.}
 \end{figure}
-
 
 \subsection*{Summary}
 The algorithm was tested in a typical environment with enabled WiFi, obstacles and many reflecting materials, as shown on the building's images.
@@ -123,7 +121,7 @@ The experiments demonstrate that the estimation's accuracy depends on the amount
 
 Furthermore, the experiment's results show, that the location estimation improves after being stationary for a few seconds, if enough beacons are deployed.
 
-Due to the fact that the application's accuracy and precision depend on so many different factors, it is possible to determine, what the system achieved during the experiments. But it is not possible to make a generally valid statement about the system's precision and accuracy. During the experiments it reached an accuracy of up to 1.52\,m (experiment\,2). By combining the results of experiment 1 and 2 (with 10\,beacons), the system reached an accuracy of 2.12\,m ($\mu$\,=\,2.12, $\sigma$\,=\,2.72). The solution's precision, expressed as \ac{CDF}, is shown in figure~\ref{fig:eval:precision}.
+Due to the fact that the application's accuracy and precision depend on so many different factors, it is possible to determine, what the system achieved during the experiments. But it is not possible to make a generally valid statement about the system's precision and accuracy. During the experiments it reached an accuracy of up to 1.52\,m (experiment\,2). By combining the results of experiment 1 and 2 (with 10\,beacons), the system reached an accuracy of 2.12\,m ($\mu$\,=\,2.12, $\sigma$\,=\,2.72). The solution's precision, expressed as \ac{CDF}, is shown in Figure~\ref{fig:eval:precision}.
 
 To summarize, the solution provides at least room level or even better accuracy, depending on the deployed beacon count and the above mentioned factors. Furthermore, the solution is able to track a user's path in environments with a lot of free space, as shown by the experiments. Consequently, the system's ability to track a user's path in a corridor should be very good, due to the fact that it takes  the map into account. The solution's only disadvantage is, that the user has to hold the device in the hand by pointing it into the user's walking direction. Otherwise the motion's orientation is completely wrong, and thus recovery often needs to be executed.
 
@@ -133,16 +131,10 @@ To summarize, the solution provides at least room level or even better accuracy,
 
 \begin{figure}
 	\input{figures/evaluationPrecision}
-	\caption{Depicts our solutions precision during the experiments.}
+	\caption{The solution's precision achieved during the experiments.}
 	\label{fig:eval:precision}
 \end{figure}
 
-
-% depends on the beacons position
-% on the location in the room
-% on the building
-% on the beacons itself
-% -> on beacons signals, and motion quality
 
 \section{Scalability}
 The area covered by the localization system depends only on the provided map and the deployed beacons. Thus, the system is highly scalable. It can be used within a single room. But it also can be extended to a very large, two-dimensional space.
@@ -169,4 +161,4 @@ The localization system is very easy to use. The user just has to download the a
 
 The user interface can be reduced to a minimum by only showing the environments map, the estimated position and the corresponding $1\sigma-\text{ellipse}$, instead of showing the beacons, the motion path, the user's estimated path, and the particle cloud.
 
-There is only one disadvantage from a usability point of view, which is the position estimation's delay. If the user walks the estimated position is only updated ever $\approx$\,3\,s, due to the fact, that \acs{CM} just provides distance estimations every $\approx$\,2.5\,s, as mentioned in chapter~\ref{chap:pf}. If the user is stationary, the delay drops to $\approx$\,1\,s, which is negligible from my point of view.
+There is only one disadvantage from a usability point of view, which is the position estimation's delay. If the user walks the estimated position is only updated ever $\approx$\,3\,s, due to the fact, that \acs{CM} just provides distance estimations every $\approx$\,2.5\,s, as mentioned in Chapter~\ref{chap:pf}. If the user is stationary, the delay drops to $\approx$\,1\,s, which is negligible from my point of view.

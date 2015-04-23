@@ -19,15 +19,15 @@ Besides the above mentioned reasons, \acl{PF} is an easy-to-implement algorithm.
 
 
 \section{System Setup}
-Before going into the detailed description of the solution, this section provides an overview of the system setup.
-
-The implementation is written in Apple's new programming language \emph{Swift} (version 1.2), which is the successor of \emph{Objective-C}. The language is based on modern programming concepts, such as functional programming, tuples, generics, etc. Furthermore, Apple tries to remove unsafe code, such as not initialized variables, null-pointers, array overflows, etc.\ by defining the language's elements in a very concise and expressive syntax, and by adding new language constructs and types, such as the Optional type. The language compiles to native code by using LLVM compiler. Swift code can also call C and Objective-C code, which provides the possibility to use Swift in existing projects \citep{apple:swift}.
-
 \begin{figure}[height=0.45\textheight]
 	\input{figures/algorithmArchitecture}
 	\caption{The solution's system setup including the used sensors and \acsp{API}.}
 	\label{fig:algo_architecture}
 \end{figure}
+
+Before going into the detailed description of the solution, this section provides an overview of the system setup.
+
+The implementation is written in Apple's new programming language \emph{Swift} (version 1.2), which is the successor of \emph{Objective-C}. The language is based on modern programming concepts, such as functional programming, tuples, generics, etc. Furthermore, Apple tries to remove unsafe code, such as not initialized variables, null-pointers, array overflows, etc.\ by defining the language's elements in a very concise and expressive syntax, and by adding new language constructs and types, such as the Optional type. The language compiles to native code by using LLVM compiler. Swift code can also call C and Objective-C code, which provides the possibility to use Swift in existing projects \citep{apple:swift}.
 
 The system, depicted in Figure~\ref{fig:algo_architecture}, consists of the \ac{PF}, its components, and the used \acsp{API}. Furthermore, the figure depicts the sensors used by the \acsp{API}. As explained in Section~\ref{sec:fund_pf}, the algorithm uses two models, the \emph{Motion Model} and the \emph{Measurement Model}.
 
@@ -45,14 +45,6 @@ The here presented solution's motion model component is responsible for three ta
 As mentioned in Chapter~\ref{chap:sensors}, \acl{CM} provides a component called \texttt{CMPedometer}, which estimates the traveled distance based on the steps a user has taken. In addition, \acl{CL} provides the smartphone's heading, based on the magnetic field, called \texttt{CLHeading}. Furthermore, \ac{CM}'s \texttt{CMDeviceMotion} provides the device attitude, which is calculated by using sensor fusion. The device's attitude can also be used to calculate the device's heading. By combining these three sources the user's motion can be tracked and a path can be constructed.
 
 \subsubsection*{Heading}
-As mentioned in Chapter~\ref{chap:sensors}, the heading provided by \texttt{CLHeading} can be influenced by magnetic fields other than the earth's magnetic field, which may cause wrong values. \texttt{CMDeviceMotion} uses sensor fusion instead of relying only on the magnetometer's values. Thus, it is not influenced by other magnetic fields. In contrast to the claims made by Apple's engineer \citet{apple:wwdc_2012_pham}, the values tend to drift away. Consequently, relying only on \texttt{CMDeviceMotion} is not sufficient. As a result, both sources are combined to determine the smartphone's heading.
-
-Both frameworks provide their values asynchronously. \texttt{CLLocationManager} calls its delegate method if a certain threshold of the heading's change, set to $1^\circ$, exceeds. Whereas \acs{CM} calls its delegate periodically, every $\approx$\,0.02\,s. The high update rate would not be necessary for heading, but as mentioned earlier, \texttt{CMDeviceMotion} also includes \texttt{userAccleration}, which is used for the stationary detection, as shown later.
-
-The \texttt{CMDeviceMotion} heading, further denoted as $\theta_A$, measured at time~$t$, is calculated from the rotation matrix, given by \texttt{CMDeviceMotion}'s \texttt{attitude}, as explained in Chapter~\ref{chap:sensors}. Due to its drift problem, only the change between two values, denoted as $\Delta\theta_A$, is used. For the absolute orientation, \texttt{CLHeading}'s \texttt{magneticHeading}, denoted as $\theta_C$, is used. Internally the motion tracking uses the heading $\theta$, which takes the map's orientation $\theta_M$ into account. $\theta$ is calculated if \acs{CL}'s heading filter is exceeded and thus, a new magnetic heading is provided. It is not updated if \acs{CM} provides a new $theta_A$, due to its high update frequency, which would result in many useless updates of $\theta$ with very small change.
-
-Listing~\ref{lst:motionModelHeadingCalculation} illustrates the used algorithm to calculate the internally used heading~$\theta$. It combines the two heading sources for more robustness against influences of disturbing magnetic fields without the drift problem. Furthermore, Table~\ref{tab:motionModelHeadingCalculationExample} provides a calculation example for better understanding.
-
 \input{listings/motionModelHeadingCalculation}
 
 \begin{table}
@@ -61,13 +53,22 @@ Listing~\ref{lst:motionModelHeadingCalculation} illustrates the used algorithm t
 	\label{tab:motionModelHeadingCalculationExample}
 \end{table}
 
+As mentioned in Chapter~\ref{chap:sensors}, the heading provided by \texttt{CLHeading} can be influenced by magnetic fields other than the earth's magnetic field, which may cause wrong values. \texttt{CMDeviceMotion} uses sensor fusion instead of relying only on the magnetometer's values. Thus, it is not influenced by other magnetic fields. In contrast to the claims made by Apple's engineer \citet{apple:wwdc_2012_pham}, the values tend to drift away. Consequently, relying only on \texttt{CMDeviceMotion} is not sufficient. As a result, both sources are combined to determine the smartphone's heading.
+
+Both frameworks provide their values asynchronously. \texttt{CLLocationManager} calls its delegate method if a certain threshold of the heading's change, set to $1^\circ$, exceeds. Whereas \acs{CM} calls its delegate periodically, every $\approx$\,0.02\,s. The high update rate would not be necessary for heading, but as mentioned earlier, \texttt{CMDeviceMotion} also includes \texttt{userAccleration}, which is used for the stationary detection, as shown later.
+
+The \texttt{CMDeviceMotion} heading, further denoted as $\theta_A$, measured at time~$t$, is calculated from the rotation matrix, given by \texttt{CMDeviceMotion}'s \texttt{attitude}, as explained in Chapter~\ref{chap:sensors}. Due to its drift problem, only the change between two values, denoted as $\Delta\theta_A$, is used. For the absolute orientation, \texttt{CLHeading}'s \texttt{magneticHeading}, denoted as $\theta_C$, is used. Internally the motion tracking uses the heading $\theta$, which takes the map's orientation $\theta_M$ into account. $\theta$ is calculated if \acs{CL}'s heading filter is exceeded and thus, a new magnetic heading is provided. It is not updated if \acs{CM} provides a new $theta_A$, due to its high update frequency, which would result in many useless updates of $\theta$ with very small change.
+
+Listing~\ref{lst:motionModelHeadingCalculation} illustrates the used algorithm to calculate the internally used heading~$\theta$. It combines the two heading sources for more robustness against influences of disturbing magnetic fields without the drift problem. Furthermore, Table~\ref{tab:motionModelHeadingCalculationExample} provides a calculation example for better understanding.
+
+
+
 \subsubsection*{Motion Path Construction}
 As explained in Chapter~\ref{chap:sensors}, \acs{CM} delivers every $\approx$\,2.5\,s a new \texttt{CMPedometer} object with the estimation of the user traveled distance~$d$. Besides the distance, the object contains the start date~$t_\text{start}$, which is the start date of the very first distance estimation. It is the same for all successive estimations. Additionally, it contains the end date~$t_\text{end}$. Thus, the user walked an estimated distance~$d$, beginning at $t_\text{start}$ and ending at $t_\text{end}$. During the walk, the user's direction $\theta$ changes several times at a certain point in time.
 
 A user's motion path is stored as an array of motions~$u$. A motion consists of $u = (\theta, d, t_\text{start}, t_\text{end})^T$, the orientation~$\theta$ at the motions start date~$t_\text{start}$, the distance~$d$ in meters and the motions end date~$t_\text{end}$. $t_\text{start}$ and $t_\text{end}$ are not really necessary for constructing the estimated motion path, but are necessary for the later explained motion integration.
 
 To calculate the motion~$u$ of a walked distance~$d$, the distance is split according to the timestamps corresponding to the smartphone's orientational changes, which occurred during the estimated distance. To do so, constant velocity over the distance~$d$ is assumed. Figure~\ref{fig:mm_path} illustrates the estimated path a user traveled in 2-dimensional space. The individual distances~$d_1$ and $d_2$, estimated by \acs{CM} are colored differently. By integrating the measured headings~$\theta_0, \ldots, \theta_4$, the path is split into motion~$u_0, \ldots, u_5$.
-
 
 \begin{figure}
 	\input{figures/algorithmMotionModel_Path}
@@ -77,22 +78,21 @@ To calculate the motion~$u$ of a walked distance~$d$, the distance is split acco
 
 
 \subsection{Stationary Detection}\label{sec:algo_stationary}
+As mentioned in Chapter~\ref{chap:sensors}, the \texttt{CMPedometer} component requires at the beginning $\approx$\,6\,--\,8\,steps to deliver the first distance estimation. During a walk it continuously updates the estimation every $\approx$\,2.5\,s. Due to the asynchronously incoming motion and beacon data, the filter cannot be run continuously with a fixed time interval, because the later discussed measurements need to be integrated at the right position on the user's walk. Thus, it is important to know whether or not the user is currently walking, i.e.\ is stationary or not.
 
-\begin{figure}
+\citet{wang:wlan} propose a system based on acceleration data to detect a user's steps by detecting the acceleration's zero-crossing. However, the system does not actually need to count the user's steps, which would require too much effort to get this information. Also, \citet{shanklin:embedded_sensors} use the user's acceleration to estimate the distance the user traveled. First they filter the values with a low-pass filter. Then they integrate the acceleration two times to get the distance. Thus, to detect if a user is stationary, one integration step would be sufficient to get the user's velocity. This requires a projection of the measured acceleration data into the global coordinate system as described by~\citet{shanklin:embedded_sensors}. Unfortunately, their solution works very unreliable. According to \citet{wang:wlan}, integration of acceleration data for distance estimation works only in theory, but not reliably in indoor environments. Furthermore, their proposed projection is based on \texttt{CMDeviceMotion}'s \texttt{attitude} property, which suffers from the drift problem as shown in Section~\ref{sec:sensor_eval}.
+
+\begin{figure}[p]
 	\input{figures/algorithmMotionModel_Stationary3Axis}
 	\caption{Example data of the 3-axis \texttt{userAcceleration} provided by \acs{CM}'s \texttt{CMDeviceMotion} object. The user's two stationary phases are clearly depicted by the low amplitude. Remark: \texttt{userAcceleration} is without gravity.}
 	\label{fig:mm_stationary_1}
 \end{figure}
 
-\begin{figure}
+\begin{figure}[p]
 	\input{figures/algorithmMotionModel_StationaryNorm}
 	\caption{The euclidian norm of the 3-axis \texttt{userAcceleration} shown in Figure~\ref{fig:mm_stationary_1}, and its simple moving average with a window of 1\,s which corresponds to 50\,measurements.}
 	\label{fig:mm_stationary_2}
 \end{figure}
-
-As mentioned in Chapter~\ref{chap:sensors}, the \texttt{CMPedometer} component requires at the beginning $\approx$\,6\,--\,8\,steps to deliver the first distance estimation. During a walk it continuously updates the estimation every $\approx$\,2.5\,s. Due to the asynchronously incoming motion and beacon data, the filter cannot be run continuously with a fixed time interval, because the later discussed measurements need to be integrated at the right position on the user's walk. Thus, it is important to know whether or not the user is currently walking, i.e.\ is stationary or not.
-
-\citet{wang:wlan} propose a system based on acceleration data to detect a user's steps by detecting the acceleration's zero-crossing. However, the system does not actually need to count the user's steps, which would require too much effort to get this information. Also, \citet{shanklin:embedded_sensors} use the user's acceleration to estimate the distance the user traveled. First they filter the values with a low-pass filter. Then they integrate the acceleration two times to get the distance. Thus, to detect if a user is stationary, one integration step would be sufficient to get the user's velocity. This requires a projection of the measured acceleration data into the global coordinate system as described by~\citet{shanklin:embedded_sensors}. Unfortunately, their solution works very unreliable. According to \citet{wang:wlan}, integration of acceleration data for distance estimation works only in theory, but not reliably in indoor environments. Furthermore, their proposed projection is based on \texttt{CMDeviceMotion}'s \texttt{attitude} property, which suffers from the drift problem as shown in Section~\ref{sec:sensor_eval}.
 
 \citet{shanklin:embedded_sensors} considered also another solution for step detection, which uses the user's minimum acceleration. Steps are detected by using a threshold, that needs to be exceeded by the acceleration's Euclidian-Norm $\left\lVert a \right\rVert = \sqrt[2]{x^{2}+y^{2}+z^{2}}$. Figure~\ref{fig:mm_stationary_1} depicts a user's 3-axis acceleration during a walk with two clearly visible stops. The corresponding Euclidian-Norm is shown in Figure~\ref{fig:mm_stationary_2}. For the actual detection of the stationary and not stationary state, a simple moving average can be used. It is calculated over the last 50 values which correspond to 1\,s using a update frequency of 0,02\,s. If the user walks the simple moving average exceeds a threshold of 0.1\,$ms^{-2}$.
 
@@ -104,7 +104,7 @@ The solution's advantage is, that it is quite easy to implement and does not nee
 
 
 \subsection{Sample Motion}\label{sec:algo_sample_motion}
-As described in Section~\ref{sec:fund_mcl}, \acs{MCL} has a \texttt{sample\_motion\_model} function to sample from the motion model, i.e.\ to apply a motion $u$ to a state hypothesis~$x^{[m]}_{t-1}$ by taking the motion's uncertainties into account, as shown by equation~\ref{eq:sample_motion}.
+As described in Section~\ref{sec:fund_mcl}, \acs{MCL} has a \texttt{sample\_motion\_model} function to sample from the motion model, i.e.\ to apply a motion $u$ to a state hypothesis~$x^{[m]}_{t-1}$ by taking the motion's uncertainties into account, as shown by Equation~\ref{eq:sample_motion}.
 
 \begin{equation}\label{eq:sample_motion}
 	x^{[m]}_t = \left(
@@ -187,13 +187,14 @@ The shown implementation is the basic implementation which does not solve the ki
 
 
 \subsection{\acl{PF}}
+
+\input{listings/algorithmParticleFilter}
+
 After explaining all prerequisites this section provides a detailed insight into the solution's \acl{PF} implementation. To reduce complexity the \acs{PF}'s code is divided into three logical parts, shown in Listing~\ref{lst:algorithmParticleFilter_1}, \ref{lst:algorithmParticleFilter_2} and \ref{lst:algorithmParticleFilter_3}. Listing~\ref{lst:algorithmParticleFilter} indicates their call order. It also contains several instance variables, which are accessible from the three parts.
 
 The \texttt{particleFilter} function is continuously called every $\approx$\,1\,s if new measurements are available. To remember, \ac{CL} calls its delegate to update the ranged beacons whether it received a beacon's signal or not. Consequently, when the function gets called, the latest measurements are always available and ready for processing. The function takes the particle set~$\chi_{t-1}$ as argument and returns the new particle set~$\chi_t$.
 
 The implementation uses a static particle set size of 200\,particles. Tests showed, that 200\,particles are sufficient and increasing the particle set does not really improve the estimation. The \texttt{particleFilter} function requires for one execution on average $\approx$\,10\,ms. Thus, a dynamic particle set size to safe processing power is also not required.
-
-\input{listings/algorithmParticleFilter}
 
 
 \subsubsection*{Instance Variables}
@@ -201,28 +202,27 @@ As mentioned, the motions and measurements are delivered asynchronously by their
 
 
 \subsubsection*{\acl{PF} Function --- Part 1}
-The algorithm's first part, shown in Listing~\ref{lst:algorithmParticleFilter_1}, consists of basically one loop, which tries to integrate the buffered motions and filter with the buffered measurements at the right point in time. The loop is executed as long as both buffers are not empty. The four if-cases are visualized in Figure~\ref{fig:algo_pf_1}. In each example, the \texttt{u\_buffer} contains two motions~$u_0, u_1$, and the \texttt{z\_buffer} contains one measurement~$z_0$. Each subfigure illustrates only the loop's first iteration. Thus, $u_1$ is not relevant during this iteration.
-
-\begin{itemize}
-\item{Case 1} (Figure \ref{fig:algo_pf_1_1}): If a motion ends before the measurement was taken ($u.{t_\text{end}} < z.t$) the motion is integrated and the measurement is reserved for the next iteration.
-
-\item{Case 2} (fig.\ \ref{fig:algo_pf_1_2}): If a measurement is taken exactly at the end of a motion ($u.{t_\text{end}} = z.t$) the motion is integrated. Afterwards, the set is filtered with the measurement.
-
-\item{Case 3} (fig.\ \ref{fig:algo_pf_1_3}): If a measurement is taken during a motion ($u.{t_\text{start}} < z.t < u.{t_\text{end}}$) the motion needs to be divided. The first sub motion is then integrated into the particle set. Afterwards it is filtered with the measurement. The second sub motion is stored in the buffer at the first place to be processed during the loop's next iteration.
-
-\item{Case 4} (fig.\ \ref{fig:algo_pf_1_4}): If the measurement was taken before the motion ($u.{z.t < t_\text{start}}$ / \texttt{else}) the filter is executed without integrating the motion. The motion is kept back for the next iteration.
-
-\end{itemize}
-
-\noindent If one of the buffers is empty the algorithm continues with the function's second part.
-
-\input{listings/algorithmParticleFilter_1}
-
-\begin{figure}
+\begin{figure}[height=0.3\textheight]
 	\input{figures/algorithmParticleFilter_4Cases}
 	\caption{Illustration of the four if-cases shown in Listing~\ref{lst:algorithmParticleFilter_1}.}
 	\label{fig:algo_pf_1}
 \end{figure}
+
+The algorithm's first part, shown in Listing~\ref{lst:algorithmParticleFilter_1}, consists of basically one loop, which tries to integrate the buffered motions and filter with the buffered measurements at the right point in time. The loop is executed as long as both buffers are not empty. The four if-cases are visualized in Figure~\ref{fig:algo_pf_1}. In each example, the \texttt{u\_buffer} contains two motions~$u_0, u_1$, and the \texttt{z\_buffer} contains one measurement~$z_0$. Each subfigure illustrates only the loop's first iteration. Thus, $u_1$ is not relevant during this iteration.
+
+\input{listings/algorithmParticleFilter_1}
+
+\begin{itemize}
+\item{Case 1} (Figure~\ref{fig:algo_pf_1_1}): If a motion ends before the measurement was taken ($u.{t_\text{end}} < z.t$) the motion is integrated and the measurement is reserved for the next iteration.
+
+\item{Case 2} (Figure~\ref{fig:algo_pf_1_2}): If a measurement is taken exactly at the end of a motion ($u.{t_\text{end}} = z.t$) the motion is integrated. Afterwards, the set is filtered with the measurement.
+
+\item{Case 3} (Figure~\ref{fig:algo_pf_1_3}): If a measurement is taken during a motion ($u.{t_\text{start}} < z.t < u.{t_\text{end}}$) the motion needs to be divided. The first sub motion is then integrated into the particle set. Afterwards it is filtered with the measurement. The second sub motion is stored in the buffer at the first place to be processed during the loop's next iteration.
+
+\item{Case 4} (Figure~\ref{fig:algo_pf_1_4}): If the measurement was taken before the motion ($u.{z.t < t_\text{start}}$ / \texttt{else}) the filter is executed without integrating the motion. The motion is kept back for the next iteration.
+\end{itemize}
+
+\noindent If one of the buffers is empty the algorithm continues with the function's second part.
 
 
 \subsubsection*{\acl{PF} Function --- Part 2}
@@ -252,6 +252,8 @@ Furthermore, tests showed, that additionally integrating a small Gaussian distri
 \subsection{Recovery}\label{sec:algo_recovery}
 The implemented recovery feature has two purposes. First, it can happen that all particles are moving out of bounds, and thus are filtered out. Second, if the particles are on a totally wrong position, which can happen if the user walked too softly. Thus the pedometer could not recognize the user's steps. It can also happen that the orientation does not fit the actual one. For instance, the user's phone does not points straight forward during the walk.
 
+\input{listings/algorithmFilter}
+
 To determine both situations, the before introduced \texttt{filter} function, shown in Listing~\ref{lst:algorithmSimpleFilter}, is enhanced to support recovery. The enhanced version is shown in Listing~\ref{lst:algorithmFilter}. During the resampling, the new particle set's \texttt{weightSum}~=~$\sum_{m = 0}^{M-1} w^{[m]}_t$ is calculated, which is the sum of all drawn particles during the resampling.
 
 If the $\texttt{weightSum} == 0$ $\chi_t$ is empty all particles have moved out of bounds, or their location is already occupied, and thus they are ignored. Consequently, a new random particle set is generated. The particles are distributed as described in Section~\ref{sec:algo_initial}, i.e\ the position estimation is restarted.
@@ -260,20 +262,24 @@ If the $\texttt{weightSum} > 0$ it is normalized by the particle set size. Then,
 
 Test of different random particle counts showed that 20\,\% seems to achieve the best result. Adding too less particles does not really help to recover, but adding too much results in a \emph{jumping} position estimation. The reason for taking the average over the last three weight sums is that sometimes the weight sum drastically drops during one filter call. This happens for instance, if the measurements to the beacons were heavily influenced by an obstacle and thus are totally wrong.
 
-Figure~\ref{fig:algo_recovery} illustrates the recovery. The shown weight sums correspond to the two screenshots. During the experiment, the kidnapping problem was simulated by walking very smoothly approximately on the green path from the lower lecture hall through the building foyer by passing the large obstacle at the left side into the upper right lecture hall. After being stationary for a few seconds, the test person returned by passing the obstacle on the other side. During the walk, the iPhone's pedometer was not able to recognize any step. Both experiments, the one with recovery, shown in Figure~\ref{fig:algo_recovery_withRecovery}, and the one without recovery, shown in Figure~\ref{fig:algo_recovery_withoutRecovery}, are simulated by using the exact same recorded data as input.
+\begin{figure}
+	\input{figures/algorithmParticleFilter_RecoveryImg}
+	\caption {Example localization track with and without the recovery feature. The green line approximates the actual path. The blue dashed line shows the estimated path. Particles are depicted as red arrows, beacons as blue filled circles.}
+	\label{fig:algo_recoveryImg}
+\end{figure}
+
+\begin{figure}
+	\input{figures/algorithmParticleFilter_Recovery}
+	\caption {The particle weight sum over time which belongs to the example localization track shown in Figure~\ref{fig:algo_recoveryImg}.}
+	\label{fig:algo_recovery}
+\end{figure}
+
+Figure~\ref{fig:algo_recoveryImg} illustrates the recovery's benefit. The weight sums shown in Figure~\ref{fig:algo_recoveryImg} correspond to the two screenshots. During the experiment, the kidnapping problem was simulated by walking very smoothly approximately on the green path from the lower lecture hall through the building foyer by passing the large obstacle at the left side into the upper right lecture hall. After being stationary for a few seconds, the test person returned by passing the obstacle on the other side. During the walk, the iPhone's pedometer was not able to recognize any step. Both experiments, the one with recovery, shown in Figure~\ref{fig:algo_recovery_withRecovery}, and the one without recovery, shown in Figure~\ref{fig:algo_recovery_withoutRecovery}, are simulated by using the exact same recorded data as input.
 
 By testing different thresholds in different scenarios, a threshold of 1.0 seems to fit best. In this example, recovery was executed the first time after $\approx$\,90\,s. During the long break from 60\,--\,90\,s the test user walked through the foyer where no beacon signals with an estimated distance of less than 5\,m were received. Thus, the \texttt{filter} function was not executed. After receiving measurements again the average particle weight sum dropped below the threshold and recovery is executed. Thus, the particles jump from the lower to the upper lecture hall. The same happened at $\approx$\,155\,s on the way back. The third recovery is executed at $\approx$\,184\,s, which caused a small jump next to the end position.
 
 Without recovery, shown in Figure~\ref{fig:algo_recovery_withoutRecovery}, the algorithm is not able to approximate the true location. After $\approx$\,90\,s the weight sum drops to $\approx$\,0, and stays there.
 
-
-\input{listings/algorithmFilter}
-
-\begin{figure}
-	\input{figures/algorithmParticleFilter_Recovery}
-	\caption {Example localization track with and without the recovery feature.}
-	\label{fig:algo_recovery}
-\end{figure}
 
 \subsection{Location Estimation}\label{sec:algo_locEstimation}
 To be able to display a concrete location estimation instead of a particle cloud, the \acs{PF}'s posterior belief, which is a multi-modal distribution represented by the particle set~$\chi_t$, needs to be converted into another distribution. As mentioned in Chapter~\ref{chap:fundamentals}, uncertainties are typically modeled as Gaussian distributions. Consequently, it is appropriate to transform the \acs{PF}'s posterior into a two-dimensional Gaussian distribution~$N(\mu, \Sigma)$, where the mean\,$\mu = (x, y)^T$ represents the concrete location. The location's uncertainty is expressed as the covariance matrix\,$\Sigma = \bigl(\begin{smallmatrix} \sigma_{x}^2&\sigma_{xy}\\ \sigma_{yx}&\sigma_{y}^2 \end{smallmatrix} \bigr)$.
@@ -282,6 +288,6 @@ The mean\,$\mu$ can either be $\chi$'s arithmetic mean or its weighted mean by u
 
 \begin{figure}
 	\includegraphics[width=0.7\textwidth]{figures/sigellipse}
-	\caption{Illustration of the particle set's transformation into a Gaussian distribution, shown as $1\sigma\text{-ellipse}$ with a weighted mean.}
+	\caption{Illustration of the particle set's transformation into a Gaussian distribution. The $1\sigma\text{-ellipse}$ with weighted mean is shown as black dashed ellipse. The deployed beacons are depicted as blue filled circles. The distributed particles as red arrows. The blue dashed line is the estimated path.}
 	\label{fig:algo_sigellipse}
 \end{figure}

@@ -1,8 +1,8 @@
 \begin{tikzpicture}
   \begin{axis}[trim axis left, trim axis right, height=0.4\textheight,
     xlabel={Error / Accuracy $x$ (m)},
-    ylabel={$CDF(x)$},
-    legend entries={Exp.\ 1, Exp.\ 2, Exp.\ 1+2},
+    ylabel={\acs{CDF}(x)},
+    legend entries={Experiment 1, Experiment 2, Experiment 1\,+\,2},
     legend pos=south east,
     grid = major]
     \addplot[red, smooth, mark=no, domain=-6.08:10.66] {cdf(2.29, 2.97)};
