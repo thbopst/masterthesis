@@ -1,9 +1,9 @@
-\subfloat[Distance measurements]{
+\subfloat[Estimated Distances]{
   \begin{tikzpicture}
   \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
-    xlabel={Reference distance (m)},
-    ylabel={Distance (m)},
-    legend entries={measurements, average},
+    xlabel={Reference Distance (m)},
+    ylabel={Estimated Distance (m)},
+    legend entries={measurement, average},
     legend pos=south east,
     grid = major]
     \addplot [blue, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inHand.csv};
@@ -13,12 +13,12 @@
   \label{fig:eval:pedometerHand:dist}
 }
 \quad
-\subfloat[Step count measurements]{
+\subfloat[Estimated Step Count]{
   \begin{tikzpicture}
   \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
-    xlabel={Reference distance (m)},
-    ylabel={Step count},
-    legend entries={measurements, average, step count ref.},
+    xlabel={Reference Distance (m)},
+    ylabel={Estimated Step Count},
+    legend entries={measurement, average, ref. step count},
     legend pos=south east,
     grid = major]
     \addplot [blue, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inHand.csv};

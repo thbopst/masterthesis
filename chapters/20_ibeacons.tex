@@ -84,20 +84,20 @@ To test and evaluate the implementation I used ten beacons from a company called
 
 \begin{figure}
 	\includegraphics[width=0.6\textwidth]{figures/BEACONinside_beacons}
-	\caption{A 3D picture of sectioned beacons. Source:~\citep{binside:ds}}
+	\caption{A 3D picture of sectioned beacons \citep{binside:ds}.}
 	\label{fig:bi:beacons}
 \end{figure}
 
-The beacons's size is $5.8\text{cm} \times 7,96\text{cm} \times 2.25\text{cm}$. They can either be powered by two AAA~batteries to provide a lifespan of approximately one year, or by an external power supply over micro usb~\citep{binside:ds}.
+The beacons's size is 5.8\,cm\,$\times$\,7,96\,cm\,$\times$\,2.25\,cm. They can either be powered by two AAA~batteries to provide a lifespan of approximately one year, or by an external power supply over micro USB~\citep{binside:ds}.
 
 The beacons are configurable with standard \ac{BLE} tools, like compatible smartphone apps. Such an app establishes a \ac{BLE} connection to the beacon. Each of the following configurable values can be accessed with a specific key. To configure the beacons an iOS app called \emph{LightBlue --- Bluetooth Low Energy}\footnote{Link to the LightBlue App in the iOS AppStore (last access: 21.04.2015) \url{https://itunes.apple.com/de/app/lightblue-bluetooth-low-energy/id557428110}} from a company named \emph{Punch Through Design LLC.}, recommended by BEACONinside is used. According to \citet{binside:ds}, the following values are configurable:
 \begin{itemize}
   \item \textbf{\texttt{proximityUUID}:} For instance \texttt{F0018B9B-7509-4C31-A905-1A27D39C003C}
-  \item \textbf{\texttt{major}:} A value between 1 -- 65535
-  \item \textbf{\texttt{minor}:} A value between 1 -- 65535
-  \item \textbf{\texttt{\acs{TX}-power level}:} It defines the power level which is used to transmit the beacons advertisement packages, i.e.\ the signals. It can either be 0dBm (default) which is the maximum power level, -6dBm or -23dBm which is the minimum power level.
-  \item \textbf{\texttt{Advertising interval}:} Defines the time interval (100ms~-- 10s) in which advertisements are sent. The default time interval is 400ms, configurable in steps of 625$\mu$s.
-  \item \textbf{\texttt{Calibration value}:} To estimate the distance of the receiving device to the beacon a calibration step is necessary. The measured \acs{RSS} in a distance of 1m needs to be sent by the beacon with every advertisement. This value can be configured for each \texttt{Tx-power level}. The default is 65dBm for the 0dBm power level. It needs to be encoded as the 2' complement in hexadecimal (e.g.\ 65dBm = \text{0xBF}).
+  \item \textbf{\texttt{major}:} A value between 1\,--\,65535
+  \item \textbf{\texttt{minor}:} A value between 1\,--\,65535
+  \item \textbf{\texttt{\acs{TX}-power level}:} It defines the power level which is used to transmit the beacons advertisement packages, i.e.\ the signals. It can either be 0\,dBm (default) which is the maximum power level, -6\,dBm or -23\,dBm which is the minimum power level.
+  \item \textbf{\texttt{Advertising interval}:} Defines the time interval (100\,ms\,--\,10\,s) in which advertisements are sent. The default time interval is 400\,ms, configurable in steps of 625\,$\mu$s.
+  \item \textbf{\texttt{Calibration value}:} To estimate the distance of the receiving device to the beacon a calibration step is necessary. The measured \acs{RSS} in a distance of 1m needs to be sent by the beacon with every advertisement. This value can be configured for each \texttt{Tx-power level}. The default is 65\,dBm for the 0dBm power level. It needs to be encoded as the 2' complement in hexadecimal (e.g.\ 65\,dBm = \text{0xBF}).
   \item \textbf{\texttt{Passkey}:} To set one of this configuration parameters the (6 digit) passkey must be entered. The beacons' default value is \texttt{555555}.
 \end{itemize}
 
@@ -116,11 +116,11 @@ The beacons are configurable with standard \ac{BLE} tools, like compatible smart
 \noindent To load the new values after changing the beacon's configuration, the beacon needs to be rebooted by setting a specific value. The beacon can also be reset to factory defaults~\citep{binside:ds}.
 
 \subsection{Deployment and Calibration}
-As mentioned before, the \ac{BLE} signal quality is heavily influenced by physical materials due to the fact that \ac{BLE} uses the 2.4GHz frequency. Especially, water which is a main part of the human body, attenuates the signal~\citep{apple:getting_started}. Thus, the beacons need to be carefully deployed. Ideally, they should be deployed in a manner, that most often the line between beacon and receiver is unobstructed. There should also be enough space around the beacon, that its signal can spread out. By deploying them carefully, the signal's attenuation and other effects like multi-path fading and shadowing can be reduced~\citep{apple:getting_started,IEEE:survey_wireless_indoor_pos}.
+As mentioned before, the \ac{BLE} signal quality is heavily influenced by physical materials due to the fact that \ac{BLE} uses the 2.4\,GHz frequency. Especially, water which is a main part of the human body, attenuates the signal~\citep{apple:getting_started}. Thus, the beacons need to be carefully deployed. Ideally, they should be deployed in a manner, that most often the line between beacon and receiver is unobstructed. There should also be enough space around the beacon, that its signal can spread out. By deploying them carefully, the signal's attenuation and other effects like multi-path fading and shadowing can be reduced~\citep{apple:getting_started,IEEE:survey_wireless_indoor_pos}.
 
 The next step is the calibration step. To be able to estimate the distance between smartphone and beacon a reference value is needed. The reference value, as mentioned before, is the measured \ac{RSS} in a distance of 1m to the beacon. The calibration value is configured on the beacon itself, which includes it in the sent advertisement together with its identifier.
 
-According to \citet{apple:getting_started}, the smartphone needs to be positioned in 1m distance to the beacon in portrait mode with the device's top half uncovered. Then the \ac{RSSI} values where collected for at least 10s. Meanwhile, the user should slowly move the device on an $\approx$~30cm line in front of the beacon, by maintaining distance and orientation. After collecting the values, the average value is calculated and configured on the beacon. It is advisable, to double check the device's estimated distance, after setting the calibration value. Due to the above mentioned problems, this needs to be repeated for every single beacon.
+According to \citet{apple:getting_started}, the smartphone needs to be positioned in 1m distance to the beacon in portrait mode with the device's top half uncovered. Then the \ac{RSSI} values were collected for at least 10s. Meanwhile, the user should slowly move the device on an $\approx$\,30\,cm line in front of the beacon, by maintaining distance and orientation. After collecting the values, the average value is calculated and configured on the beacon. It is advisable, to double check the device's estimated distance, after setting the calibration value. Due to the above mentioned problems, this needs to be repeated for every single beacon.
 
 \section{API --- iOS 8.1}
 After describing what beacons are and how they work, this section focuses on the receivers side, especially on the \acs{API} provided by Apple's iOS~8.1 platform. The \acf{CL} framework's \texttt{CLLocationManager} component provides two functionalities, called \emph{region monitoring} and \emph{beacon ranging} to receive a beacon's signals within an iOS app \citep{apple:ios_doc_cl}.
@@ -138,7 +138,7 @@ The \texttt{CLLocationManager} passes an array of \texttt{CLBeacon} objects to i
 
 \begin{table}
 	\input{tables/beaconExampleData}
-	\caption{Shows recorded beacon example data. Each row represents a \texttt{CLBeacon} object. The table contains two successive datasets.}
+	\caption{Two successive example datasets of \texttt{CLBeacon} objects passed by the\texttt{CLLocationManager} to the specified delegate.}
 	\label{tab:beaconExampleData}
 \end{table}
 
@@ -163,13 +163,13 @@ Thus, I first interpreted this description as the error of the \texttt{proximity
 	d = 10^{-\frac{RSSI + A}{10 * n}}
 \end{equation}
 
-According to \citet{wang:bt_pos}, the distance $d$, between an iBeacon and a smartphone, which depends on the \acl{RSS}, can be calculated with the formula shown in equation~\ref{eq:rssiToDistanceCalc}, where $A$ is the \acs{RSSI} value at a distance of 1m, and $n$ an environmental constant. To proof the assumption, that the \texttt{accuracy} value is actually the distance, test measurements for certain reference distances were performed. The measurements where taken outdoor with \ac{LOS} between beacon and smartphone in order to have the signal's quality as less impacted by physical materials as possible. After collecting the \acs{RSSI} and \texttt{accuracy} values of 60 measurements for each reference distance the data set was sorted according their \texttt{rssi} values. Then the \texttt{accuracy} value's average per \texttt{rssi} was calculated. Afterwards, the above mentioned formula shown in equation~\ref{eq:rssiToDistanceCalc} was used to calculate the distance for each measured \texttt{rssi} value. During the measurements, the beacon's calibration value was set to 65dBm; thus, $A = 65\text{dBm}$. To approximate the \texttt{CLBeacon} object's \texttt{accuracy} property best, an environmental constant of $n = 2.1$ was used, which is similar to the one used by \citet{wang:bt_pos}.
+According to \citet{wang:bt_pos}, the distance $d$, between an iBeacon and a smartphone, which depends on the \acl{RSS}, can be calculated with the formula shown in equation~\ref{eq:rssiToDistanceCalc}, where $A$ is the \acs{RSSI} value at a distance of 1m, and $n$ an environmental constant. To prove the assumption, that the \texttt{accuracy} value is actually the distance, test measurements for certain reference distances were performed. The measurements were taken outdoor with \ac{LOS} between beacon and smartphone in order to have the signal's quality as less impacted by physical materials as possible. After collecting the \acs{RSSI} and \texttt{accuracy} values of 60 measurements for each reference distance the data set was sorted according their \texttt{rssi} values. Then the \texttt{accuracy} value's average per \texttt{rssi} was calculated. Afterwards, the above mentioned formula shown in equation~\ref{eq:rssiToDistanceCalc} was used to calculate the distance for each measured \texttt{rssi} value. During the measurements, the beacon's calibration value was set to 65dBm; thus, $A = 65\text{dBm}$. To approximate the \texttt{CLBeacon} object's \texttt{accuracy} property best, an environmental constant of $n = 2.1$ was used, which is similar to the one used by \citet{wang:bt_pos}.
 
 Figure~\ref{fig:eval_accuracy_vs_distance} illustrates the result and the fact, that the \texttt{CLBeacon} object's \texttt{accuracy} property is the estimated distance, between beacon and smartphone. Additionally, it implicitly depicts, that the unit dB is a logarithmic unit.
 
 \begin{figure}
   \input{figures/iBeaconEval_AccuracyVsDistance}
-	\caption{Dependency on \texttt{CLBeacon} object's \texttt{rssi} and \texttt{accuracy} properties \citep{apple:ios_doc_cl,wang:bt_pos,kotanen:exp_local_pos_bt}.}
+	\caption{Dependency of the \texttt{CLBeacon} object's \texttt{rssi} and \texttt{accuracy} property. Proves that the \texttt{CLBeacon} object's \texttt{accuracy} is the estimated distance between smartphone and beacon because $d$ is the estimated distance depending on the \ac{RSS} according to \citet{wang:bt_pos,kotanen:exp_local_pos_bt}.}
 	\label{fig:eval_accuracy_vs_distance}
 \end{figure}
 
@@ -192,11 +192,11 @@ The first reason is, that the measured \ac{RSS} is not directly used to calculat
 	\input{figures/iBeaconEval_AccuracyVsRssi}
 	\caption {Dependency of the \texttt{CLBeacon} object's \texttt{accuracy} and \texttt{rssi} property over time with an actual distance of 2\,m.}
 	\label{fig:beacon_eval_accuracy-rssi}
-\end{figure} % TODO Remove last seconds
+\end{figure}
 
 \subsubsection*{Attitude \& Obstacles}
 The second reason is the device's attitude relative to the beacon. Figure~\ref{fig:beacon_eval_situations} illustrates the impact on the estimated distance and the \ac{RSS} in typical situations.
-During the experiment the actual distance between smartphone and beacon was 1\,m. The measurements were taken indoor. The values shown in Figure~\ref{fig:beacon_eval_situations} are average values. For each situation 60~--~100 values were recorded.\newline
+During the experiment the actual distance between smartphone and beacon was 1\,m. The measurements were taken indoor. The values shown in Figure~\ref{fig:beacon_eval_situations} are average values. For each situation 60\,--\,100 values were recorded.\newline
 
 \textbf{Situations:}
 \begin{itemize}
@@ -219,7 +219,7 @@ The above illustrated scenarios are very common. The problem is, that without kn
 
 \begin{figure}
 	\input{figures/iBeaconEval_Situations}
-	\caption {Depicts the impact of the phones attitude, relative to the beacon, and obstacles, such as humans or walls, on the \acs{RSS}.} %  The measurements where taken indoor (HTWG Konstanz FK034) with an actual distance of 1~m between iBeacon and smartphone.
+	\caption {The impact on the beacon signal's quality, i.e.\ the \texttt{CLBeacon} object's \texttt{accuracy} and \texttt{rssi} values in different situations, such as obstacles between smartphone and beacon, and the smartphone's orientation relative to a beacon. For each value 60\,--\,100 measurements were recorded with an actual distance of 1\,m.}
 	\label{fig:beacon_eval_situations}
 \end{figure}
 
@@ -241,16 +241,16 @@ The depicted measurements in Figure~\ref{fig:beacon_dispersion_f007} were record
 
 \begin{figure}
 	\input{figures/iBeaconEval_SignalSpreading}
-	\caption {Shows the \texttt{accuracy}'s spreading depending on the actual distance and the environment.}
+	\caption{The distribution of the estimated distances, i.e.\ the measured \texttt{accuracy} values, depending on the actual distance and the environment.}
 	\label{fig:beacon_dispersion}
 \end{figure}
 
-
-\paragraph{Uncertainty} As mentioned in Section~\ref{sec:fund_loc}, it is necessary to know the uncertainty of a measurement to implement a \acl{PF}. Thus, I determined distance estimation's uncertainty based on the data shown in Figure~\ref{fig:beacon_dispersion_outdoor} and \ref{fig:beacon_dispersion_f007}. The Gaussian's parameters to model the distance estimation's uncertainty are depicted in Figure~\ref{fig:beacon_eval_ndf}. The two dashed straight lines show the linear function that approximates the standard deviation $\sigma$ depending on the mean $\mu$ best.
+% paragraph{Uncertainty}
+As mentioned in Section~\ref{sec:fund_loc}, it is necessary to know the uncertainty of a measurement to implement a \acl{PF}. Thus, the distance estimation's uncertainty were determined based on the data shown in Figure~\ref{fig:beacon_dispersion_outdoor} and \ref{fig:beacon_dispersion_f007}. The Gaussian's parameters to model the distance estimation's uncertainty are depicted in Figure~\ref{fig:beacon_eval_ndf}. The two dashed straight lines show the linear function that approximates the standard deviation $\sigma$ depending on the mean $\mu$ best.
 
 \begin{figure}
 	\input{figures/iBeaconEval_NDF}
-	\caption{Depicts the uncertainties of the distance estimation modeled with a normal distribution function.}
+	\caption{The distance estimations' uncertainties, modeled as Gaussians, depending on the actual distance. Additionally, the uncertainties were approximated by linear regression.}
 	\label{fig:beacon_eval_ndf}
 \end{figure}
 
@@ -272,7 +272,7 @@ The first screenshot depicted in Figure~\ref{fig:beacon_eval_multilat_1} shows, 
 
 \begin{figure}
   \input{figures/iBeaconEval_Multilateration}
-  \caption{Screenshots of indoor self-localization experiment using multilateration.}
+  \caption{Four successive screenshots of the indoor self-localization experiment in a lecture hall (HTWG-KN F007) using multilateration. The screenshots show a map of the lecture hall, the walked path in green, the beacons as blue filled circles and their estimated distances as large blue circles. The red line depicts the estimated path.}
   \label{fig:beacon_eval_multilat}
 \end{figure}
 
@@ -280,7 +280,7 @@ The experiment was repeated with the same setting and recorded data, but only us
 
 \begin{figure}
 	\includegraphics[width=0.45\textwidth]{figures/multilat_less5m}
-	\caption{Screenshots of indoor self-localization experiment using multilateration, by using just signals where $\texttt{accuracy} < 5~m$.}
+	\caption{Screenshots of the indoor self-localization experiment in a lecture hall (HTWG-KN F007) using multilateration by only ignoring estimated distances more than 5\,m. The screenshots show a map of the lecture hall, the walked path in green, the beacons as blue filled circles and their estimated distances as large blue circles. The red line depicts the estimated path.}
 	\label{fig:beacon_eval_multilat_less5m}
 \end{figure}
 

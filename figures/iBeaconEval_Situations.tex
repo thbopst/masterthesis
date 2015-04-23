@@ -1,21 +1,25 @@
-\subfloat[Average accuracy in different situations]{
+\subfloat[The average estimated distance in different situations.]{
   \begin{tikzpicture}
     \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
         xlabel={Situation},
-        ylabel={Accuracy (m)},
+        ylabel={Estimated Distance (m)},
         xtick=data,
+        legend entries={\texttt{accuracy}},
+        legend pos = north west,
       grid = major]
       \addplot [only marks, mark=*] table[col sep=semicolon, x=measurement, y=accuracy] {csv/2014-10-27_htwg_fk034_angles/all_avg.csv};
   \end{axis}
 \end{tikzpicture}
 }
-\subfloat[Average \acs{RSSI} in different situations]{
+\subfloat[The average \acs{RSS} in different situations.]{
   \begin{tikzpicture}
     \begin{axis}[width=0.45\textwidth, height=0.4\textheight,
         xlabel={Situation},
-        ylabel={RSSI (dBm)},
+        ylabel={\acl{RSS} (dBm)},
         y dir=reverse,
         xtick=data,
+        legend entries={\texttt{rssi}},
+        legend pos = north west,
       grid = major]
       \addplot [only marks, mark=*] table[col sep=semicolon, x=measurement, y=rssi] {csv/2014-10-27_htwg_fk034_angles/all_avg.csv};
   \end{axis}

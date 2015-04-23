@@ -12,7 +12,7 @@ Today, most smartphones have a built-in magnetometer to measure the strength and
 
 
 \paragraph{Accelerometer}
-The accelerometer, which is also implemented in most smartphones, measures the acceleration applied to the device. The measured acceleration is the gravity plus the acceleration that the user applies to the device, measured in $\frac{m}{s^2}$. Thus, the measured acceleration is $1g = 9.81 \frac{m}{s^2}$ if the device is stationary, i.e.\ no user acceleration is applied to the device. Typically, smartphones include a three-axis accelerometer to measure the acceleration along the three spatial axis to determine for example the device's tip and tilt \citep{apple:wwdc_2012_pham,apple:ios_doc_cm}.
+The accelerometer, which is also implemented in most smartphones, measures the acceleration applied to the device. The measured acceleration is the gravity plus the acceleration that the user applies to the device, measured in $\frac{m}{s^2}$. Thus, the measured acceleration is 1\,g\,=\,9.81\,$\frac{m}{s^2}$ if the device is stationary, i.e.\ no user acceleration is applied to the device. Typically, smartphones include a three-axis accelerometer to measure the acceleration along the three spatial axis to determine for example the device's tip and tilt \citep{apple:wwdc_2012_pham,apple:ios_doc_cm}.
 
 
 \paragraph{Gyroscope}
@@ -54,14 +54,14 @@ Table~\ref{tab:motionActivityScenarios} shows an overview of the different motio
 
 \begin{table}
 	\input{tables/motionActivityScenarios}
-	\caption{Shows motion activity example scenarios based on the example made by \citet{apple:wwdc_2014_pham}.}
+	\caption{Example scenarios illustrating the \texttt{CMMotionActivity} object's activity classification \citep{apple:wwdc_2014_pham}.}
 	\label{tab:motionActivityScenarios}
 \end{table}
 
 
 Thus,
 \begin{itemize}
-  \item a device lying \textbf{on a table} does not move; hence, it is stationary. % TODO on a table
+  \item a device lying \textbf{on a table} does not move; hence, it is stationary.
   \item a \textbf{person checking email}  usually does not hold its smartphone completely steady.
   \item a \textbf{person walking} can be detected across body location.
   \item in a \textbf{moving vehicle} the state is automotive.
@@ -121,21 +121,21 @@ As mentioned before, the iPhone contains a magnetometer, which is good for headi
 
 \begin{figure}
 	\includegraphics[width=0.4\textwidth]{figures/iphone_coordinatesystem}
-	\caption{Depicts the iPhone's local coordinate system. Source:~\citep{apple:wwdc_2012_pham}}
+	\caption{The iPhone's local coordinate system \citep{apple:wwdc_2012_pham}.}
 	\label{fig:iphone_cs}
 \end{figure}
 
-To start receiving the device's \texttt{attitude} via the \texttt{CMDeviceMotionManager}, a reference frame needs to be specified. Figure~\ref{fig:iphone_cs} shows the iPhones local coordinate system, which is important to know, to understand the differences between the four possible reference frames. The four \texttt{CMAttitudeReferenceFrame}s, illustrated in figure~\ref{fig:cm_referenceframes} have the vertical z-axis aligned with the gravity in common. According to \citet{apple:wwdc_2014_pham}, the specified reference frame also specifies the type of sensor fusion. The following reference frames exist \citep{apple:wwdc_2014_pham,apple:ios_doc_cm}:
+To start receiving the device's \texttt{attitude} via the \texttt{CMDeviceMotionManager}, a reference frame needs to be specified. Figure~\ref{fig:iphone_cs} shows the iPhones local coordinate system, which is important to know, to understand the differences between the four possible reference frames. The four \texttt{CMAttitudeReferenceFrame}s, illustrated in Figure~\ref{fig:cm_referenceframes} have the vertical z-axis aligned with the gravity in common. According to \citet{apple:wwdc_2014_pham}, the specified reference frame also specifies the type of sensor fusion. The following reference frames exist \citep{apple:wwdc_2014_pham,apple:ios_doc_cm}:
 \begin{itemize}
-  \item \textbf{XArbitrary} (Fig.~\ref{fig:cm_referenceframes_xArbitrary}): The x and y axis are unspecified. The initial position fixes the x and y orientation. There is no correction of the heading; it drifts over time.
-  \item \textbf{XArbitraryCorrected} (Fig.~\ref{fig:cm_referenceframes_xArbitraryCorrected}): The x- and y-axis are unspecified. The initial pose fixes the x- and y-orientation. Additionally, the magnetometer is used to correct heading and to improve yaw accuracy over time.
-  \item \textbf{XMagneticNorth} (Fig.~\ref{fig:cm_referenceframes_xMagneticNorth}): The x-axis is absolutely tagged to magnetic north. It uses the compass for orientation.
-  \item \textbf{xTrueNorth} (Fig.~\ref{fig:cm_referenceframes_xTrueNorth}): The x-axis is absolutely tagged to true north\footnote{The earth's magnetic field moves. Thus, true and magnetic north are not the same. Maps are oriented towards true north.}. It uses the compass to determine true north.
+  \item \textbf{XArbitrary} (Figure~\ref{fig:cm_referenceframes_xArbitrary}): The x and y axis are unspecified. The initial position fixes the x and y orientation. There is no correction of the heading; it drifts over time.
+  \item \textbf{XArbitraryCorrected} (Figure~\ref{fig:cm_referenceframes_xArbitraryCorrected}): The x- and y-axis are unspecified. The initial pose fixes the x- and y-orientation. Additionally, the magnetometer is used to correct heading and to improve yaw accuracy over time.
+  \item \textbf{XMagneticNorth} (Figure~\ref{fig:cm_referenceframes_xMagneticNorth}): The x-axis is absolutely tagged to magnetic north. It uses the compass for orientation.
+  \item \textbf{xTrueNorth} (Figure~\ref{fig:cm_referenceframes_xTrueNorth}): The x-axis is absolutely tagged to true north\footnote{The earth's magnetic field moves. Thus, true and magnetic north are not the same. Maps are oriented towards true north.}. It uses the compass to determine true north.
 \end{itemize}
 
 \begin{figure}
     \input{figures/CMReferenceFrames}  
-	\caption{Shows the different device attitude reference frames. Source:~ \citep{apple:wwdc_2012_pham}}
+	\caption{The \acl{CM} framework's attitude reference frames \citep{apple:wwdc_2012_pham}.}
 	\label{fig:cm_referenceframes}
 \end{figure}
 
@@ -163,13 +163,13 @@ This experiment shows that the user needs to actually walk a very long distance 
 
 \begin{table}
 	\input{tables/motionActivityEvaluation}
-	\caption{Shows a part of the recorded MotionActivity during a test walk. Remark: To simplify the table the start date is shown as relative timestamp instead of an absolute date.}
+	\caption{Recorded \texttt{CMMotionActivity} data during a test walk. The user stopped at $\approx$\,32\,s. Remark: To simplify the table the start date is shown as relative timestamp instead of an absolute date.}
 	\label{tab:motionActivityEvaluation}
 \end{table}
 
 
 \subsection{Pedometer}
-To evaluate the accuracy of \ac{CM}'s \texttt{CMPedometer} component, test walks of different distances  were performed, to compare the actual distance and step count with the measured values. Due to the fact that users usually carry their smartphone in their trouser pockets or hold it in their hand, the experiment was performed for both positions. Figure~\ref{fig:eval:pedometerHand} shows the measured distances and the corresponding step counts for different distances with the phone in hand. The results of the same experiment with the phone in the trousers pocket are shown in figure~\ref{fig:eval:pedometerPocket}.
+To evaluate the accuracy of \ac{CM}'s \texttt{CMPedometer} component, test walks of different distances  were performed, to compare the actual distance and step count with the measured values. Due to the fact that users usually carry their smartphone in their trouser pockets or hold it in their hand, the experiment was performed for both positions. Figure~\ref{fig:eval:pedometerHand} shows the measured distances and the corresponding step counts for different distances with the phone in hand. The results of the same experiment with the phone in the trousers pocket are shown in Figure~\ref{fig:eval:pedometerPocket}.
 
 The experiments visualization shows the measurements dispersion. Sometimes, the \texttt{CMPedometer} overestimates or underestimates the distance, i.e.\ the step count. The experiment also shows, that the phone on average underestimates the values, if the user holds the device in hand. If the user walks with the phone in the trouser pocket the device also underestimates the measured distances; whereas, the measured step counts are more precise.
 
@@ -178,39 +178,39 @@ Figure~\ref{fig:eval:pedometerNDF} depicts the \texttt{CMPedometer}'s standard d
 % CMPedometer (step count, distance)  dispersion plots
 \begin{figure}
     \input{figures/sensorEval_PedometerInHand}  
-	\caption{Shows the measured distances and step counts for different distances. The measurements where taken indoor on a hard floor with the smartphone in hand.}
+	\caption{Measured distances and step counts for different reference distances estimated by \ac{CM}'s \texttt{CMPedometer}. The measurements were taken indoor on a hard floor with the smartphone in hand.}
 	\label{fig:eval:pedometerHand}
 \end{figure}
 
 \begin{figure}
   \input{figures/sensorEval_PedometerInPocket}
-  \caption{Shows the measured distances and step counts for different distances. The measurements where taken indoor on a hard floor with the smartphone in pants pocket.}
+  \caption{Measured distances and step counts for different reference distances estimated by \ac{CM}'s \texttt{CMPedometer}. The measurements were taken indoor on a hard floor with the smartphone in trouser pocket.}
   \label{fig:eval:pedometerPocket}
 \end{figure}
 
 \begin{figure}
   \input{figures/sensorEval_PedometerNDF}
-  \caption {Shows the \texttt{CMPedometer} component's uncertainty, depending on the walked distance and the phone's position.}
+  \caption {The \texttt{CMPedometer} component's uncertainty and their approximation using linear regression depending on the walked distance and the phone's position.}
   \label{fig:eval:pedometerNDF}
 \end{figure}
 
 
 Besides the pedometer's accuracy also the duration until the component detects that the user is walking and thus delivers the first distance estimation was evaluated. The \texttt{CMPedometer} component on average needs 5\,--\,10\,s to deliver the first estimation, which is also consistent with a statement made by \citet{apple:wwdc_2014_pham}. The first estimation typically contains a step count of 6\,--\,8\,s. Once it detects that the user is walking, it continuously delivers updates every $\approx$\,2.5\,s.
 
-Another interesting value is the time it takes the pedometer to recognize that the user continues walking after a short break of $\approx$\,10\,--\,15\,s. Against my expectation, it takes approximately the same amount of time and also the same amount of steps as the component requires to recognize it the first time. This behavior is depicted in table~\ref{tab:pedometerEvaluation}. First it shows the amount of time and steps it took the component to recognize that the user is walking (Table~\ref{tab:pedometerEvaluation}, Line 1). After 50\,steps the user took a short break of around 15\,s (Table~\ref{tab:pedometerEvaluation}, Line 5). Furthermore it shows that the component requires 6\,steps to recognize that the user continued walking (Table~\ref{tab:pedometerEvaluation}, Line 7). The third data block shows another break that the user made during the test walk (Table~\ref{tab:pedometerEvaluation}, Line 9\,--\,11).
+Another interesting value is the time it takes the pedometer to recognize that the user continues walking after a short break of $\approx$\,10\,--\,15\,s. Against my expectation, it takes approximately the same amount of time and also the same amount of steps as the component requires to recognize it the first time. This behavior is depicted in Table~\ref{tab:pedometerEvaluation}. First it shows the amount of time and steps it took the component to recognize that the user is walking (Table~\ref{tab:pedometerEvaluation}, Line 1). After 50\,steps the user took a short break of around 15\,s (Table~\ref{tab:pedometerEvaluation}, Line 5). Furthermore it shows that the component requires 6\,steps to recognize that the user continued walking (Table~\ref{tab:pedometerEvaluation}, Line 7). The third data block shows another break that the user made during the test walk (Table~\ref{tab:pedometerEvaluation}, Line 9\,--\,11).
 
 \begin{table}
 	\input{tables/pedometerEvaluation}
-	\caption{Shows the recorded pedometer example data. Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used, instead of the absolute timestamps. Additionally all values, except the steps, are being truncated.}
+	\caption{Recorded \texttt{CMPedometer} example data. Remark: To simplify the table relative timestamps for startDate and endDate are used. All values except the steps are truncated.}
 	\label{tab:pedometerEvaluation}
 \end{table}
 
 
 \subsection{Heading}
-As mentioned earlier, the localization algorithm, introduced in chapter~\ref{chap:pf}, needs heading for the motion tracking to determine in which direction the user is moving. To get the devices' heading, either the \texttt{CMAttitude} provided by \ac{CM}, or the \texttt{CLHeading} provided by \ac{CL} can be used. In this section first the \texttt{CMAttitude}'s data is evaluated and afterwards the data provided by \texttt{CLHeading}.
+As mentioned earlier, the localization algorithm, introduced in Chapter~\ref{chap:pf}, needs heading for the motion tracking to determine in which direction the user is moving. To get the devices' heading, either the \texttt{CMAttitude} provided by \ac{CM}, or the \texttt{CLHeading} provided by \ac{CL} can be used. In this section first the \texttt{CMAttitude}'s data is evaluated and afterwards the data provided by \texttt{CLHeading}.
 
 \subsubsection*{CMAttitude}
-As mentioned before, the \texttt{CMAttitude} data is provided as Euler angles, Quaternions and as rotation matrix. To be able to compare attitude with compass heading, it is of advantage to transform the attitude into a heading in compass degrees. This means, if the device top is pointing towards magnetic north, the heading $\theta = 0^{\circ}$, east $\theta = 90^{\circ}$, south $\theta = 180^{\circ}$, and west $\theta = 270^{\circ}$. Equation~\ref{eq:rotationmatrix} shows the 3-dimensional rotation matrix provided by \texttt{CMAttitude} as specified in the \ac{CM}'s documentation \citep{apple:ios_doc_cm}. The calculation of $\theta$ in compass degrees, where $m_{1,2}$ and $m_{2,2}$ describe the transformation of the phone's y-axis by the rotation around its z-axis, is shown in equation~\ref{eq:rotation2heading}.
+As mentioned before, the \texttt{CMAttitude} data is provided as Euler angles, Quaternions and as rotation matrix. To be able to compare attitude with compass heading, it is of advantage to transform the attitude into a heading in compass degrees. This means, if the device top is pointing towards magnetic north, the heading $\theta = 0^{\circ}$, east $\theta = 90^{\circ}$, south $\theta = 180^{\circ}$, and west $\theta = 270^{\circ}$. Equation\,\ref{eq:rotationmatrix} shows the 3-dimensional rotation matrix provided by \texttt{CMAttitude} as specified in the \ac{CM}'s documentation \citep{apple:ios_doc_cm}. The calculation of $\theta$ in compass degrees, where $m_{1,2}$ and $m_{2,2}$ describe the transformation of the phone's y-axis by the rotation around its z-axis, is shown in Equation\,\ref{eq:rotation2heading}.
 
 \begin{equation} \label{eq:rotationmatrix}
   M_{3,3} = \begin{pmatrix}
@@ -231,31 +231,31 @@ The most important requirement for heading is long-term accuracy. To test this, 
 
 \begin{figure}[htbp]
 	\input{figures/sensorEval_AttitudeXMagneticNorth}
-	\caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with reference frame \texttt{xMagneticNorth}.}
+	\caption{\texttt{CMAttitude}'s heading drift using the \texttt{xMagneticNorth} reference frame. The test person walked 10 times around a small table in clockwise and counter-clockwise direction.}
 	\label{fig:evalAttitude:xMagneticNorth}
 \end{figure}
 
 \begin{figure}[htbp]
 	\input{figures/sensorEval_AttitudeReferenceframes}
-	\caption{Shows the heading's drift over time, calculated from \texttt{CMAttitude}, with three different reference frames.}
+	\caption{Compares \texttt{CMAttitude}'s heading drift using different reference frames. The test person walked 10 times around a small table in counter-clockwise direction.}
 	\label{fig:evalAttitude:referenceframes}
 \end{figure}
 
 \subsubsection*{CLHeading}
-During the experiment the compass's \texttt{CLHeading} values were recorded as well. Figure~\ref{fig:eval:compass} shows the heading's error over time. The values were measured together with the values of figure~\ref{fig:evalAttitude:xMagneticNorth} and \ref{fig:evalAttitude:referenceframes}. The chart shows no drift over time compared to the data measured by \texttt{CMAttitude}. However, it also shows that the compass can be biased by other magnetic fields. The outliers in the experiment with counter-clockwise direction led me to assume that another magnetic field biased the before measured magnetic field.
+During the experiment the compass's \texttt{CLHeading} values were recorded as well. Figure~\ref{fig:eval:compass} shows the heading's error over time. The values were measured together with the values of Figure~\ref{fig:evalAttitude:xMagneticNorth} and \ref{fig:evalAttitude:referenceframes}. The chart shows no drift over time compared to the data measured by \texttt{CMAttitude}. However, it also shows that the compass can be biased by other magnetic fields. The outliers in the experiment with counter-clockwise direction led me to assume that another magnetic field biased the before measured magnetic field.
 
 That the compass reacts on other magnetic fields, than the earth's magnetic field can easily be shown by moving a small magnet around the phone. In contrast to the compass, the \texttt{CMAttitude} does not react to other magnetic fields, like the one of a magnet.
 
-According to the 40\,measurements depicted in figure~\ref{fig:eval:compass}, the compass's standard deviation $\sigma$ amounts to $3.1^{\circ}$. During the experiment the \texttt{CLHeading} components heading filter was set to $1.0^{\circ}$.
+According to the 40\,measurements depicted in Figure~\ref{fig:eval:compass}, the compass's standard deviation $\sigma$ amounts to $3.1^{\circ}$. During the experiment the \texttt{CLHeading} components heading filter was set to $1.0^{\circ}$.
 
 
 \begin{figure}[htbp]
 	\input{figures/sensorEval_Compass}
-	\caption{Shows the compass' magnetic heading error in degree. The measurements where taken by walking 10 times around a table. The initial measurement is being used as reference value. The heading filter was set to 1.0 degree.}
+	\caption{\texttt{CLHeading}'s, i.e.\ the compass' magnetic heading's drift. The test person walked 10 times around a small table in clockwise and counter-clockwise direction. The initial measurement is used as reference value. The heading filter was set to $1.0^{\circ}$. The measurements (lines colors) belong to the ones presented in Figure~\ref{fig:evalAttitude:xMagneticNorth} and \ref{fig:evalAttitude:referenceframes}.}
 	\label{fig:eval:compass}
 \end{figure}
 
 \subsection{Summary}
-As advertised, the solution explained in chapter~\ref{chap:pf}, is based on \ac{MCL}. Thus, motion tracking is required, which seems to be feasible by combining \ac{CM}'s distance estimation and \ac{CL} heading. If the \texttt{CLHeading} is heavily influenced by other materials, like iron bars, it could probably be reasonable to also integrate the discussed heading based on \ac{CM}'s attitude. But, due to its huge drift problem, only the change in heading, i.e.\ the rotation rate, can be used.
+As advertised, the solution explained in Chapter~\ref{chap:pf}, is based on \ac{MCL}. Thus, motion tracking is required, which seems to be feasible by combining \ac{CM}'s distance estimation and \ac{CL} heading. If the \texttt{CLHeading} is heavily influenced by other materials, like iron bars, it could probably be reasonable to also integrate the discussed heading based on \ac{CM}'s attitude. But, due to its huge drift problem, only the change in heading, i.e.\ the rotation rate, can be used.
 
 Furthermore, \ac{CM}'s motion activity classification seems to be useless for later presented solution due to its huge latency.

@@ -2,7 +2,7 @@
     \begin{axis}[trim axis left, trim axis right, width=0.9\textwidth, height=0.4\textheight,
         xlabel={Distance / Mean $\mu$ (m)},
         ylabel={Standard deviation $\sigma$ (m)},
-        legend entries={in hand, $f(\mu)=0.0971 \cdot \mu + 1.445$, in pocket, $f(\mu)=0.1971 \cdot \mu + 2.8703$},
+        legend entries={in hand, $f(\mu)=0.0971 \cdot \mu + 1.445$, in trouser pocket, $f(\mu)=0.1971 \cdot \mu + 2.8703$},
         legend pos=north west,
       grid = major]
       \addplot [blue, mark=*] table[col sep=semicolon, x=mu_distanceRef, y=sigma_distanceRef] {csv/2014-10-28_htwg_keller_f/inHand_ndf_parameters.csv};
