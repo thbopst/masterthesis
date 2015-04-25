@@ -20,7 +20,7 @@ Modern smartphones usually include a three-axis gyroscope to measure the rotatio
 
 
 \paragraph{Barometer}
-Some of the latest smartphones also include a barometer to measure air pressure. It is measured in $kilo pascals$. Thus, the relative change in altitude can be calculated. The barometer can be used for hiking apps, to determine the change in altitude for example \cite{apple:ios_doc_cm}.
+Some of the latest smartphones also include a barometer to measure air pressure. It is measured in $kilo pascals$. Thus, the relative change in altitude can be calculated. The barometer can be used for hiking apps, to determine the change in altitude for example \citep{apple:ios_doc_cm}.
 
 
 \section{\acsp{API} --- iOS\,8.1}
@@ -32,7 +32,7 @@ With the iPhone\,5S Apple introduced in 2013 a motion coprocessor, called M7. Th
 
 \ac{CM} implements algorithms to filter and combine the input of multiple sensors. Thus, the \acsp{API} can provide more accurate results for values such as the device's attitude. Together with the motion coprocessor it can offer more convenient interfaces to developers with already processed data, such as step counting and motion activity classification \citep{apple:wwdc_2014_pham}.
 
-Earlier iPhones used their processor to gather and process sensor data, which is very energy consuming and inefficient, because it eats up a lot of \acs{CPU} time. According to \citet{apple:wwdc_2012_pham}, one of Apple's \ac{CM} engineers, the motion coprocessor is very energy efficient. He mentions, that the energy consumption of 24\,hours motion processing, e.g.\ motion activity classification, or the pedometer, is equal to a three minute FaceTime\footnote{FaceTime is Apple's video telephony application.} call.
+Earlier iPhones used their \acs{CPU} to gather and process sensor data, which is very energy consuming and inefficient, because it eats up a lot of \acs{CPU} time. According to \citet{apple:wwdc_2012_pham}, one of Apple's \ac{CM} engineers, the motion coprocessor is very energy efficient. He mentions, that the energy consumption of 24\,hours motion processing, e.g.\ motion activity classification, or the pedometer, is equal to a three minute FaceTime\footnote{FaceTime is Apple's video telephony application.} call.
 
 Motion awareness gives applications the possibility to query the user's motion data for the past seven days.
 
@@ -50,7 +50,7 @@ Apple's \texttt{CMMotionActivityManager}, which is part of the \ac{CM} framework
 
 As mentioned before, the \ac{CM} framework's MotionActivity \acsp{API} provides a push interface to receive motion activity changes, and a pull interface to query historical data between two dates. Both \acsp{API} are reporting every single change in motion activity, that was detected.
 
-Table~\ref{tab:motionActivityScenarios} shows an overview of the different motion activities and illustrates some example scenarios. The states \texttt{walking}, \texttt{running}, \texttt{automotive}, \texttt{cycling}, and \texttt{unknown} are mutually exclusive motion activity types; whereas, \texttt{stationary} is not mutually exclusive to the other types.
+Table~\ref{tab:motionActivityScenarios} shows an overview of the different motion activities and illustrates some example scenarios. The states \texttt{walking}, \texttt{running}, \texttt{automotive}, \texttt{cycling}, and \texttt{unknown} are mutually exclusive motion activity types, whereas \texttt{stationary} is not mutually exclusive to the other types.
 
 \begin{table}
 	\input{tables/motionActivityScenarios}
@@ -59,32 +59,32 @@ Table~\ref{tab:motionActivityScenarios} shows an overview of the different motio
 \end{table}
 
 
-Thus,
+\noindent Thus,
 \begin{itemize}
   \item a device lying \textbf{on a table} does not move; hence, it is stationary.
   \item a \textbf{person checking email}  usually does not hold its smartphone completely steady.
   \item a \textbf{person walking} can be detected across body location.
   \item in a \textbf{moving vehicle} the state is automotive.
-  \item the motion activity type of a device \textbf{in an idling vehicle}, e.g.\ in front of a stop sign, is stationary and at the same time automotive. Thus, the device needs to be mounted in car.
+  \item in an \textbf{idling vehicle}, e.g.\ in front of a stop sign, the state is stationary and automotive at the same time. The device needs to be mounted in car.
 
   \item immediate after a \textbf{reboot} the device's state is unknown because it first needs to collect some data to determine its real state.
 \end{itemize}
 
-\noindent As mentioned by \citet{apple:wwdc_2014_pham}, the \texttt{CMMotionActivityManager} has some latency depending on the activity and its location. For example, if a person is walking and holds the device in hand, it takes around 5\,--\,10\,s to detect walking. If it is carried in a pocket it takes only around 3\,--\,5\,s. To detect walking takes relatively long compared to the running state. Only a couple of steps are needed. According to \citet{apple:wwdc_2014_pham} one reason is that they can assume, that running persons does not check their emails or Facebook messages at the same time. If the phone is mounted in a car, the driving state can also be detected very fast. They also mention that the cycling state is very difficult to detect.
+\noindent As mentioned by \citet{apple:wwdc_2014_pham}, the \texttt{CMMotionActivityManager} has some latency depending on the activity and its location. For example, if a person is walking and holds the device in hand, it takes $\approx$\,5\,--\,10\,s to detect walking. If it is carried in a pocket it takes only $\approx$\,3\,--\,5\,s. To detect walking takes relatively long compared to the running state. Running can be detected within a couple of steps. According to \citet{apple:wwdc_2014_pham} one reason is that they can assume, that running persons does not check their emails or Facebook messages at the same time. If the smartphone is mounted in a car, the driving state can also be detected very fast. They also mention that the cycling state is very difficult to detect.
 
 Another important point is the accuracy across body location. They point out, that the average accuracy across body location is always the same.
 
-Every \texttt{CMMotionActivity} object which is reported to the application includes a \texttt{confidence} property. Confidence is measured at three different levels: low, medium, and high. Thus, the more confident the \texttt{CMMotionActivityManager} is about a motion activity state the higher the confidence value. Usually, it increases over time if the activity type does not change \citep{apple:wwdc_2014_pham,apple:ios_doc_cm}.
+Every \texttt{CMMotionActivity} object which is reported to the application includes a \texttt{confidence} property. Confidence is measured at three different levels: \texttt{low\,=\,0}, \texttt{medium\,=\,1}, and \texttt{high\,=\,2}. Thus, the more confident the \texttt{CMMotionActivityManager} is about a motion activity state the higher the confidence value. Usually, it increases over time if the activity type does not change \citep{apple:wwdc_2014_pham,apple:ios_doc_cm}.
 
 
 \subsection{Pedometer}
 \begin{table}
 	\input{tables/pedometerExampleData}
-	\caption{Recorded pedometer example data with additional timestamp. Remark: To simplify the table, relative values for timestamp, startDate and endDate are being used instead of the absolute timestamps. Additionally all values, except the steps, are being truncated.}
+	\caption{Recorded pedometer example data with additional timestamp. Remark: To simplify the table, relative values for timestamp, startDate and endDate are used instead of the absolute timestamps. The \emph{timestamp} column is actually not part of the \texttt{CMPedometerData}. Additionally all values, except the steps, are truncated.}
 	\label{tab:pedometerExampleData}
 \end{table}
 
-The pedometer's \acs{API} also is a component of Apple's \acs{CM} framework. It provides the distance a person traveled over time in meters. The iPhone needs to be equipped with a motion coprocessor\footnote{Note: iPads with motion coprocessor do not provide step counting and distance estimation.}. The motion coprocessor processes the accelerometer's data to count a person's steps and to estimate the person's stride length. The stride estimation adapts over time. Thus, the more often the pedometer is used the better the accuracy \citep{apple:wwdc_2014_pham}. According to \citet{apple:wwdc_2014_pham}, the pedometer has a consistent performance and accuracy across the phone's body location.
+The pedometer's \acs{API} is a component of Apple's \acs{CM} framework. It provides the distance a person traveled over time in meters. The iPhone needs to be equipped with a motion coprocessor\footnote{Note: iPads with motion coprocessor do not provide step counting and distance estimation.}. The motion coprocessor processes the accelerometer's data to count a person's steps and to estimate the person's stride length. The stride estimation adapts over time. Thus, the more often the pedometer is used the better the accuracy \citep{apple:wwdc_2014_pham}. According to \citet{apple:wwdc_2014_pham}, the pedometer has a consistent performance and accuracy across the phone's body location.
 
 As mentioned before, there are two different interfaces to request the pedometer data. Via the pull interface the application can ask the pedometer component for the distance a person traveled by passing a start and end date. The second possibility is the push interface. With it the application can register a callback function to receive updates while the person is walking. If the user is walking or running the function is called every $\approx$\,2.5\,s, assuming the motion processor detects the taken steps. If it does not detect steps the handler is not called. The received steps and distances are the cumulative step count and distance since the start date, which is for all successive \texttt{CMPedometerData} objects the same \citep{apple:wwdc_2014_pham}.
 
@@ -127,13 +127,13 @@ As mentioned before, the iPhone contains a magnetometer, which is good for headi
   \item \textbf{magnetic field}, with removed disturbances
 \end{itemize}
 
-\noindent The mentioned values are all by-products of the device's attitude calculation.
+\noindent The mentioned values are all by-products of the device's attitude calculation \citep{apple:wwdc_2012_pham,apple:ios_doc_cm}.
 
 \paragraph{Attitude} The device's attitude is provided in three different mathematical forms, Euler angles, Quaternions, and as rotation matrix.
 
-To start receiving the device's \texttt{attitude} via the \texttt{CMDeviceMotionManager}, a reference frame needs to be specified. Figure~\ref{fig:iphone_cs} shows the iPhones local coordinate system, which is important to know, to understand the differences between the four possible reference frames. The four \texttt{CMAttitudeReferenceFrame}s, illustrated in Figure~\ref{fig:cm_referenceframes} have the vertical z-axis aligned with the gravity in common. According to \citet{apple:wwdc_2014_pham}, the specified reference frame also specifies the type of sensor fusion. The following reference frames exist \citep{apple:wwdc_2014_pham,apple:ios_doc_cm}:
+To start receiving the device's \texttt{attitude} via the \texttt{CMDeviceMotionManager}, a reference frame needs to be specified. Figure~\ref{fig:iphone_cs} shows the iPhones local coordinate system, which is important to know, to understand the differences between the four possible reference frames. The four \texttt{CMAttitudeReferenceFrame}s, illustrated in Figure~\ref{fig:cm_referenceframes} have the vertical z-axis aligned with the gravity in common. According to \citet{apple:wwdc_2012_pham}, the specified reference frame also specifies the type of sensor fusion. The following reference frames exist \citep{apple:wwdc_2012_pham,apple:ios_doc_cm}:
 \begin{itemize}
-  \item \textbf{XArbitrary} (Figure~\ref{fig:cm_referenceframes_xArbitrary}): The x and y axis are unspecified. The initial position fixes the x and y orientation. There is no correction of the heading; it drifts over time.
+  \item \textbf{XArbitrary} (Figure~\ref{fig:cm_referenceframes_xArbitrary}): The x- and y-axis are unspecified. The initial position fixes the x and y orientation. There is no correction of the heading; it drifts over time.
   \item \textbf{XArbitraryCorrected} (Figure~\ref{fig:cm_referenceframes_xArbitraryCorrected}): The x- and y-axis are unspecified. The initial pose fixes the x- and y-orientation. Additionally, the magnetometer is used to correct heading and to improve yaw accuracy over time.
   \item \textbf{XMagneticNorth} (Figure~\ref{fig:cm_referenceframes_xMagneticNorth}): The x-axis is absolutely tagged to magnetic north. It uses the compass for orientation.
   \item \textbf{xTrueNorth} (Figure~\ref{fig:cm_referenceframes_xTrueNorth}): The x-axis is absolutely tagged to true north\footnote{The earth's magnetic field moves. Thus, true and magnetic north are not the same. Maps are oriented towards true north.}. It uses the compass to determine true north.
@@ -142,7 +142,7 @@ To start receiving the device's \texttt{attitude} via the \texttt{CMDeviceMotion
 
 
 \subsection{Compass}
-The compass is part of the \ac{CL} framework. It provides the device's \emph{magnetic heading} and also its \emph{true north heading} in degrees. The heading depends on the specified device orientation, such as portrait, landscape left, or landscape right mode \citep{apple:ios_doc_cl}. According to \citet{apple:wwdc_2012_pham}, the compass uses sensor fusion and not only the magnetometer.
+The compass is part of the \ac{CL} framework. It provides the device's \emph{magnetic heading} and also its \emph{true heading} in degrees. The heading depends on the specified device orientation, such as portrait, landscape left, or landscape right mode \citep{apple:ios_doc_cl}. According to \citet{apple:wwdc_2012_pham}, the compass uses sensor fusion and not only the magnetometer.
 
 To access the device's heading, the \texttt{CLLocationManager} must be configured. It informs the application when the heading changes. The developer can specify a heading filter. Thus, a new heading is only reported, if the heading filter is exceeded \citep{apple:ios_doc_cl}.
 
@@ -154,11 +154,11 @@ The purpose of this section is to find out if the above referenced sensors and \
 
 
 \subsection{MotionActivity}
-As mentioned above, the the purpose of the \texttt{CMMotionActivity} component is to detect and classify a user's activity. To prove the statement concerning the recognition duration of the walking state made by Apple's engineer \citet{apple:wwdc_2014_pham} some test walks were performed. The results of the experiment show, that the claim of a recognition time of 10\,--\,15\,s for the walking state is very optimistic. Table~\ref{tab:motionActivityEvaluation} shows the beginning of one of these test walks.
+As mentioned above, the purpose of the \texttt{CMMotionActivity} component is to detect and classify a user's activity. To prove the statement concerning the recognition duration of the walking state made by Apple's engineer \citet{apple:wwdc_2014_pham} some test walks were performed. The results of the experiment show, that the claim of a recognition time of 10\,--\,15\,s for the walking state is very optimistic. Table~\ref{tab:motionActivityEvaluation} shows the beginning of one of these test walks.
 
-From the start, the test user walked with constant speed and with the phone in hand. It shows that the component recognize when the device was moving (not stationary) even before the application started (Table~\ref{tab:motionActivityEvaluation}, Line 1). In reality, the application was started before starting to walk, but \emph{not stationary} means that the user just somehow moves the device. After $\approx$\,10.7\,s the component increases its confidence for the current state (Table~\ref{tab:motionActivityEvaluation}, Line 2). Another $\approx$5\,s later it set the confidence to \emph{high} (Table~\ref{tab:motionActivityEvaluation}, Line 3); thus, the component is very confident that the user somehow moves the device. After $\approx$\,25\,s of walking the component finally detects with medium confidence, that the user actually walks (Table~\ref{tab:motionActivityEvaluation}, Line 4).
+From the start, the test user walked with constant speed and with the phone in hand. It shows that the component recognize when the device was moving (not stationary) even before the application started (Table~\ref{tab:motionActivityEvaluation}, Line 1). In reality, the application was started before starting to walk, but \emph{not stationary} means that the user just somehow moves the device. After $\approx$\,10.7\,s the component increases its confidence for the current state (Table~\ref{tab:motionActivityEvaluation}, Line 2). Another $\approx$\,5\,s later it set the confidence to \texttt{high} (Table~\ref{tab:motionActivityEvaluation}, Line 3); thus, the component is very confident that the user somehow moves the device. After $\approx$\,25\,s of walking the component finally detects with \texttt{low} confidence, that the user actually walks (Table~\ref{tab:motionActivityEvaluation}, Line 4).
 
-Compared to detecting the users walking state, it detects nearly in real-time, that the user stops walking after $\approx$\,32\, (Table~\ref{tab:motionActivityEvaluation}, Line 5). At this point in time the user holds the device very steady because the component only switches between stationary and not stationary, in a very short time period (Table~\ref{tab:motionActivityEvaluation}, Line 5\,--\,7).
+Compared to detecting the users walking state, it detects nearly in real-time, that the user stops walking after $\approx$\,32\, (Table~\ref{tab:motionActivityEvaluation}, Line 5). At this point in time the user holds the device very steady. The component only switches between stationary and not stationary, in a very short time period (Table~\ref{tab:motionActivityEvaluation}, Line 5\,--\,7).
 
 This experiment shows that the user needs to actually walk a very long distance until the phone recognizes that the user is walking. It also shows that the user has to hold the device very steady until the device claims that the device is stationary. Consequently, \ac{CM}'s \texttt{CMMotionActivity} cannot really be used to determine a user's walking state for short distances. Also the stationary state cannot be used to claim that the user is not walking due to the high sensibility.
 
@@ -170,11 +170,11 @@ This experiment shows that the user needs to actually walk a very long distance 
 
 
 \subsection{Pedometer}
-To evaluate the accuracy of \ac{CM}'s \texttt{CMPedometer} component, test walks of different distances  were performed, to compare the actual distance and step count with the measured values. Due to the fact that users usually carry their smartphone in their trouser pockets or hold it in their hand, the experiment was performed for both positions. Figure~\ref{fig:eval:pedometerHand} shows the measured distances and the corresponding step counts for different distances with the phone in hand. The results of the same experiment with the phone in the trousers pocket are shown in Figure~\ref{fig:eval:pedometerPocket}.
+To evaluate the accuracy of \ac{CM}'s \texttt{CMPedometer} component, test walks of different distances  were performed, to compare the actual distance and step count with the measured values. Due to the fact that users usually carry their smartphone in their trouser pockets or hold it in their hand, the experiment was performed for both positions. Figure~\ref{fig:eval:pedometerHand} shows the measured distances and the corresponding step counts for different distances with the phone in hand. The results of the same experiment with the phone in the trouser pocket are shown in Figure~\ref{fig:eval:pedometerPocket}.
 
 The experiments visualization shows the measurements dispersion. Sometimes, the \texttt{CMPedometer} overestimates or underestimates the distance, i.e.\ the step count. The experiment also shows, that the phone on average underestimates the values, if the user holds the device in hand. If the user walks with the phone in the trouser pocket the device also underestimates the measured distances; whereas, the measured step counts are more precise.
 
-Figure~\ref{fig:eval:pedometerNDF} depicts the \texttt{CMPedometer}'s standard deviation $\sigma$ depending on the distance and phone's position. To model the uncertainty for any walked distance, depending on the phones position, linear regression based on the measurements was used. Initially, I expected a higher accuracy of the estimated distance if the user carries the phone in the trouser pocket, but the diagram prooves the opposite. Consequently, $\sigma$ is significantly smaller if the user holds the phone in hand.
+Figure~\ref{fig:eval:pedometerNDF} depicts the \texttt{CMPedometer}'s standard deviation $\sigma$ depending on the distance and phone's position. To model the uncertainty for any walked distance, depending on the smartphone's position, linear regression based on the measurements was used. Initially, I expected a higher accuracy of the estimated distance if the user carries the phone in the trouser pocket, but the diagram prooves the opposite. Consequently, $\sigma$ is significantly smaller if the user holds the phone in hand.
 
 % CMPedometer (step count, distance)  dispersion plots
 \begin{figure}[p]
@@ -189,7 +189,7 @@ Figure~\ref{fig:eval:pedometerNDF} depicts the \texttt{CMPedometer}'s standard d
   \label{fig:eval:pedometerPocket}
 \end{figure}
 
-Besides the pedometer's accuracy also the duration until the component detects that the user is walking and thus delivers the first distance estimation was evaluated. The \texttt{CMPedometer} component on average needs 5\,--\,10\,s to deliver the first estimation, which is also consistent with a statement made by \citet{apple:wwdc_2014_pham}. The first estimation typically contains a step count of 6\,--\,8\,s. Once it detects that the user is walking, it continuously delivers updates every $\approx$\,2.5\,s.
+Besides the pedometer's accuracy also the duration until the component detects that the user is walking and thus delivers the first distance estimation was evaluated. The \texttt{CMPedometer} component on average needs 5\,--\,10\,s to deliver the first estimation, which is also consistent with a statement made by \citet{apple:wwdc_2014_pham}. The first estimation typically contains a step count of 6\,--\,8. Once it detects that the user is walking, it continuously delivers updates every $\approx$\,2.5\,s.
 
 Another interesting value is the time it takes the pedometer to recognize that the user continues walking after a short break of $\approx$\,10\,--\,15\,s. Against my expectation, it takes approximately the same amount of time and also the same amount of steps as the component requires to recognize it the first time. This behavior is depicted in Table~\ref{tab:pedometerEvaluation}. First it shows the amount of time and steps it took the component to recognize that the user is walking (Table~\ref{tab:pedometerEvaluation}, Line 1). After 50\,steps the user took a short break of around 15\,s (Table~\ref{tab:pedometerEvaluation}, Line 5). Furthermore it shows that the component requires 6\,steps to recognize that the user continued walking (Table~\ref{tab:pedometerEvaluation}, Line 7). The third data block shows another break that the user made during the test walk (Table~\ref{tab:pedometerEvaluation}, Line 9\,--\,11).
 
@@ -207,7 +207,7 @@ Another interesting value is the time it takes the pedometer to recognize that t
 
 
 \subsection{Heading}
-As mentioned earlier, the localization algorithm, introduced in Chapter~\ref{chap:pf}, needs heading for the motion tracking to determine in which direction the user is moving. To get the devices' heading, either the \texttt{CMAttitude} provided by \ac{CM}, or the \texttt{CLHeading} provided by \ac{CL} can be used. In this section first the \texttt{CMAttitude}'s data is evaluated and afterwards the data provided by \texttt{CLHeading}.
+As mentioned earlier, the solution's localization algorithm, introduced in Chapter~\ref{chap:pf}, needs heading for the motion tracking to determine in which direction the user is moving. To get the devices' heading, either the \texttt{CMAttitude} provided by \ac{CM}, or the \texttt{CLHeading} provided by \ac{CL} can be used. In this section first the \texttt{CMAttitude}'s data is evaluated and afterwards the data provided by \texttt{CLHeading}.
 
 \subsubsection*{CMAttitude}
 As mentioned before, the \texttt{CMAttitude} data is provided as Euler angles, Quaternions and as rotation matrix. To be able to compare attitude with compass heading, it is of advantage to transform the attitude into a heading in compass degrees. This means, if the device top is pointing towards magnetic north, the heading $\theta = 0^{\circ}$, east $\theta = 90^{\circ}$, south $\theta = 180^{\circ}$, and west $\theta = 270^{\circ}$. Equation\,\ref{eq:rotationmatrix} shows the 3-dimensional rotation matrix provided by \texttt{CMAttitude} as specified in the \ac{CM}'s documentation \citep{apple:ios_doc_cm}. The calculation of $\theta$ in compass degrees, where $m_{1,2}$ and $m_{2,2}$ describe the transformation of the phone's y-axis by the rotation around its z-axis, is shown in Equation\,\ref{eq:rotation2heading}.
@@ -248,7 +248,7 @@ As mentioned before, the \texttt{CMAttitude} data is provided as Euler angles, Q
 The most important requirement for heading is long-term accuracy. To test this, the test person walked 10\,times around a small table in the same direction and recorded the heading after each round. To record the heading after each round the device was put on the table at the exact same position. Thus, the heading should be roughly the same after each round. Figure~\ref{fig:evalAttitude:xMagneticNorth} illustrates the error of each measurement compared to the initial measurement. First, the test person walked counter-clockwise around the table. An enormous drift of $\approx 30^{\circ}$ after each round was observed. This sums up to a total drift of $\approx 300^{\circ}$ after 10 rounds. To confirm this, the person walked also clockwise around the table and observed the same amount of drift in the opposite direction. Apple's engineer, \citet{apple:wwdc_2012_pham}, explicitly mentioned that the magnetometer is used to provide long-term yaw accuracy, if the \texttt{xArbitraryCorrected} reference frame is specified. Thus, the same test was repeated for the \texttt{xArbitrary} and the \texttt{xArbitraryCorrected} reference frame. Then the results were compared with the results from before, shown in Figure~\ref{fig:evalAttitude:referenceframes}. There is nearly no difference in long-term accuracy between the three tested reference frames.
 
 \subsubsection*{CLHeading}
-During the experiment the compass's \texttt{CLHeading} values were recorded as well. Figure~\ref{fig:eval:compass} shows the heading's error over time. The values were measured together with the values of Figure~\ref{fig:evalAttitude:xMagneticNorth} and \ref{fig:evalAttitude:referenceframes}. The chart shows no drift over time compared to the data measured by \texttt{CMAttitude}. However, it also shows that the compass can be biased by other magnetic fields. The outliers in the experiment with counter-clockwise direction led me to assume that another magnetic field biased the before measured magnetic field.
+During the before mentioned experiment, shown in Figure~\ref{fig:evalAttitude:xMagneticNorth} and \ref{fig:evalAttitude:referenceframes}, the compass, i.e.\ \texttt{CLHeading}, values were recorded as well. Figure~\ref{fig:eval:compass} shows the heading's error over time. The chart shows no drift over time compared to the data measured by \texttt{CMAttitude}. However, it also shows that the compass can be biased by other magnetic fields. The outliers in the experiment with counter-clockwise direction led me to assume that another magnetic field biased the before measured magnetic field.
 
 That the compass reacts on other magnetic fields, than the earth's magnetic field can easily be shown by moving a small magnet around the phone. In contrast to the compass, the \texttt{CMAttitude} does not react to other magnetic fields, like the one of a magnet.
 
@@ -264,4 +264,4 @@ According to the 40\,measurements depicted in Figure~\ref{fig:eval:compass}, the
 \subsection{Summary}
 As advertised, the solution explained in Chapter~\ref{chap:pf}, is based on \ac{MCL}. Thus, motion tracking is required, which seems to be feasible by combining \ac{CM}'s distance estimation and \ac{CL} heading. If the \texttt{CLHeading} is heavily influenced by other materials, like iron bars, it could probably be reasonable to also integrate the discussed heading based on \ac{CM}'s attitude. But, due to its huge drift problem, only the change in heading, i.e.\ the rotation rate, can be used.
 
-Furthermore, \ac{CM}'s motion activity classification seems to be useless for later presented solution due to its huge latency.
+Furthermore, \ac{CM}'s motion activity classification seems to be useless for the later presented solution due to its huge latency.
