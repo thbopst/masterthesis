@@ -13,7 +13,7 @@ filter($\chi_{t-1}$, $z_t$, map) {
   $\bar{\chi}_t = \emptyset$
 
   if size of weightSum == 3 && avg.\ weightSums < 1.0 {
-    add $0.2\%$ additional random particles to $\chi_{t-1}$
+    add 20% additional random particles to $\chi_{t-1}$
   }
 
   // importance factoring
@@ -28,10 +28,11 @@ filter($\chi_{t-1}$, $z_t$, map) {
   }
 
   if weightSum > 0 {
-    override oldest value in weightSum with (weightSums/particleSetSize)
+    override oldest value in weightSums with (weightSums/particleSetSize)
   } else {
     $\chi_t$ = generate new random particle set
     clear weightSums
   }
   return $\chi_t$
-}return\end{lstlisting}
+}
+\end{lstlisting}

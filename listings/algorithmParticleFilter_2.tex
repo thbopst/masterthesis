@@ -9,14 +9,14 @@ PART_2($\chi_{t-1}$) {
 
   $\bar{\chi}_t = \chi_{t-1}$
 
-  // integrate residual motions, filter just with map
+  // integrate remaining motions and filter with map
   while u_buffer isNotEmpty {
     $u$ = u_buffer.first
     $z = \emptyset$
     $\bar{\chi}_t$ = integrateMotion($\bar{\chi}_t$, $u$)
      u_buffer.remove($u$)
 
-     // filter without measurements, just with map
+     // empty measurements
      $\bar{\chi}_t$ = filter($\bar{\chi}_t$, $z$, map)
   }
 
