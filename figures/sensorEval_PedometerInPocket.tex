@@ -5,6 +5,7 @@
     ylabel={Estimated Distance (m)},
     legend entries={measurement, average},
     legend pos=south east,
+    xtick={10,20,30},
     grid = major]
       \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
   \addplot [red, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=distance] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};
@@ -20,6 +21,7 @@
     ylabel={Estimated Step Count},
     legend entries={measurement, average, ref.\ step count},
     legend pos=south east,
+    xtick={10,20,30},
     grid = major]
       \addplot [red, only marks, mark=x] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket.csv};
   \addplot [red, only marks, mark=triangle*, mark size=3pt] table[col sep=semicolon, x=distanceRef, y=steps] {csv/2014-10-28_htwg_keller_f/inPocket_avg.csv};

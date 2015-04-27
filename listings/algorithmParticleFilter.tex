@@ -6,9 +6,9 @@
   caption={Shows the \acl{PF}'s implementation and the used instance variables. To reduce complexity the code is divided into three parts, shown in Listing~\ref{lst:algorithmParticleFilter_1}, \ref{lst:algorithmParticleFilter_2} and \ref{lst:algorithmParticleFilter_3}.},
   label=lst:algorithmParticleFilter]
 // instance variables
-u_buffer // list of not jet integrated motions $u_t$
+u_buffer // list of not yet integrated motions $u_t$
 $u_\text{latest}$ // stores the latest motion
-z_buffer // list of not jet integrated measurements $z^{[k]}_t$
+z_buffer // list of not yet integrated measurements $z^{[k]}_t$
 map // occupancy grid and landmarks
 
 particleFilter($\chi_{t-1}$) {
